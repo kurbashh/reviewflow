@@ -1,0 +1,22 @@
+# === ФРОНТЕНД (Next.js / Vite / React) ===
+**/frontend/node_modules/
+**/frontend/dist/
+**/frontend/.next/
+**/frontend/.cursorrules
+*.tsbuildinfo
+
+# === БЭКЕНД (Python / FastAPI) ===
+**/backend/__pycache__/
+**/backend/.pytest_cache/
+**/backend/.venv/
+**/backend/env/
+*.pyc
+
+# === СИСТЕМНЫЕ ФАЙЛЫ И ЛОГИ ===
+.vscode/
+.cursor/
+.DS_Store
+Thumbs.db
+*.log
+.env
+.env.*
