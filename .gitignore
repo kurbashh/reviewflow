@@ -11,6 +11,8 @@
 **/backend/.venv/
 **/backend/env/
 *.pyc
+*.pyo
+*.pyd
 
 # === СИСТЕМНЫЕ ФАЙЛЫ И ЛОГИ ===
 .vscode/
