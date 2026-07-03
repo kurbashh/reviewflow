@@ -1,0 +1,95 @@
+# docker-compose.yml
+#
+# `version:` ключ намеренно не используется — устарел в Compose V2,
+# современный Docker Compose (Hetzner VPS: docker compose plugin) его игнорирует.
+#
+# Все 4 сервиса поднимаются одной командой на Hetzner VPS (CX22):
+#   docker compose up -d --build
+#
+# Перед api/worker/beat снаружи стоит Caddy/Nginx (см. ТЗ, Deploy-шаги) —
+# он не входит в этот compose-файл и настраивается на хосте отдельно,
+# т.к. также обслуживает Next.js-статику и HTTPS через Let's Encrypt.
+
+services:
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    # append-only persistence — чтобы очередь Celery не терялась при
+    # обычном restart контейнера (не при полном удалении volume).
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - reviewflow
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      # Внутри docker-сети сервисы обращаются друг к другу по имени сервиса,
+      # а не localhost — переопределяем REDIS_URL из .env на всякий случай,
+      # чтобы .env для локальной разработки (localhost) не сломал прод-сеть.
+      REDIS_URL: redis://redis:6379/0
+    ports:
+      - "8000:8000"
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - reviewflow
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    command: ["celery", "-A", "app.tasks.celery_app", "worker", "--loglevel=info", "--concurrency=2"]
+    env_file:
+      - .env
+    environment:
+      REDIS_URL: redis://redis:6379/0
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - reviewflow
+
+  beat:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    # Отдельный volume под schedule-файл: celery beat хранит время последнего
+    # запуска каждой периодической задачи в файле на диске. Без persistent
+    # volume при пересоздании контейнера beat забудет историю и может
+    # задвоить суточную проверку биллинга сразу после рестарта.
+    command: ["celery", "-A", "app.tasks.celery_app", "beat", "--loglevel=info",
+               "--schedule=/var/lib/celery/celerybeat-schedule"]
+    env_file:
+      - .env
+    environment:
+      REDIS_URL: redis://redis:6379/0
+    volumes:
+      - celery_beat_data:/var/lib/celery
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - reviewflow
+
+volumes:
+  redis_data:
+  celery_beat_data:
+
+networks:
+  reviewflow:
+    driver: bridge
