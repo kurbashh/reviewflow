@@ -1,24 +1,51 @@
-# === ФРОНТЕНД (Next.js / Vite / React) ===
+# === Python / FastAPI (backend) ===
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+ENV/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+.eggs/
+htmlcov/
+.coverage
+.coverage.*
+
+# Alembic (миграции коммитим, но не кэш/локальные версии)
+**/alembic/__pycache__/
+
+# === Frontend (Vite / React / TS) ===
 **/frontend/node_modules/
 **/frontend/dist/
-**/frontend/.next/
-**/frontend/.cursorrules
+**/frontend/dist-ssr/
+**/frontend/.vite/
 *.tsbuildinfo
 
-# === БЭКЕНД (Python / FastAPI) ===
-**/backend/__pycache__/
-**/backend/.pytest_cache/
-**/backend/.venv/
-**/backend/env/
-*.pyc
-*.pyo
-*.pyd
-
-# === СИСТЕМНЫЕ ФАЙЛЫ И ЛОГИ ===
-.vscode/
-.cursor/
-.DS_Store
-Thumbs.db
-*.log
+# === Env / секреты ===
 .env
 .env.*
+!.env.example
+
+# === Docker ===
+**/postgres_data/
+**/pgdata/
+*.pid
+
+# === IDE / редакторы ===
+.vscode/
+.idea/
+.cursor/
+**/.cursorrules
+
+# === OS ===
+.DS_Store
+Thumbs.db
+
+# === Логи ===
+*.log
+logs/
+npm-debug.log*
