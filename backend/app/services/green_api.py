@@ -40,6 +40,20 @@ def _to_chat_id(phone: str) -> str:
     return f"{digits}@c.us"
 
 
+def normalize_incoming_phone(sender: str) -> str:
+    """
+    Обратное преобразование: senderData.sender во входящем вебхуке Green API
+    приходит в формате "77001234567@c.us" (личка) или "...@g.us" (группа).
+    В БД (review_requests.client_phone) номер хранится без суффикса — только
+    цифры, как его прислала CRM/форма в /webhook/intake. Без этой нормализации
+    find_latest_pending_request никогда не находит совпадение, и вебхук
+    ответа клиента остаётся необработанным при каждом реальном ответе
+    (подтверждено вживую: сравнение "77001234567@c.us" == "77001234567"
+    всегда ложно).
+    """
+    return re.sub(r"\D", "", sender)
+
+
 def send_whatsapp_message(phone: str, text: str) -> dict:
     """
     Отправляет текстовое сообщение через Green API.

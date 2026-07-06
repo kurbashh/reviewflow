@@ -29,6 +29,7 @@ from app.services.crud import (
     is_opted_out,
     update_review_request,
 )
+from app.services.green_api import normalize_incoming_phone
 from app.tasks.send_review_request import send_review_request_task
 
 logger = logging.getLogger(__name__)
@@ -79,7 +80,7 @@ async def webhook_intake(payload: dict, session: AsyncSession = Depends(get_sess
 @router.post("/webhook/reply")
 async def webhook_reply(payload: dict, session: AsyncSession = Depends(get_session)):
     try:
-        sender_phone = payload["senderData"]["sender"]
+        sender_phone = normalize_incoming_phone(payload["senderData"]["sender"])
         text = payload["messageData"]["textMessageData"]["textMessage"].strip()
     except (KeyError, AttributeError):
         # Не текстовое сообщение (голосовое/картинка) или payload другого типа

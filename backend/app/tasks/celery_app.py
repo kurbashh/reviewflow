@@ -11,7 +11,6 @@ app/tasks/celery_app.py
 """
 
 from celery import Celery
-from celery.schedules import crontab
 
 from app.config import settings
 
@@ -58,9 +57,16 @@ celery_app.conf.update(
 # --------------------------------------------------------------------------
 # Celery Beat — периодические задачи (Этап 7 ТЗ: суточная проверка биллинга)
 # --------------------------------------------------------------------------
-celery_app.conf.beat_schedule = {
-    "check-overdue-subscriptions": {
-        "task": "app.tasks.billing_check.check_overdue",
-        "schedule": crontab(hour=3, minute=0),  # раз в сутки в 03:00 Asia/Almaty
-    },
-}
+# ВАЖНО: не регистрируем beat_schedule, пока app.tasks.billing_check.check_overdue
+# не реализован (сейчас billing_check.py — пустая заглушка, см. TODO там же).
+# Если включить schedule сейчас, celery beat каждый день в 03:00 будет пытаться
+# отправить задачу с именем, которого нет ни в одном @celery_app.task — воркер
+# залогирует "Received unregistered task" и молча ничего не сделает. Раскомментировать
+# и одновременно реализовать check_overdue как часть Этапа 7 (см. tasks/billing_check.py).
+#
+# celery_app.conf.beat_schedule = {
+#     "check-overdue-subscriptions": {
+#         "task": "app.tasks.billing_check.check_overdue",
+#         "schedule": crontab(hour=3, minute=0),  # раз в сутки в 03:00 Asia/Almaty
+#     },
+# }

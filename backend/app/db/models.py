@@ -16,6 +16,7 @@ import uuid
 from datetime import datetime
 
 from sqlalchemy import (
+    DateTime,
     Enum as SAEnum,
     ForeignKey,
     Integer,
@@ -28,6 +29,28 @@ from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
+
+
+def _pg_enum(enum_cls: type[enum.Enum], *, name: str, length: int) -> SAEnum:
+    """
+    Обёртка над SAEnum с обязательным values_callable.
+
+    БЕЗ values_callable SQLAlchemy по умолчанию хранит в БД .name члена enum
+    (например "LIGHT"), а не .value ("light"), даже если enum отнаследован
+    от str! Это расходится и с ТЗ (там статусы - "light"/"trial"/"pending"
+    строчными буквами), и с ожиданиями любого кода, который читает эти
+    колонки напрямую через SQL (дашборд, будущие CRM-репорты, ручные
+    запросы в Supabase Studio). Баг подтверждён вживую: без этой обёртки
+    INSERT/SELECT с методами вроде BusinessPlan.LIGHT падает с
+    LookupError: 'light' is not among the defined enum values.
+    """
+    return SAEnum(
+        enum_cls,
+        name=name,
+        native_enum=False,
+        length=length,
+        values_callable=lambda cls: [member.value for member in cls],
+    )
 
 
 # --------------------------------------------------------------------------
@@ -84,12 +107,12 @@ class Business(Base):
     phone: Mapped[str] = mapped_column(String(32), nullable=False)
 
     plan: Mapped[BusinessPlan] = mapped_column(
-        SAEnum(BusinessPlan, name="business_plan", native_enum=False, length=20),
+        _pg_enum(BusinessPlan, name="business_plan", length=20),
         default=BusinessPlan.LIGHT,
         nullable=False,
     )
     status: Mapped[BusinessStatus] = mapped_column(
-        SAEnum(BusinessStatus, name="business_status", native_enum=False, length=20),
+        _pg_enum(BusinessStatus, name="business_status", length=20),
         default=BusinessStatus.TRIAL,
         nullable=False,
     )
@@ -99,17 +122,17 @@ class Business(Base):
     telegram_chat_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
 
     crm_type: Mapped[CrmType | None] = mapped_column(
-        SAEnum(CrmType, name="crm_type", native_enum=False, length=20),
+        _pg_enum(CrmType, name="crm_type", length=20),
         nullable=True,
     )
     # Секрет для валидации входящих вебхуков конкретного бизнеса (см. core/security.py)
     crm_webhook_secret: Mapped[str] = mapped_column(String(128), nullable=False)
 
     created_at: Mapped[datetime] = mapped_column(
-        server_default=func.now(), nullable=False
+        DateTime(timezone=True), server_default=func.now(), nullable=False
     )
     updated_at: Mapped[datetime] = mapped_column(
-        server_default=func.now(), onupdate=func.now(), nullable=False
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
     )
 
     locations: Mapped[list["Location"]] = relationship(
@@ -152,7 +175,7 @@ class Location(Base):
     yandex_maps_url: Mapped[str | None] = mapped_column(String(512), nullable=True)
 
     created_at: Mapped[datetime] = mapped_column(
-        server_default=func.now(), nullable=False
+        DateTime(timezone=True), server_default=func.now(), nullable=False
     )
 
     business: Mapped["Business"] = relationship(back_populates="locations")
@@ -189,12 +212,7 @@ class ReviewRequest(Base):
     master_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
 
     status: Mapped[ReviewRequestStatus] = mapped_column(
-        SAEnum(
-            ReviewRequestStatus,
-            name="review_request_status",
-            native_enum=False,
-            length=20,
-        ),
+        _pg_enum(ReviewRequestStatus, name="review_request_status", length=20),
         default=ReviewRequestStatus.PENDING,
         nullable=False,
         index=True,
@@ -203,12 +221,17 @@ class ReviewRequest(Base):
     rating: Mapped[int | None] = mapped_column(Integer, nullable=True)
     generated_review: Mapped[str | None] = mapped_column(Text, nullable=True)
 
-    sent_at: Mapped[datetime | None] = mapped_column(nullable=True)
-    responded_at: Mapped[datetime | None] = mapped_column(nullable=True)
-    completed_at: Mapped[datetime | None] = mapped_column(nullable=True)
+    # DateTime(timezone=True) обязателен: весь код проекта (crud.py, тасках)
+    # пишет сюда timezone-aware datetime.now(timezone.utc). Без timezone=True
+    # колонка становится TIMESTAMP WITHOUT TIME ZONE, и asyncpg роняет запрос
+    # с DataError "can't subtract offset-naive and offset-aware datetimes"
+    # прямо в момент commit — подтверждено вживую на /webhook/reply.
+    sent_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    responded_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
     created_at: Mapped[datetime] = mapped_column(
-        server_default=func.now(), nullable=False
+        DateTime(timezone=True), server_default=func.now(), nullable=False
     )
 
     business: Mapped["Business"] = relationship(back_populates="review_requests")
@@ -241,16 +264,14 @@ class MessageLog(Base):
     )
 
     direction: Mapped[MessageDirection] = mapped_column(
-        SAEnum(
-            MessageDirection, name="message_direction", native_enum=False, length=10
-        ),
+        _pg_enum(MessageDirection, name="message_direction", length=10),
         nullable=False,
     )
     # Сырой payload от Green API (входящий вебхук) или отправленное тело сообщения
     payload: Mapped[dict] = mapped_column(JSONB, nullable=False)
 
     created_at: Mapped[datetime] = mapped_column(
-        server_default=func.now(), nullable=False
+        DateTime(timezone=True), server_default=func.now(), nullable=False
     )
 
     review_request: Mapped["ReviewRequest"] = relationship(back_populates="messages")
@@ -279,7 +300,7 @@ class OptedOutNumber(Base):
         ForeignKey("businesses.id", ondelete="CASCADE"), nullable=False
     )
     opted_out_at: Mapped[datetime] = mapped_column(
-        server_default=func.now(), nullable=False
+        DateTime(timezone=True), server_default=func.now(), nullable=False
     )
 
     business: Mapped["Business"] = relationship(back_populates="opted_out_numbers")
