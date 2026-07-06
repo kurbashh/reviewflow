@@ -21,9 +21,9 @@ from datetime import datetime, timezone
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 
-from app.db.models import Business, OptedOutNumber, ReviewRequest, ReviewRequestStatus
+from app.db.models import Business, Location, OptedOutNumber, ReviewRequest, ReviewRequestStatus
 
 # --------------------------------------------------------------------------
 # Async — для FastAPI (app/api/webhooks.py)
@@ -95,6 +95,49 @@ async def find_latest_pending_request(
     return result.scalar_one_or_none()
 
 
+async def find_latest_awaiting_feedback_request(
+    session: AsyncSession, client_phone: str
+) -> ReviewRequest | None:
+    """
+    Этап 3.2 ТЗ: находит запрос, для которого владельцу уже отправлен вопрос
+    "что не понравилось" (status=AWAITING_FEEDBACK) и мы ждём от клиента
+    свободный текст — в отличие от find_latest_pending_request, здесь ждём
+    не цифру-оценку, а произвольное сообщение.
+
+    Вызывается в /webhook/reply ПОСЛЕ того, как find_latest_pending_request
+    не нашёл активный запрос на оценку — т.е. это резервная ветка разбора
+    входящего сообщения (см. app/api/webhooks.py).
+    """
+    stmt = (
+        select(ReviewRequest)
+        .where(
+            ReviewRequest.client_phone == client_phone,
+            ReviewRequest.status == ReviewRequestStatus.AWAITING_FEEDBACK,
+        )
+        .order_by(ReviewRequest.responded_at.desc())
+        .limit(1)
+    )
+    result = await session.execute(stmt)
+    return result.scalar_one_or_none()
+
+
+async def get_location_by_slug(session: AsyncSession, slug: str) -> Location | None:
+    """
+    selectinload(Location.business) обязателен: app/api/redirect.py читает
+    location.business синхронным атрибутом (не через await) сразу после
+    вызова этой функции. Без явного eager load AsyncSession не может
+    неявно лениво подгрузить relationship вне await-контекста и падает
+    с MissingGreenlet при первом же обращении к .business.
+    """
+    stmt = (
+        select(Location)
+        .where(Location.redirect_slug == slug)
+        .options(selectinload(Location.business))
+    )
+    result = await session.execute(stmt)
+    return result.scalar_one_or_none()
+
+
 async def update_review_request(
     session: AsyncSession,
     request_id: uuid.UUID,
@@ -137,3 +180,8 @@ def update_status_sync(
         setattr(request, field, value)
     if status == ReviewRequestStatus.SENT:
         request.sent_at = datetime.now(timezone.utc)
+    elif status == ReviewRequestStatus.COMPLETED:
+        # Единая точка простановки completed_at — и для "лояльного" сценария
+        # (generate_review_task, Этап 3.1), и для перехваченного негатива
+        # (capture_negative.deliver_negative_feedback_task, Этап 3.2).
+        request.completed_at = datetime.now(timezone.utc)

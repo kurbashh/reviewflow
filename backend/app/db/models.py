@@ -81,7 +81,10 @@ class ReviewRequestStatus(str, enum.Enum):
     SENT = "sent"               # сообщение отправлено в WhatsApp
     RATED = "rated"              # клиент прислал оценку 1-5
     GENERATED = "generated"       # ИИ сгенерировал текст отзыва (промежуточный статус)
-    COMPLETED = "completed"        # цикл завершён (текст отправлен клиенту)
+    AWAITING_FEEDBACK = "awaiting_feedback"
+    # оценка 1-3: владельцу отправлен вопрос "что не понравилось", ждём
+    # свободный текст от клиента (см. Этап 3.2 ТЗ, app/tasks/capture_negative.py)
+    COMPLETED = "completed"        # цикл завершён (текст отправлен клиенту / негатив передан владельцу)
     OPTED_OUT = "opted_out"         # клиент в стоп-листе, запрос не отправлялся
 
 
@@ -220,6 +223,11 @@ class ReviewRequest(Base):
 
     rating: Mapped[int | None] = mapped_column(Integer, nullable=True)
     generated_review: Mapped[str | None] = mapped_column(Text, nullable=True)
+    # Свободный текст, который недовольный клиент (оценка 1-3) прислал в ответ
+    # на уточняющий вопрос ("что именно не понравилось") — Этап 3.2 ТЗ.
+    # Пересылается владельцу в Telegram (app/services/telegram_notify.py) и
+    # хранится здесь же для истории/дашборда (Этап 5).
+    owner_feedback: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     # DateTime(timezone=True) обязателен: весь код проекта (crud.py, тасках)
     # пишет сюда timezone-aware datetime.now(timezone.utc). Без timezone=True

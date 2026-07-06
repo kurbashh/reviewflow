@@ -117,11 +117,18 @@ class Settings(BaseSettings):
     # ------------------------------------------------------------------
     openai_api_key: str = Field(default="", description="Ключ OpenAI API")
     openai_model: str = Field(default="gpt-4o-mini")
+    openai_base_url: str | None = Field(
+        default=None,
+        description="Переопределение базового URL OpenAI-совместимого API "
+        "(например, self-hosted прокси или YandexGPT-шлюз с OpenAI-совместимым "
+        "интерфейсом). None — используется дефолтный эндпоинт OpenAI.",
+    )
 
     # ------------------------------------------------------------------
     # Telegram Bot API (уведомления о негативе)
     # ------------------------------------------------------------------
     telegram_bot_token: str = Field(default="")
+    telegram_api_base_url: str = Field(default="https://api.telegram.org")
 
     # ------------------------------------------------------------------
     # Kaspi Pay (биллинг подписки)
