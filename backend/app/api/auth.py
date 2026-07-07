@@ -103,15 +103,7 @@ async def register(payload: RegisterRequest, session: AsyncSession = Depends(get
         full_name=payload.full_name,
     )
     
-    # Автоматически создаем дефолтный бизнес для нового пользователя
-    default_business = Business(
-        owner=user,
-        name=f"Бизнес: {payload.full_name}",
-        phone="",
-    )
-    
     session.add(user)
-    session.add(default_business)
     await session.commit()
     await session.refresh(user)
 

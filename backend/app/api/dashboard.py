@@ -8,7 +8,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.session import get_session
 from app.services import crud
-from app.db.models import BusinessPlan, BusinessStatus, CrmType
+from app.db.models import BusinessPlan, BusinessStatus, CrmType, User, Business
+from app.core.jwt import get_current_user
 
 router = APIRouter()
 
@@ -59,6 +60,14 @@ class LocationCreate(BaseModel):
     gis_2gis_url: str | None = Field(None, max_length=512)
     yandex_maps_url: str | None = Field(None, max_length=512)
 
+class OnboardingRequest(BaseModel):
+    name: str = Field(..., min_length=1, max_length=255)
+    phone: str = Field(..., max_length=32)
+
+class OnboardingResponse(BaseModel):
+    business_id: uuid.UUID
+    message: str
+
 class LocationUpdate(BaseModel):
     name: str = Field(..., min_length=1, max_length=255)
     gis_2gis_url: str | None = Field(None, max_length=512)
@@ -92,6 +101,23 @@ class BillingResponse(BaseModel):
 # --------------------------------------------------------------------------
 # Endpoints
 # --------------------------------------------------------------------------
+
+@router.post("/onboarding", response_model=OnboardingResponse, status_code=status.HTTP_201_CREATED)
+async def complete_onboarding(
+    payload: OnboardingRequest,
+    session: AsyncSession = Depends(get_session),
+    current_user: User = Depends(get_current_user)
+):
+    """Создание первого бизнеса пользователя (онбординг)."""
+    business = Business(
+        owner_id=current_user.id,
+        name=payload.name,
+        phone=payload.phone,
+    )
+    session.add(business)
+    await session.commit()
+    await session.refresh(business)
+    return OnboardingResponse(business_id=business.id, message="Бизнес успешно создан")
 
 @router.get("/{business_id}/stats")
 async def get_dashboard_stats(

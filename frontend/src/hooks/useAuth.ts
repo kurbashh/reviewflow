@@ -69,6 +69,21 @@ export function useAuth() {
     };
   }, [state.token]);
 
+  const refreshUser = useCallback(async () => {
+    if (!state.token) return;
+    try {
+      const res = await fetch(`${API_BASE}/api/auth/me`, {
+        headers: { Authorization: `Bearer ${state.token}` },
+      });
+      if (res.ok) {
+        const user = await res.json();
+        setState(prev => ({ ...prev, user }));
+      }
+    } catch (err) {
+      console.error("Failed to refresh user", err);
+    }
+  }, [state.token]);
+
   const login = useCallback(
     async (email: string, password: string) => {
       const res = await fetch(`${API_BASE}/api/auth/login`, {
@@ -120,5 +135,6 @@ export function useAuth() {
     login,
     register,
     logout,
+    refreshUser,
   };
 }

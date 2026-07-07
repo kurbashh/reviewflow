@@ -2,9 +2,10 @@ import { useState, useEffect } from "react";
 import { useAuth } from "./hooks/useAuth";
 import { LoginPage } from "./pages/LoginPage";
 import { DashboardPage } from "./pages/DashboardPage";
+import { OnboardingPage } from "./pages/OnboardingPage";
 
 export default function App() {
-  const { user, loading, isAuthenticated, login, register, logout } = useAuth();
+  const { user, token, loading, isAuthenticated, login, register, logout, refreshUser } = useAuth();
 
   const [activeTab, setActiveTab] = useState<string>(() => {
     return localStorage.getItem("rf_active_tab") || "overview";
@@ -29,6 +30,11 @@ export default function App() {
   // Not authenticated -> Login page
   if (!isAuthenticated) {
     return <LoginPage onLogin={login} onRegister={register} />;
+  }
+
+  // Authenticated, but no businesses -> Onboarding
+  if (!user?.businesses || user.businesses.length === 0) {
+    return <OnboardingPage token={token || ""} onComplete={refreshUser} />;
   }
 
   // Authenticated -> Dashboard
