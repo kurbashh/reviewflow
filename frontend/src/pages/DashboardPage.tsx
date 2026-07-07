@@ -65,6 +65,9 @@ interface BillingData {
   trial_ends_at: string;
   amount_due: number;
   payment_link: string;
+  is_lifetime_access: boolean;
+  subscription_ends_at: string | null;
+  is_manually_paused: boolean;
 }
 
 export function DashboardPage({
@@ -1055,77 +1058,107 @@ export function DashboardPage({
 
             {/* BILLING TAB */}
             {activeTab === "billing" && billing && (
-              <div className="max-w-2xl mx-auto space-y-6">
+              <div className="max-w-4xl mx-auto space-y-6">
                 
-                {/* Subscription Details Card */}
-                <CardShell>
+                {/* Subscription Details Header */}
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                   <div>
-                    <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Управление подпиской</h3>
-                    <p className="mt-1 text-sm text-slate-400">Сведения о вашем тарифном плане и платежах</p>
+                    <h3 className="text-xl font-bold text-slate-900 dark:text-white">Управление подпиской</h3>
+                    <p className="mt-1 text-sm text-slate-500">
+                      {billing.is_lifetime_access 
+                        ? "Вам предоставлен вечный доступ. Рассылки никогда не будут заблокированы."
+                        : "Управляйте тарифами, платежами и статусом рассылок"}
+                    </p>
+                  </div>
+                  {billing.is_lifetime_access && (
+                    <span className="inline-flex items-center rounded-full bg-indigo-50 dark:bg-indigo-900/30 px-3 py-1 text-xs font-semibold text-indigo-700 dark:text-indigo-300 ring-1 ring-inset ring-indigo-600/20">
+                      Вечный доступ (Lifetime)
+                    </span>
+                  )}
+                </div>
+
+                <div className="grid gap-6 sm:grid-cols-3">
+                  {/* START Plan */}
+                  <div className={`relative rounded-3xl p-6 border ${billing.plan === "light" ? "border-brand bg-brand/5 shadow-md" : "border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900"} transition-all`}>
+                    {billing.plan === "light" && <div className="absolute top-0 right-0 rounded-bl-xl rounded-tr-3xl bg-brand px-3 py-1 text-[10px] font-bold text-white uppercase tracking-wider">Текущий</div>}
+                    <h4 className="text-lg font-bold text-slate-900 dark:text-white">Start</h4>
+                    <p className="mt-1 text-xs text-slate-500 min-h-[40px]">Базовые возможности для начала</p>
+                    <div className="my-4 text-2xl font-extrabold text-slate-900 dark:text-white">10 000 ₸<span className="text-sm font-normal text-slate-500">/мес</span></div>
+                    <ul className="space-y-3 text-sm text-slate-600 dark:text-slate-400 mb-6">
+                      <li className="flex gap-2"><RiCheckLine className="h-5 w-5 text-green-500 shrink-0"/> Обычная рассылка сообщений</li>
+                      <li className="flex gap-2"><RiCheckLine className="h-5 w-5 text-green-500 shrink-0"/> Перехват негатива в Telegram</li>
+                      <li className="flex gap-2"><RiCheckLine className="h-5 w-5 text-green-500 shrink-0"/> Маршрутизация на 2GIS/Yandex</li>
+                    </ul>
+                    <button onClick={() => handleSubscribe("light")} className={`w-full rounded-full py-2.5 text-sm font-semibold transition-colors ${billing.plan === "light" ? "bg-slate-100 text-slate-400 cursor-default" : "bg-brand text-white hover:bg-brand-hover"}`} disabled={billing.plan === "light"}>
+                      {billing.plan === "light" ? "Активен" : "Выбрать Start"}
+                    </button>
                   </div>
 
-                  <div className="mt-8 grid gap-6 sm:grid-cols-2">
-                    <div className="rounded-2xl bg-slate-50 dark:bg-zinc-800/40 p-5 space-y-1">
-                      <p className="text-xs text-slate-400 font-semibold uppercase">Тарифный план</p>
-                      <p className="text-2xl font-extrabold text-slate-900 dark:text-slate-100 uppercase">{billing.plan}</p>
-                      <p className="text-[10px] text-slate-400 pt-1">
-                        {billing.plan === "light" ? "До 150 рассылок в месяц" :
-                         billing.plan === "standard" ? "До 500 рассылок в месяц + AI" :
-                         "Безлимитный тариф для сетей"}
-                      </p>
-                    </div>
-
-                    <div className="rounded-2xl bg-slate-50 dark:bg-zinc-800/40 p-5 space-y-1">
-                      <p className="text-xs text-slate-400 font-semibold uppercase">Статус подписки</p>
-                      <p className="text-2xl font-extrabold text-brand uppercase">{billing.status}</p>
-                      <p className="text-[10px] text-slate-400 pt-1">
-                        {billing.status === "trial" ? "Действует пробный период" :
-                         billing.status === "active" ? "Подписка оплачена ✓" :
-                         "Рассылки временно приостановлены"}
-                      </p>
-                    </div>
+                  {/* PRO Plan */}
+                  <div className={`relative rounded-3xl p-6 border ${billing.plan === "standard" ? "border-brand bg-brand/5 shadow-md transform scale-105" : "border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900"} transition-all`}>
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-orange-400 to-pink-500 px-3 py-0.5 text-[10px] font-bold text-white uppercase tracking-wider shadow-sm">Популярный</div>
+                    {billing.plan === "standard" && <div className="absolute top-0 right-0 rounded-bl-xl rounded-tr-3xl bg-brand px-3 py-1 text-[10px] font-bold text-white uppercase tracking-wider">Текущий</div>}
+                    <h4 className="text-lg font-bold text-slate-900 dark:text-white">Pro</h4>
+                    <p className="mt-1 text-xs text-slate-500 min-h-[40px]">Максимум отзывов с искусственным интеллектом</p>
+                    <div className="my-4 text-2xl font-extrabold text-slate-900 dark:text-white">15 000 ₸<span className="text-sm font-normal text-slate-500">/мес</span></div>
+                    <ul className="space-y-3 text-sm text-slate-600 dark:text-slate-400 mb-6">
+                      <li className="flex gap-2"><RiCheckLine className="h-5 w-5 text-green-500 shrink-0"/> Всё из тарифа Start</li>
+                      <li className="flex gap-2 font-medium text-slate-900 dark:text-slate-200"><RiCheckLine className="h-5 w-5 text-orange-500 shrink-0"/> ИИ-генерация отзывов</li>
+                      <li className="flex gap-2 font-medium text-slate-900 dark:text-slate-200"><RiCheckLine className="h-5 w-5 text-orange-500 shrink-0"/> Умный тайминг отправки</li>
+                    </ul>
+                    <button onClick={() => handleSubscribe("standard")} className={`w-full rounded-full py-2.5 text-sm font-semibold transition-colors ${billing.plan === "standard" ? "bg-slate-100 text-slate-400 cursor-default" : "bg-brand text-white hover:bg-brand-hover shadow-md hover:shadow-lg"}`} disabled={billing.plan === "standard"}>
+                      {billing.plan === "standard" ? "Активен" : "Выбрать Pro"}
+                    </button>
                   </div>
 
-                  <div className="mt-6 border-t border-[var(--border-subtle)] pt-6 space-y-4 text-sm text-slate-600 dark:text-slate-400">
-                    <div className="flex justify-between">
-                      <span>Дата подключения:</span>
-                      <span className="font-bold text-slate-800 dark:text-slate-200">
-                        {new Date(billing.created_at).toLocaleDateString("ru-RU")}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Пробный период действует до:</span>
-                      <span className="font-bold text-slate-800 dark:text-slate-200">
-                        {new Date(billing.trial_ends_at).toLocaleDateString("ru-RU")}
-                      </span>
-                    </div>
-                    <div className="flex justify-between border-t border-[var(--border-subtle)] pt-4 text-base font-bold">
-                      <span className="text-slate-800 dark:text-slate-200">К оплате за следующий месяц:</span>
-                      <span className="text-brand">{billing.amount_due.toLocaleString()} ₸</span>
-                    </div>
+                  {/* ENTERPRISE Plan */}
+                  <div className={`relative rounded-3xl p-6 border ${billing.plan === "network" ? "border-brand bg-brand/5 shadow-md" : "border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900"} transition-all`}>
+                    {billing.plan === "network" && <div className="absolute top-0 right-0 rounded-bl-xl rounded-tr-3xl bg-brand px-3 py-1 text-[10px] font-bold text-white uppercase tracking-wider">Текущий</div>}
+                    <h4 className="text-lg font-bold text-slate-900 dark:text-white">Enterprise</h4>
+                    <p className="mt-1 text-xs text-slate-500 min-h-[40px]">Для сетей и крупных проектов</p>
+                    <div className="my-4 text-2xl font-extrabold text-slate-900 dark:text-white">Индивидуально</div>
+                    <ul className="space-y-3 text-sm text-slate-600 dark:text-slate-400 mb-6">
+                      <li className="flex gap-2"><RiCheckLine className="h-5 w-5 text-green-500 shrink-0"/> Всё из тарифа Pro</li>
+                      <li className="flex gap-2"><RiCheckLine className="h-5 w-5 text-green-500 shrink-0"/> Несколько локаций/филиалов</li>
+                      <li className="flex gap-2"><RiCheckLine className="h-5 w-5 text-green-500 shrink-0"/> Приоритетная поддержка</li>
+                    </ul>
+                    <button onClick={() => handleSubscribe("network")} className={`w-full rounded-full py-2.5 text-sm font-semibold transition-colors ${billing.plan === "network" ? "bg-slate-100 text-slate-400 cursor-default" : "bg-slate-900 text-white dark:bg-white dark:text-slate-900 hover:opacity-90"}`} disabled={billing.plan === "network"}>
+                      {billing.plan === "network" ? "Активен" : "Связаться с нами"}
+                    </button>
                   </div>
-                </CardShell>
+                </div>
 
-                {/* Kaspi Pay trigger card */}
-                <CardShell className="bg-orange-50 dark:bg-orange-950/20 border-orange-100 dark:border-orange-900/30 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 transition-colors">
-                  <div className="space-y-1">
-                    <h4 className="font-bold text-orange-950 dark:text-orange-300 text-base">Быстрая оплата подписки через Kaspi Pay</h4>
-                    <p className="text-xs text-orange-850 dark:text-orange-400">Оплачивайте подписку юридического лица мгновенно и без комиссий</p>
+                <CardShell className="mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border-t-4 border-t-[var(--brand)]">
+                  <div className="space-y-2">
+                    <h4 className="font-bold text-slate-900 dark:text-white">Статус рассылок</h4>
+                    <div className="text-sm text-slate-600 dark:text-slate-400">
+                      {billing.is_manually_paused ? (
+                        <span className="text-orange-600 font-medium">Приостановлены (Пауза). Новые визиты сохраняются, но сообщения не отправляются.</span>
+                      ) : billing.status === "churned" && !billing.is_lifetime_access ? (
+                        <span className="text-red-500 font-medium">Приостановлены (Неоплата). Оплатите подписку для возобновления.</span>
+                      ) : (
+                        <span className="text-green-600 font-medium">Активны. Сообщения отправляются клиентам в штатном режиме.</span>
+                      )}
+                    </div>
+                    {!billing.is_lifetime_access && billing.subscription_ends_at && (
+                      <div className="text-xs text-slate-500">
+                        Оплачено до: <span className="font-semibold text-slate-700 dark:text-slate-300">{new Date(billing.subscription_ends_at).toLocaleDateString("ru-RU")}</span>
+                      </div>
+                    )}
                   </div>
-
-                  <a
-                    href={billing.payment_link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      alert(`Мок-переход на Kaspi Pay: Выставлен счет на ${billing.amount_due} ₸ для бизнеса с ID ${businessId}`);
-                    }}
-                    className="inline-flex items-center justify-center rounded-full bg-brand hover:bg-brand-hover px-6 py-3.5 text-sm font-semibold text-white transition-colors shadow-md hover:shadow-lg text-center"
+                  
+                  <button
+                    onClick={handleTogglePause}
+                    className={`shrink-0 rounded-full px-5 py-2 text-sm font-semibold transition-colors ${
+                      billing.is_manually_paused 
+                        ? "bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-400 dark:hover:bg-green-900/50" 
+                        : "bg-orange-100 text-orange-700 hover:bg-orange-200 dark:bg-orange-900/30 dark:text-orange-400 dark:hover:bg-orange-900/50"
+                    }`}
                   >
-                    Оплатить подписку
-                  </a>
+                    {billing.is_manually_paused ? "Возобновить рассылки" : "Приостановить рассылки"}
+                  </button>
                 </CardShell>
+
               </div>
             )}
           </>

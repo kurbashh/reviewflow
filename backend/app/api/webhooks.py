@@ -27,7 +27,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.security import verify_business_secret
 from app.core.timing import random_delay
 from app.core.limiter import limiter
-from app.db.models import ReviewRequestStatus
+from app.db.models import ReviewRequestStatus, BusinessStatus, BusinessPlan
 from app.db.session import get_session
 from app.services.crud import (
     create_review_request,
@@ -106,14 +106,17 @@ async def webhook_intake(request: Request, payload: WebhookIntakePayload, sessio
 
     # request.id уже присвоен (flush в create_review_request), но commit ещё не
     # произошёл — он случится в get_session после успешного возврата из роута.
-    # Задачу в Celery можно ставить уже сейчас: request существует в транзакции,
-    # а celery worker прочитает её из БД не раньше, чем через 5 минут (random_delay),
-    # commit к этому моменту гарантированно случится.
-    send_review_request_task.apply_async(
-        args=[str(request.id)], countdown=random_delay()
-    )
 
-    return {"status": "queued", "id": str(request.id)}
+    is_active = business.is_lifetime_access or (business.status != BusinessStatus.CHURNED and not business.is_manually_paused)
+    
+    if is_active:
+        send_review_request_task.apply_async(
+            args=[str(request.id)], countdown=random_delay()
+        )
+        return {"status": "queued", "id": str(request.id)}
+    else:
+        logger.info("webhook_intake: business %s is paused or churned, skipping celery task", business_id)
+        return {"status": "paused_or_churned", "id": str(request.id)}
 
 
 @router.post("/webhook/reply")

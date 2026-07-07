@@ -98,6 +98,18 @@ class BillingResponse(BaseModel):
     trial_ends_at: str
     amount_due: int
     payment_link: str
+    is_lifetime_access: bool = False
+    subscription_ends_at: str | None = None
+    is_manually_paused: bool = False
+
+class BillingSubscribeRequest(BaseModel):
+    plan: BusinessPlan
+
+class BillingPauseRequest(BaseModel):
+    is_paused: bool
+
+class BillingLifetimeRequest(BaseModel):
+    is_lifetime: bool
 
 # --------------------------------------------------------------------------
 # Endpoints
@@ -351,4 +363,65 @@ async def get_dashboard_billing(
         trial_ends_at=trial_ends.isoformat(),
         amount_due=amount_due,
         payment_link=payment_link,
+        is_lifetime_access=business.is_lifetime_access,
+        subscription_ends_at=business.subscription_ends_at.isoformat() if business.subscription_ends_at else None,
+        is_manually_paused=business.is_manually_paused,
     )
+
+@router.post("/{business_id}/billing/subscribe", response_model=dict[str, str])
+async def subscribe_billing(
+    business_id: str,
+    payload: BillingSubscribeRequest,
+    session: AsyncSession = Depends(get_session),
+):
+    try:
+        business_uuid = uuid.UUID(business_id)
+    except ValueError:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Неверный формат UUID")
+
+    business = await crud.get_business(session, business_id)
+    if not business:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Бизнес не найден")
+
+    from datetime import datetime, timedelta, timezone
+    # Обновляем тариф, статус и время окончания
+    business.plan = payload.plan
+    business.status = BusinessStatus.ACTIVE
+    business.subscription_ends_at = datetime.now(timezone.utc) + timedelta(days=30)
+    business.is_manually_paused = False
+    
+    session.add(business)
+    await session.commit()
+    return {"status": "success"}
+
+@router.post("/{business_id}/billing/pause", response_model=dict[str, str])
+async def pause_billing(
+    business_id: str,
+    payload: BillingPauseRequest,
+    session: AsyncSession = Depends(get_session),
+):
+    business = await crud.get_business(session, business_id)
+    if not business:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Бизнес не найден")
+
+    business.is_manually_paused = payload.is_paused
+    session.add(business)
+    await session.commit()
+    return {"status": "success"}
+
+@router.post("/{business_id}/billing/lifetime", response_model=dict[str, str])
+async def lifetime_billing(
+    business_id: str,
+    payload: BillingLifetimeRequest,
+    session: AsyncSession = Depends(get_session),
+):
+    business = await crud.get_business(session, business_id)
+    if not business:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Бизнес не найден")
+
+    business.is_lifetime_access = payload.is_lifetime
+    if payload.is_lifetime:
+        business.status = BusinessStatus.ACTIVE
+    session.add(business)
+    await session.commit()
+    return {"status": "success"}

@@ -158,6 +158,10 @@ class Business(Base):
         nullable=False,
     )
 
+    is_lifetime_access: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    subscription_ends_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    is_manually_paused: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+
     gis_2gis_url: Mapped[str | None] = mapped_column(String(512), nullable=True)
     yandex_maps_url: Mapped[str | None] = mapped_column(String(512), nullable=True)
     telegram_chat_id: Mapped[str | None] = mapped_column(String(64), nullable=True)

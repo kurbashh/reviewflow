@@ -14,7 +14,7 @@ from __future__ import annotations
 
 import logging
 
-from app.db.models import ReviewRequestStatus
+from app.db.models import ReviewRequestStatus, BusinessPlan
 from app.db.session import get_sync_session
 from app.services.ai_review import AiReviewError, generate_review_text
 from app.services.crud import get_review_request_sync, update_status_sync
@@ -28,6 +28,11 @@ MESSAGE_TEMPLATE = (
     "Спасибо за высокую оценку! 🙌\n"
     "Вот текст, который можно скопировать и вставить в отзыв:\n\n"
     '"{review_text}"\n\n'
+    "Оставить отзыв здесь: {link}"
+)
+
+SIMPLE_MESSAGE_TEMPLATE = (
+    "Спасибо за высокую оценку! 🙌\n\n"
     "Оставить отзыв здесь: {link}"
 )
 
@@ -47,7 +52,7 @@ def generate_review_task(self, request_id: str) -> None:
         client_phone = request.client_phone
         location = request.location
 
-    if not review_text:
+    if not review_text and business.plan != BusinessPlan.LIGHT:
         try:
             review_text = generate_review_text(
                 business_name=business.name,
@@ -76,7 +81,10 @@ def generate_review_task(self, request_id: str) -> None:
     # Шаг 2: отправка готового текста + ссылки в WhatsApp
     # ------------------------------------------------------------------
     link = build_go_link(location, business)
-    message = MESSAGE_TEMPLATE.format(review_text=review_text, link=link)
+    if business.plan == BusinessPlan.LIGHT:
+        message = SIMPLE_MESSAGE_TEMPLATE.format(link=link)
+    else:
+        message = MESSAGE_TEMPLATE.format(review_text=review_text, link=link)
 
     try:
         send_whatsapp_message(client_phone, message)
