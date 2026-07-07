@@ -74,13 +74,11 @@ export function DashboardPage({
   activeTab,
   setActiveTab,
   businessId,
-  setBusinessId,
   onLogout,
 }: {
   activeTab: string;
   setActiveTab: (tab: string) => void;
   businessId: string;
-  setBusinessId: (id: string) => void;
   onLogout?: () => void;
 }) {
   // Loading & State
@@ -324,6 +322,47 @@ export function DashboardPage({
         <span className="text-slate-200">{"★".repeat(5 - rating)}</span>
       </span>
     );
+  };
+
+  const handleSubscribe = async (planName: string) => {
+    if (!businessId) return;
+    if (confirm(`Вы будете перенаправлены на Kaspi Pay для оплаты тарифа ${planName.toUpperCase()}. Продолжить?`)) {
+      try {
+        const res = await fetch(`${API_BASE}/${businessId}/billing/subscribe`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ plan: planName }),
+        });
+        if (res.ok) {
+          alert("Оплата успешно завершена (Mock Kaspi). Тариф активирован!");
+          const bRes = await fetch(`${API_BASE}/${businessId}/billing`);
+          if (bRes.ok) setBilling(await bRes.json());
+        }
+      } catch (e) {
+        console.error("Ошибка при оплате подписки:", e);
+      }
+    }
+  };
+
+  const handleTogglePause = async () => {
+    if (!businessId || !billing) return;
+    const newPauseState = !billing.is_manually_paused;
+    const actionText = newPauseState ? "приостановить" : "возобновить";
+    if (confirm(`Вы уверены, что хотите ${actionText} рассылки?`)) {
+      try {
+        const res = await fetch(`${API_BASE}/${businessId}/billing/pause`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ is_paused: newPauseState }),
+        });
+        if (res.ok) {
+          const bRes = await fetch(`${API_BASE}/${businessId}/billing`);
+          if (bRes.ok) setBilling(await bRes.json());
+        }
+      } catch (e) {
+        console.error("Ошибка при паузе рассылок:", e);
+      }
+    }
   };
 
   return (

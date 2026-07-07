@@ -43,7 +43,6 @@ export default function App() {
       activeTab={activeTab}
       setActiveTab={setActiveTab}
       businessId={businessId}
-      setBusinessId={() => {}}
       onLogout={logout}
     />
   );
