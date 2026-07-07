@@ -25,19 +25,17 @@ export function DashboardLayout({
   }, [darkMode]);
 
   return (
-    <div className="h-screen overflow-hidden bg-[var(--dashboard-bg)] p-3 sm:p-4 lg:p-6 transition-colors duration-200">
-      <div className="mx-auto flex h-full max-w-[1440px] overflow-hidden rounded-[var(--radius-shell)] bg-[var(--surface)] shadow-[var(--shadow-card)] transition-colors duration-200">
-        <Sidebar
-          activeTab={activeTab}
-          setActiveTab={setActiveTab}
-          darkMode={darkMode}
-          setDarkMode={setDarkMode}
-        />
+    <div className="flex h-screen w-full overflow-hidden bg-[var(--dashboard-bg)] text-[var(--text-main)] transition-colors duration-200">
+      <Sidebar
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        darkMode={darkMode}
+        setDarkMode={setDarkMode}
+      />
 
-        <main className="flex-1 overflow-auto rounded-[calc(var(--radius-shell)-0.5rem)] bg-[var(--dashboard-bg)] p-6 sm:p-8 lg:p-10 transition-colors duration-200">
-          {children}
-        </main>
-      </div>
+      <main className="flex-1 overflow-auto p-4 sm:p-6 lg:p-8 transition-colors duration-200">
+        {children}
+      </main>
     </div>
   );
 }
