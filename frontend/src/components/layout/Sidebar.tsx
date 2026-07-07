@@ -9,6 +9,7 @@ import {
   IconSun,
   LogoMark,
 } from "../ui/icons";
+import { RiLogoutBoxRLine } from "@remixicon/react";
 
 const navItems = [
   { id: "overview", label: "Обзор", icon: IconOverview },
@@ -23,11 +24,13 @@ export function Sidebar({
   setActiveTab,
   darkMode,
   setDarkMode,
+  onLogout,
 }: {
   activeTab: string;
   setActiveTab: (tab: string) => void;
   darkMode: boolean;
   setDarkMode: (val: boolean) => void;
+  onLogout?: () => void;
 }) {
   return (
     <aside className="flex w-[88px] shrink-0 flex-col items-center justify-between py-8 lg:w-[104px] border-r border-[var(--border-subtle)] bg-[var(--surface)] transition-colors">
@@ -95,7 +98,17 @@ export function Sidebar({
           </div>
         </button>
 
-        <div className="h-11 w-11 overflow-hidden rounded-full border-2 border-[var(--border-subtle)] bg-gradient-to-br from-slate-200 to-slate-300 shadow-sm" />
+        {onLogout && (
+          <button
+            type="button"
+            onClick={onLogout}
+            className="flex h-11 w-11 items-center justify-center rounded-2xl text-[var(--text-muted)] transition-colors hover:bg-red-500/10 hover:text-red-500"
+            aria-label="Выйти"
+            title="Выйти из аккаунта"
+          >
+            <RiLogoutBoxRLine className="h-5 w-5" />
+          </button>
+        )}
       </div>
     </aside>
   );

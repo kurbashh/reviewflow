@@ -72,11 +72,13 @@ export function DashboardPage({
   setActiveTab,
   businessId,
   setBusinessId,
+  onLogout,
 }: {
   activeTab: string;
   setActiveTab: (tab: string) => void;
   businessId: string;
   setBusinessId: (id: string) => void;
+  onLogout?: () => void;
 }) {
   // Loading & State
   const [stats, setStats] = useState<Stats | null>(null);
@@ -321,7 +323,7 @@ export function DashboardPage({
   };
 
   return (
-    <DashboardLayout activeTab={activeTab} setActiveTab={setActiveTab}>
+    <DashboardLayout activeTab={activeTab} setActiveTab={setActiveTab} onLogout={onLogout}>
       <div className="space-y-8">
         
         {/* Header */}

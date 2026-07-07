@@ -17,6 +17,7 @@ psycopg[binary]==3.3.4     # sync-драйвер для Celery-тасок (app/d
 # --- Конфигурация ---
 pydantic==2.13.4
 pydantic-settings==2.14.2
+email-validator>=2.0.0       # валидация EmailStr в Pydantic
 
 # --- Очереди / фоновые задачи ---
 celery[redis]==5.6.3
@@ -26,3 +27,7 @@ redis==6.4.0
 openai==2.44.0              # генерация текста отзыва (gpt-4o-mini), Этап 3
 httpx==0.28.1                # Green API, Telegram Bot API, Kaspi Pay — единый HTTP-клиент
 supabase==2.31.0             # Supabase Auth + API clients (Python equivalent of @supabase/server)
+
+# --- Авторизация ---
+bcrypt==4.3.0                # хэширование паролей
+PyJWT[crypto]==2.13.0        # генерация/валидация JWT-токенов

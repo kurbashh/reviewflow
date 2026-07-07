@@ -150,8 +150,20 @@ class Settings(BaseSettings):
     webhook_signing_secret: str = Field(
         ..., description="Общий секрет для HMAC-подписи входящих вебхуков"
     )
+    # ------------------------------------------------------------------
+    # JWT Auth
+    # ------------------------------------------------------------------
+    jwt_secret_key: str = Field(
+        default="change-me-in-production",
+        description="Секрет для подписи JWT-токенов (HMAC-SHA256)",
+    )
+    jwt_algorithm: str = Field(default="HS256")
+    jwt_expire_minutes: int = Field(
+        default=1440, description="Время жизни access_token в минутах (24 часа)"
+    )
+
     cors_allowed_origins: list[str] = Field(
-        default_factory=lambda: ["https://reviewflow.kz", "http://localhost:3000"]
+        default_factory=lambda: ["https://reviewflow.kz", "http://localhost:3000", "http://localhost:5173"]
     )
 
 

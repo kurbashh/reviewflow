@@ -5,10 +5,12 @@ export function DashboardLayout({
   children,
   activeTab,
   setActiveTab,
+  onLogout,
 }: {
   children: ReactNode;
   activeTab: string;
   setActiveTab: (tab: string) => void;
+  onLogout?: () => void;
 }) {
   const [darkMode, setDarkMode] = useState<boolean>(() => {
     return localStorage.getItem("rf_theme") === "dark";
@@ -31,6 +33,7 @@ export function DashboardLayout({
         setActiveTab={setActiveTab}
         darkMode={darkMode}
         setDarkMode={setDarkMode}
+        onLogout={onLogout}
       />
 
       <main className="flex-1 overflow-auto p-4 sm:p-6 lg:p-8 transition-colors duration-200">
