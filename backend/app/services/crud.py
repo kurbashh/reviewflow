@@ -17,7 +17,7 @@ CRUD-хелперы для работы с ReviewRequest/Business.
 from __future__ import annotations
 
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 from sqlalchemy import select, func, cast, Date
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -43,6 +43,35 @@ async def is_opted_out(session: AsyncSession, phone: str, business_id: str) -> b
         OptedOutNumber.phone == phone,
         OptedOutNumber.business_id == business_id,
     )
+    result = await session.execute(stmt)
+    return result.scalar_one_or_none() is not None
+
+
+async def opt_out_client(session: AsyncSession, phone: str, business_id: str) -> None:
+    try:
+        business_uuid = uuid.UUID(business_id)
+    except ValueError:
+        return
+    if await is_opted_out(session, phone, business_id):
+        return
+    opt_out = OptedOutNumber(phone=phone, business_id=business_uuid)
+    session.add(opt_out)
+    await session.commit()
+
+
+async def has_recent_request(session: AsyncSession, phone: str, business_id: str, days: int = 7) -> bool:
+    try:
+        business_uuid = uuid.UUID(business_id)
+    except ValueError:
+        return False
+    
+    threshold = datetime.now(timezone.utc) - timedelta(days=days)
+    stmt = select(ReviewRequest).where(
+        ReviewRequest.client_phone == phone,
+        ReviewRequest.business_id == business_uuid,
+        ReviewRequest.created_at >= threshold
+    ).limit(1)
+    
     result = await session.execute(stmt)
     return result.scalar_one_or_none() is not None
 
@@ -101,8 +130,7 @@ async def find_latest_awaiting_feedback_request(
     """
     Этап 3.2 ТЗ: находит запрос, для которого владельцу уже отправлен вопрос
     "что не понравилось" (status=AWAITING_FEEDBACK) и мы ждём от клиента
-    свободный текст — в отличие от find_latest_pending_request, здесь ждём
-    не цифру-оценку, а произвольное сообщение.
+    текстового ответа с деталями негатива.
 
     Вызывается в /webhook/reply ПОСЛЕ того, как find_latest_pending_request
     не нашёл активный запрос на оценку — т.е. это резервная ветка разбора
@@ -115,6 +143,19 @@ async def find_latest_awaiting_feedback_request(
             ReviewRequest.status == ReviewRequestStatus.AWAITING_FEEDBACK,
         )
         .order_by(ReviewRequest.responded_at.desc())
+        .limit(1)
+    )
+    result = await session.execute(stmt)
+    return result.scalar_one_or_none()
+
+
+async def find_latest_request_any_status(
+    session: AsyncSession, client_phone: str
+) -> ReviewRequest | None:
+    stmt = (
+        select(ReviewRequest)
+        .where(ReviewRequest.client_phone == client_phone)
+        .order_by(ReviewRequest.created_at.desc())
         .limit(1)
     )
     result = await session.execute(stmt)

@@ -19,13 +19,14 @@ from __future__ import annotations
 
 import logging
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
 from typing import Any
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.security import verify_business_secret
 from app.core.timing import random_delay
+from app.core.limiter import limiter
 from app.db.models import ReviewRequestStatus
 from app.db.session import get_session
 from app.services.crud import (
@@ -35,6 +36,9 @@ from app.services.crud import (
     get_business,
     is_opted_out,
     update_review_request,
+    has_recent_request,
+    opt_out_client,
+    find_latest_request_any_status,
 )
 from app.services.green_api import normalize_incoming_phone
 from app.tasks.capture_negative import capture_negative_task, deliver_negative_feedback_task
@@ -68,7 +72,8 @@ class GreenApiWebhookPayload(BaseModel):
 
 
 @router.post("/webhook/intake")
-async def webhook_intake(payload: WebhookIntakePayload, session: AsyncSession = Depends(get_session)):
+@limiter.limit("30/minute")
+async def webhook_intake(request: Request, payload: WebhookIntakePayload, session: AsyncSession = Depends(get_session)):
     business_id = payload.business_id
     client_phone = payload.client_phone
 
@@ -83,6 +88,10 @@ async def webhook_intake(payload: WebhookIntakePayload, session: AsyncSession = 
 
     if await is_opted_out(session, client_phone, business_id):
         return {"status": "skipped"}
+        
+    if await has_recent_request(session, client_phone, business_id, days=7):
+        logger.info("webhook_intake: client %s rate limited (already requested in last 7 days)", client_phone)
+        return {"status": "rate_limited"}
 
     request = await create_review_request(
         session,
@@ -108,7 +117,8 @@ async def webhook_intake(payload: WebhookIntakePayload, session: AsyncSession = 
 
 
 @router.post("/webhook/reply")
-async def webhook_reply(payload: GreenApiWebhookPayload, session: AsyncSession = Depends(get_session)):
+@limiter.limit("60/minute")
+async def webhook_reply(request: Request, payload: GreenApiWebhookPayload, session: AsyncSession = Depends(get_session)):
     try:
         sender_phone = normalize_incoming_phone(payload.senderData["sender"])
         text = payload.messageData["textMessageData"]["textMessage"].strip()
@@ -116,6 +126,13 @@ async def webhook_reply(payload: GreenApiWebhookPayload, session: AsyncSession =
         # Не текстовое сообщение (голосовое/картинка) или payload другого типа
         # события Green API (не incomingMessageReceived) — просто игнорируем.
         return {"status": "ignored"}
+
+    if text.lower() in ["стоп", "stop", "отписаться"]:
+        latest_req = await find_latest_request_any_status(session, sender_phone)
+        if latest_req:
+            await opt_out_client(session, sender_phone, str(latest_req.business_id))
+            logger.info("webhook_reply: client %s opted out", sender_phone)
+        return {"status": "opted_out"}
 
     request = await find_latest_pending_request(session, sender_phone)
     if request:
@@ -159,6 +176,11 @@ async def webhook_reply(payload: GreenApiWebhookPayload, session: AsyncSession =
         logger.info(
             "webhook_reply: получен фидбэк по негативу для request %s",
             awaiting_feedback_request.id,
+        )
+        # Переводим запрос в COMPLETED, чтобы больше не принимать сообщения
+        # от этого клиента по этому инциденту (защита от honeypot-спама).
+        await update_review_request(
+            session, awaiting_feedback_request.id, status=ReviewRequestStatus.COMPLETED
         )
         deliver_negative_feedback_task.delay(str(awaiting_feedback_request.id), text)
         return {"status": "ok"}

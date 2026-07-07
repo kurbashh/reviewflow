@@ -49,6 +49,15 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from slowapi.middleware import SlowAPIMiddleware
+from app.core.limiter import limiter
+
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+app.add_middleware(SlowAPIMiddleware)
+
 # CORS нужен только для дашборда на Next.js (Этап 5); вебхуки Green API/CRM
 # бьют напрямую в бэкенд без браузера, CORS на них не влияет.
 app.add_middleware(
