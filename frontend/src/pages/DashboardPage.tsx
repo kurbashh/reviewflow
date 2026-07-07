@@ -5,7 +5,7 @@ import {
   CardShell,
   Avatar,
 } from "../components/ui/icons";
-import { RiStarFill, RiMagicFill, RiChatSmile3Fill } from "@remixicon/react";
+import { RiStarFill, RiMagicFill, RiChatSmile3Fill, RiFileCopyLine, RiCheckLine } from "@remixicon/react";
 
 const API_BASE = "https://167-233-118-175.sslip.io/api/dashboard";
 
@@ -87,6 +87,7 @@ export function DashboardPage({
   const [billing, setBilling] = useState<BillingData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [copiedId, setCopiedId] = useState(false);
 
   // Reviews Tab Filters & Pagination
   const [reviewFilter, setReviewFilter] = useState<"all" | "negative">("all");
@@ -337,13 +338,22 @@ export function DashboardPage({
 
           <div className="flex items-center gap-3">
             <span className="text-xs font-medium text-slate-500">ID бизнеса:</span>
-            <input
-              type="text"
-              value={businessId}
-              onChange={(e) => setBusinessId(e.target.value.trim())}
-              placeholder="UUID бизнеса"
-              className="rounded-full border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-4 py-2 text-xs font-mono text-slate-700 dark:text-slate-200 placeholder-slate-400 dark:placeholder-zinc-500 focus:border-brand focus:outline-none shadow-sm transition-colors"
-            />
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText(businessId);
+                setCopiedId(true);
+                setTimeout(() => setCopiedId(false), 2000);
+              }}
+              title="Копировать ID бизнеса"
+              className="group flex items-center gap-2 rounded-full border border-slate-200 dark:border-zinc-700 bg-white/50 dark:bg-zinc-800/50 px-4 py-2 text-xs font-mono text-slate-700 dark:text-slate-300 transition-all hover:bg-slate-100 hover:dark:bg-zinc-700"
+            >
+              <span className="truncate max-w-[120px] sm:max-w-[160px]">{businessId}</span>
+              {copiedId ? (
+                <RiCheckLine className="h-4 w-4 text-green-500" />
+              ) : (
+                <RiFileCopyLine className="h-4 w-4 text-slate-400 group-hover:text-[var(--brand)] transition-colors" />
+              )}
+            </button>
           </div>
         </header>
 
