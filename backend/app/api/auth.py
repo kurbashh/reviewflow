@@ -18,7 +18,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.jwt import create_access_token, get_current_user
-from app.db.models import User
+from app.db.models import User, Business
 from app.db.session import get_session
 
 logger = logging.getLogger(__name__)
@@ -102,7 +102,16 @@ async def register(payload: RegisterRequest, session: AsyncSession = Depends(get
         password_hash=_hash_password(payload.password),
         full_name=payload.full_name,
     )
+    
+    # Автоматически создаем дефолтный бизнес для нового пользователя
+    default_business = Business(
+        owner=user,
+        name=f"Бизнес: {payload.full_name}",
+        phone="",
+    )
+    
     session.add(user)
+    session.add(default_business)
     await session.commit()
     await session.refresh(user)
 
