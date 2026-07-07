@@ -19,7 +19,7 @@ from __future__ import annotations
 import uuid
 from datetime import datetime, timezone
 
-from sqlalchemy import select
+from sqlalchemy import select, func, cast, Date
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Session, selectinload
 
@@ -185,3 +185,241 @@ def update_status_sync(
         # (generate_review_task, Этап 3.1), и для перехваченного негатива
         # (capture_negative.deliver_negative_feedback_task, Этап 3.2).
         request.completed_at = datetime.now(timezone.utc)
+
+
+# --------------------------------------------------------------------------
+# Dashboard / Onboarding / CRUD Stats (Этап 5 ТЗ)
+# --------------------------------------------------------------------------
+
+async def get_business_stats(session: AsyncSession, business_id: uuid.UUID) -> dict:
+    # 1. Total Sent (sent_at is not null)
+    sent_stmt = select(func.count(ReviewRequest.id)).where(
+        ReviewRequest.business_id == business_id,
+        ReviewRequest.sent_at.is_not(None),
+    )
+    sent_res = await session.execute(sent_stmt)
+    sent_count = sent_res.scalar_one() or 0
+
+    # 2. Total Rated (rating is not null)
+    rated_stmt = select(func.count(ReviewRequest.id)).where(
+        ReviewRequest.business_id == business_id,
+        ReviewRequest.rating.is_not(None),
+    )
+    rated_res = await session.execute(rated_stmt)
+    rated_count = rated_res.scalar_one() or 0
+
+    # 3. Average Rating
+    avg_stmt = select(func.avg(ReviewRequest.rating)).where(
+        ReviewRequest.business_id == business_id,
+        ReviewRequest.rating.is_not(None),
+    )
+    avg_res = await session.execute(avg_stmt)
+    avg_val = avg_res.scalar_one()
+    avg_rating = round(float(avg_val), 1) if avg_val is not None else 0.0
+
+    # 4. Pending Replies (status is SENT or AWAITING_FEEDBACK)
+    pending_stmt = select(func.count(ReviewRequest.id)).where(
+        ReviewRequest.business_id == business_id,
+        ReviewRequest.status.in_([ReviewRequestStatus.SENT, ReviewRequestStatus.AWAITING_FEEDBACK]),
+    )
+    pending_res = await session.execute(pending_stmt)
+    pending_count = pending_res.scalar_one() or 0
+
+    # 5. Reviews Completed (status is COMPLETED)
+    completed_stmt = select(func.count(ReviewRequest.id)).where(
+        ReviewRequest.business_id == business_id,
+        ReviewRequest.status == ReviewRequestStatus.COMPLETED,
+    )
+    completed_res = await session.execute(completed_stmt)
+    completed_count = completed_res.scalar_one() or 0
+
+    # 6. Negative Captured (rating <= 3)
+    negative_stmt = select(func.count(ReviewRequest.id)).where(
+        ReviewRequest.business_id == business_id,
+        ReviewRequest.rating <= 3,
+    )
+    negative_res = await session.execute(negative_stmt)
+    negative_count = negative_res.scalar_one() or 0
+
+    # 7. Daily Stats (last 7 days)
+    daily_stmt = (
+        select(
+            cast(ReviewRequest.created_at, Date).label("day"),
+            func.count(ReviewRequest.id).label("sent"),
+            func.count(ReviewRequest.rating).label("rated"),
+            func.avg(ReviewRequest.rating).label("avg_rating"),
+        )
+        .where(ReviewRequest.business_id == business_id)
+        .group_by(cast(ReviewRequest.created_at, Date))
+        .order_by(cast(ReviewRequest.created_at, Date).desc())
+        .limit(7)
+    )
+    daily_res = await session.execute(daily_stmt)
+    daily_rows = daily_res.all()
+
+    # Format daily stats in chronological order
+    daily_stats = []
+    for row in reversed(daily_rows):
+        daily_stats.append({
+            "date": str(row.day),
+            "sent": row.sent,
+            "rated": row.rated,
+            "avg_rating": round(float(row.avg_rating), 1) if row.avg_rating is not None else 0.0
+        })
+
+    # Fallback default values if no activity is recorded
+    if not daily_stats:
+        from datetime import date, timedelta
+        today = date.today()
+        for i in range(6, -1, -1):
+            d = today - timedelta(days=i)
+            daily_stats.append({
+                "date": str(d),
+                "sent": 0,
+                "rated": 0,
+                "avg_rating": 0.0
+            })
+
+    # 8. Location Stats
+    loc_stmt = (
+        select(
+            Location.name.label("location_name"),
+            func.count(ReviewRequest.id).label("sent"),
+            func.count(ReviewRequest.rating).label("rated"),
+            func.avg(ReviewRequest.rating).label("avg_rating"),
+        )
+        .join(ReviewRequest, ReviewRequest.location_id == Location.id, isouter=True)
+        .where(Location.business_id == business_id)
+        .group_by(Location.name)
+    )
+    loc_res = await session.execute(loc_stmt)
+    loc_rows = loc_res.all()
+
+    location_stats = []
+    for row in loc_rows:
+        location_stats.append({
+            "name": row.location_name,
+            "sent": row.sent,
+            "rated": row.rated,
+            "avg_rating": round(float(row.avg_rating), 1) if row.avg_rating is not None else 0.0
+        })
+
+    response_rate = round((rated_count / sent_count) * 100, 1) if sent_count > 0 else 0.0
+
+    return {
+        "sent": sent_count,
+        "rated": rated_count,
+        "avg_rating": avg_rating,
+        "pending_replies": pending_count,
+        "reviews_completed": completed_count,
+        "negative_captured": negative_count,
+        "response_rate": response_rate,
+        "daily_stats": daily_stats,
+        "location_stats": location_stats
+    }
+
+
+async def get_business_reviews(
+    session: AsyncSession,
+    business_id: uuid.UUID,
+    limit: int = 50,
+    offset: int = 0,
+    rating_lte: int | None = None,
+) -> tuple[list[ReviewRequest], int]:
+    stmt = (
+        select(ReviewRequest)
+        .where(ReviewRequest.business_id == business_id)
+        .order_by(ReviewRequest.created_at.desc())
+    )
+    if rating_lte is not None:
+        stmt = stmt.where(ReviewRequest.rating <= rating_lte)
+
+    # Count query
+    count_stmt = select(func.count()).select_from(stmt.subquery())
+    count_res = await session.execute(count_stmt)
+    total_count = count_res.scalar_one() or 0
+
+    # Limit and Offset query
+    stmt = stmt.limit(limit).offset(offset)
+    res = await session.execute(stmt)
+    reviews = res.scalars().all()
+    return list(reviews), total_count
+
+
+async def update_business_settings(
+    session: AsyncSession,
+    business_id: uuid.UUID,
+    settings_data: dict,
+) -> Business | None:
+    business = await session.get(Business, business_id)
+    if not business:
+        return None
+
+    updatable_fields = [
+        "name", "category", "phone", "crm_type",
+        "gis_2gis_url", "yandex_maps_url", "telegram_chat_id"
+    ]
+    for field in updatable_fields:
+        if field in settings_data:
+            setattr(business, field, settings_data[field])
+
+    await session.flush()
+    return business
+
+
+async def get_business_locations(
+    session: AsyncSession,
+    business_id: uuid.UUID,
+) -> list[Location]:
+    stmt = select(Location).where(Location.business_id == business_id).order_by(Location.name.asc())
+    res = await session.execute(stmt)
+    return list(res.scalars().all())
+
+
+async def create_location(
+    session: AsyncSession,
+    business_id: uuid.UUID,
+    name: str,
+    redirect_slug: str,
+    gis_2gis_url: str | None = None,
+    yandex_maps_url: str | None = None,
+) -> Location:
+    location = Location(
+        business_id=business_id,
+        name=name,
+        redirect_slug=redirect_slug,
+        gis_2gis_url=gis_2gis_url,
+        yandex_maps_url=yandex_maps_url,
+    )
+    session.add(location)
+    await session.flush()
+    return location
+
+
+async def update_location(
+    session: AsyncSession,
+    location_id: uuid.UUID,
+    name: str,
+    gis_2gis_url: str | None = None,
+    yandex_maps_url: str | None = None,
+) -> Location | None:
+    location = await session.get(Location, location_id)
+    if not location:
+        return None
+    location.name = name
+    location.gis_2gis_url = gis_2gis_url
+    location.yandex_maps_url = yandex_maps_url
+    await session.flush()
+    return location
+
+
+async def delete_location(
+    session: AsyncSession,
+    location_id: uuid.UUID,
+) -> bool:
+    location = await session.get(Location, location_id)
+    if not location:
+        return False
+    await session.delete(location)
+    await session.flush()
+    return True

@@ -11,38 +11,48 @@ import {
 } from "../ui/icons";
 
 const navItems = [
-  { label: "Обзор", icon: IconOverview, active: true },
-  { label: "Отзывы", icon: IconReviews, active: false },
-  { label: "Аналитика", icon: IconAnalytics, active: false },
-  { label: "Локации", icon: IconLocations, active: false },
-  { label: "Настройки", icon: IconSettings, active: false },
+  { id: "overview", label: "Обзор", icon: IconOverview },
+  { id: "reviews", label: "Отзывы", icon: IconReviews },
+  { id: "locations", label: "Локации", icon: IconLocations },
+  { id: "settings", label: "Настройки", icon: IconSettings },
+  { id: "billing", label: "Биллинг", icon: IconAnalytics },
 ];
 
-export function Sidebar() {
+export function Sidebar({
+  activeTab,
+  setActiveTab,
+}: {
+  activeTab: string;
+  setActiveTab: (tab: string) => void;
+}) {
   return (
     <aside className="flex w-[88px] shrink-0 flex-col items-center justify-between py-8 lg:w-[104px]">
       <div className="flex flex-col items-center gap-10">
         <LogoMark className="h-11 w-11" />
 
         <nav className="flex flex-col gap-3">
-          {navItems.map(({ label, icon: Icon, active }) => (
-            <button
-              key={label}
-              type="button"
-              aria-current={active ? "page" : undefined}
-              className={`group relative flex h-12 w-12 items-center justify-center rounded-2xl transition-colors ${
-                active
-                  ? "bg-white text-slate-900 shadow-[var(--shadow-soft)]"
-                  : "text-slate-400 hover:bg-white/70 hover:text-slate-700"
-              }`}
-              title={label}
-            >
-              {active && (
-                <span className="absolute -right-1 top-1/2 h-8 w-1 -translate-y-1/2 rounded-full bg-gradient-to-b from-orange-300 to-brand" />
-              )}
-              <Icon className="h-5 w-5" />
-            </button>
-          ))}
+          {navItems.map(({ id, label, icon: Icon }) => {
+            const isActive = activeTab === id;
+            return (
+              <button
+                key={id}
+                type="button"
+                onClick={() => setActiveTab(id)}
+                aria-current={isActive ? "page" : undefined}
+                className={`group relative flex h-12 w-12 items-center justify-center rounded-2xl transition-colors ${
+                  isActive
+                    ? "bg-white text-slate-900 shadow-[var(--shadow-soft)]"
+                    : "text-slate-400 hover:bg-white/70 hover:text-slate-700"
+                }`}
+                title={label}
+              >
+                {isActive && (
+                  <span className="absolute -right-1 top-1/2 h-8 w-1 -translate-y-1/2 rounded-full bg-gradient-to-b from-orange-300 to-brand" />
+                )}
+                <Icon className="h-5 w-5" />
+              </button>
+            );
+          })}
         </nav>
       </div>
 
