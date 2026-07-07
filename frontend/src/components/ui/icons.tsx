@@ -1,126 +1,74 @@
 import type { ReactNode } from "react";
+import {
+  RiDashboardLine,
+  RiMessage3Line,
+  RiBarChartBoxLine,
+  RiMapPin2Line,
+  RiSettings4Line,
+  RiSearchLine,
+  RiNotification3Line,
+  RiStarFill,
+  RiArrowRightUpLine,
+  RiArrowRightLine,
+  RiAddLine,
+  RiSunLine,
+  RiMoonLine
+} from "@remixicon/react";
 
 type IconProps = {
   className?: string;
 };
 
 export function IconOverview({ className }: IconProps) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
-      <rect x="3" y="3" width="7" height="7" rx="1.5" />
-      <rect x="14" y="3" width="7" height="7" rx="1.5" />
-      <rect x="3" y="14" width="7" height="7" rx="1.5" />
-      <rect x="14" y="14" width="7" height="7" rx="1.5" />
-    </svg>
-  );
+  return <RiDashboardLine className={className} />;
 }
 
 export function IconReviews({ className }: IconProps) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
-      <path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z" />
-    </svg>
-  );
+  return <RiMessage3Line className={className} />;
 }
 
 export function IconAnalytics({ className }: IconProps) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
-      <path d="M4 19V5" />
-      <path d="M4 19h16" />
-      <path d="M8 17V11" />
-      <path d="M12 17V7" />
-      <path d="M16 17v-4" />
-    </svg>
-  );
+  return <RiBarChartBoxLine className={className} />;
 }
 
 export function IconLocations({ className }: IconProps) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
-      <path d="M12 21s7-4.5 7-11a7 7 0 1 0-14 0c0 6.5 7 11 7 11z" />
-      <circle cx="12" cy="10" r="2.5" />
-    </svg>
-  );
+  return <RiMapPin2Line className={className} />;
 }
 
 export function IconSettings({ className }: IconProps) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
-      <circle cx="12" cy="12" r="3" />
-      <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
-    </svg>
-  );
+  return <RiSettings4Line className={className} />;
 }
 
 export function IconSearch({ className }: IconProps) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
-      <circle cx="11" cy="11" r="7" />
-      <path d="m20 20-3.5-3.5" />
-    </svg>
-  );
+  return <RiSearchLine className={className} />;
 }
 
 export function IconBell({ className }: IconProps) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
-      <path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
-      <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-    </svg>
-  );
+  return <RiNotification3Line className={className} />;
 }
 
 export function IconStar({ className }: IconProps) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
-      <path d="m12 2 3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-    </svg>
-  );
+  return <RiStarFill className={className} />;
 }
 
 export function IconTrendUp({ className }: IconProps) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="m3 17 6-6 4 4 8-8" />
-      <path d="M14 7h7v7" />
-    </svg>
-  );
+  return <RiArrowRightUpLine className={className} />;
 }
 
 export function IconArrowRight({ className }: IconProps) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="M5 12h14" />
-      <path d="m13 6 6 6-6 6" />
-    </svg>
-  );
+  return <RiArrowRightLine className={className} />;
 }
 
 export function IconPlus({ className }: IconProps) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="M12 5v14" />
-      <path d="M5 12h14" />
-    </svg>
-  );
+  return <RiAddLine className={className} />;
 }
 
 export function IconSun({ className }: IconProps) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
-      <circle cx="12" cy="12" r="4" />
-      <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
-    </svg>
-  );
+  return <RiSunLine className={className} />;
 }
 
 export function IconMoon({ className }: IconProps) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
-      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-    </svg>
-  );
+  return <RiMoonLine className={className} />;
 }
 
 export function Sparkline({ className }: IconProps) {
