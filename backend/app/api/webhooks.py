@@ -20,6 +20,8 @@ from __future__ import annotations
 import logging
 
 from fastapi import APIRouter, Depends, HTTPException
+from pydantic import BaseModel, Field
+from typing import Any
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.security import verify_business_secret
@@ -43,17 +45,38 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
+# --------------------------------------------------------------------------
+# Pydantic Schemas
+# --------------------------------------------------------------------------
+
+class WebhookIntakePayload(BaseModel):
+    business_id: str
+    client_phone: str = Field(..., max_length=32)
+    secret: str | None = None
+    client_name: str | None = Field(None, max_length=255)
+    service_name: str | None = Field(None, max_length=255)
+    master_name: str | None = Field(None, max_length=255)
+    location_id: str | None = None
+
+    model_config = {"extra": "ignore"}
+
+class GreenApiWebhookPayload(BaseModel):
+    senderData: dict[str, Any] | None = None
+    messageData: dict[str, Any] | None = None
+    
+    model_config = {"extra": "ignore"}
+
 
 @router.post("/webhook/intake")
-async def webhook_intake(payload: dict, session: AsyncSession = Depends(get_session)):
-    business_id = payload.get("business_id")
-    client_phone = payload.get("client_phone")
+async def webhook_intake(payload: WebhookIntakePayload, session: AsyncSession = Depends(get_session)):
+    business_id = payload.business_id
+    client_phone = payload.client_phone
 
     if not business_id or not client_phone:
         raise HTTPException(status_code=422, detail="business_id и client_phone обязательны")
 
     business = await get_business(session, business_id)
-    if not business or not verify_business_secret(business, payload.get("secret")):
+    if not business or not verify_business_secret(business, payload.secret):
         # Намеренно одна и та же ошибка для "бизнес не найден" и "секрет неверный" —
         # чтобы не давать возможность перебором узнать, какие business_id существуют.
         raise HTTPException(status_code=401, detail="unauthorized")
@@ -65,10 +88,10 @@ async def webhook_intake(payload: dict, session: AsyncSession = Depends(get_sess
         session,
         business_id=business_id,
         client_phone=client_phone,
-        client_name=payload.get("client_name"),
-        service_name=payload.get("service_name"),
-        master_name=payload.get("master_name"),
-        location_id=payload.get("location_id"),
+        client_name=payload.client_name,
+        service_name=payload.service_name,
+        master_name=payload.master_name,
+        location_id=payload.location_id,
     )
     await session.flush()
 
@@ -85,11 +108,11 @@ async def webhook_intake(payload: dict, session: AsyncSession = Depends(get_sess
 
 
 @router.post("/webhook/reply")
-async def webhook_reply(payload: dict, session: AsyncSession = Depends(get_session)):
+async def webhook_reply(payload: GreenApiWebhookPayload, session: AsyncSession = Depends(get_session)):
     try:
-        sender_phone = normalize_incoming_phone(payload["senderData"]["sender"])
-        text = payload["messageData"]["textMessageData"]["textMessage"].strip()
-    except (KeyError, AttributeError):
+        sender_phone = normalize_incoming_phone(payload.senderData["sender"])
+        text = payload.messageData["textMessageData"]["textMessage"].strip()
+    except (KeyError, AttributeError, TypeError):
         # Не текстовое сообщение (голосовое/картинка) или payload другого типа
         # события Green API (не incomingMessageReceived) — просто игнорируем.
         return {"status": "ignored"}
