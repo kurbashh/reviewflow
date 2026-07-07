@@ -375,7 +375,7 @@ export function DashboardPage({
               <div className="space-y-8">
                 
                 {/* Hero / Overview Welcome */}
-                <section className="relative overflow-hidden rounded-[2rem] bg-[var(--surface)] border border-[var(--border-subtle)] p-8 shadow-[var(--shadow-card)] lg:p-10 transition-colors duration-200">
+                <section className="relative overflow-hidden rounded-card bg-[var(--surface)] border border-[var(--border-subtle)] p-8 shadow-[var(--shadow-card)] lg:p-10 transition-colors duration-200">
                   <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[var(--success)] to-[var(--brand)]" />
                   <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
                     <div className="max-w-xl">
@@ -397,11 +397,11 @@ export function DashboardPage({
                       </div>
                     </div>
                     
-                    <div className="relative mx-auto flex h-48 w-full max-w-sm items-center justify-center rounded-[1.75rem] mesh-gradient-flow lg:h-56 shadow-lg">
-                      <div className="absolute inset-6 rounded-[1.5rem] border border-white/20 bg-white/30 dark:bg-black/30 backdrop-blur-md shadow-sm" />
+                    <div className="relative mx-auto flex h-48 w-full max-w-sm items-center justify-center rounded-2xl mesh-gradient-flow lg:h-56 shadow-lg">
+                      <div className="absolute inset-6 rounded-xl border border-white/20 bg-white/30 dark:bg-black/30 backdrop-blur-md shadow-sm" />
                       <div className="relative grid grid-cols-3 gap-6 p-6">
-                        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--surface)] text-[var(--success)] shadow-sm text-lg font-bold">★</div>
-                        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--brand)] text-white shadow-md text-lg font-bold">AI</div>
+                        <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-[var(--surface)] text-[var(--success)] shadow-sm text-lg font-bold">★</div>
+                        <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-[var(--brand)] text-white shadow-md text-lg font-bold">AI</div>
                         <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--surface)] text-[var(--text-main)] shadow-sm text-lg font-bold">💬</div>
                       </div>
                     </div>
@@ -412,12 +412,12 @@ export function DashboardPage({
                 <section className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
                   <CardShell>
                     <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Всего запросов</p>
-                    <p className="mt-3 text-3xl font-bold font-mono text-slate-900">{stats.sent}</p>
+                    <p className="mt-3 text-3xl font-bold font-mono text-slate-900 dark:text-white">{stats.sent}</p>
                     <p className="mt-1 text-xs text-slate-400">Отправлено в WhatsApp</p>
                   </CardShell>
                   <CardShell>
                     <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Средняя оценка</p>
-                    <p className="mt-3 text-3xl font-bold font-mono text-emerald-600">★ {stats.avg_rating}</p>
+                    <p className="mt-3 text-3xl font-bold font-mono text-emerald-600 dark:text-emerald-400">★ {stats.avg_rating}</p>
                     <p className="mt-1 text-xs text-slate-400">Оценка на основе {stats.rated} ответов</p>
                   </CardShell>
                   <CardShell>
@@ -427,7 +427,7 @@ export function DashboardPage({
                   </CardShell>
                   <CardShell>
                     <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Ожидают ответа</p>
-                    <p className="mt-3 text-3xl font-bold font-mono text-slate-900">{stats.pending_replies}</p>
+                    <p className="mt-3 text-3xl font-bold font-mono text-slate-900 dark:text-white">{stats.pending_replies}</p>
                     <p className="mt-1 text-xs text-slate-400">Активные диалоги</p>
                   </CardShell>
                 </section>
@@ -443,11 +443,11 @@ export function DashboardPage({
                         <p className="mt-1 text-sm text-slate-400">Новые запросы и полученные оценки за 7 дней</p>
                       </div>
                       <div className="flex items-center gap-4 text-xs">
-                        <span className="flex items-center gap-1.5 text-slate-600 font-medium">
+                        <span className="flex items-center gap-1.5 text-slate-600 dark:text-slate-300 font-medium">
                           <span className="h-2 w-2 rounded-full bg-brand" />
                           Отправлено
                         </span>
-                        <span className="flex items-center gap-1.5 text-slate-600 font-medium">
+                        <span className="flex items-center gap-1.5 text-slate-600 dark:text-slate-300 font-medium">
                           <span className="h-2 w-2 rounded-full bg-blue-500" />
                           С оценкой
                         </span>
@@ -570,13 +570,13 @@ export function DashboardPage({
                         reviewsData.reviews.slice(0, 4).map((review) => (
                           <li
                             key={review.id}
-                            className="flex flex-col gap-3 rounded-2xl border border-slate-100 p-4 hover:bg-slate-50/50 transition-all"
+                            className="flex flex-col gap-3 rounded-2xl border border-[var(--border-subtle)] p-4 hover:bg-slate-50 dark:hover:bg-zinc-800/50 transition-all cursor-pointer"
                           >
                             <div className="flex items-center justify-between">
                               <div className="flex items-center gap-3">
                                 <Avatar name={review.client_name || "К"} className="h-9 w-9 shrink-0" />
                                 <div>
-                                  <p className="text-sm font-bold text-slate-800">{review.client_name || "Клиент"}</p>
+                                  <p className="text-sm font-bold text-slate-800 dark:text-slate-200">{review.client_name || "Клиент"}</p>
                                   <p className="text-xs text-slate-400">{review.service_name || "Услуга не указана"}</p>
                                 </div>
                               </div>
@@ -654,7 +654,7 @@ export function DashboardPage({
                         reviewFilter === "negative" ? "bg-white dark:bg-zinc-900 text-slate-900 dark:text-slate-100 shadow-sm" : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
                       }`}
                     >
-                      Негатив (1-3★)
+                      Негативные (1-3★)
                     </button>
                   </div>
                 </div>
@@ -680,13 +680,13 @@ export function DashboardPage({
                         </tr>
                       ) : (
                         reviewsData.reviews.map((review) => (
-                          <tr key={review.id} className="border-b border-slate-50 hover:bg-slate-50/40 transition-colors">
-                            <td className="py-4 pl-4 font-semibold text-slate-900">
+                          <tr key={review.id} className="border-b border-[var(--border-subtle)] hover:bg-slate-50 dark:hover:bg-zinc-800/40 transition-colors cursor-pointer">
+                            <td className="py-4 pl-4 font-semibold text-slate-900 dark:text-white">
                               <div>{review.client_name || "Без имени"}</div>
                               <div className="text-xs text-slate-400 font-mono mt-0.5">{review.client_phone}</div>
                             </td>
                             <td className="py-4">
-                              <div className="text-slate-700 font-medium">{review.service_name || "Не указана"}</div>
+                              <div className="text-slate-700 dark:text-slate-200 font-medium">{review.service_name || "Не указана"}</div>
                               <div className="text-xs text-slate-400">Мастер: {review.master_name || "Не указан"}</div>
                             </td>
                             <td className="py-4 font-medium">{renderStars(review.rating)}</td>
@@ -768,17 +768,17 @@ export function DashboardPage({
                       <p className="text-center text-xs text-slate-400 py-12">Точки еще не добавлены. Добавьте филиал справа.</p>
                     ) : (
                       settings.locations.map((loc) => (
-                        <div key={loc.id} className="rounded-2xl border border-[var(--border-subtle)] p-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between hover:bg-slate-50/20 dark:hover:bg-zinc-800/20 transition-colors">
+                        <div key={loc.id} className="rounded-2xl border border-[var(--border-subtle)] p-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between hover:bg-slate-100 dark:hover:bg-zinc-800/50 transition-colors cursor-pointer">
                           <div className="space-y-1">
                             <h4 className="font-bold text-slate-800 dark:text-slate-200 text-base">{loc.name}</h4>
                             <p className="text-xs text-slate-400 font-mono">
                               Редирект: <a href={`https://167-233-118-175.sslip.io/api/redirect/${loc.redirect_slug}`} target="_blank" rel="noopener noreferrer" className="text-brand hover:underline">/go/{loc.redirect_slug}</a>
                             </p>
                             <div className="flex flex-wrap gap-x-4 gap-y-1 pt-1 text-[11px]">
-                              <span className={loc.gis_2gis_url ? "text-emerald-600" : "text-slate-300 dark:text-zinc-600"}>
+                              <span className={loc.gis_2gis_url ? "text-emerald-600 dark:text-emerald-500" : "text-slate-300 dark:text-zinc-600"}>
                                 2ГИС: {loc.gis_2gis_url ? "Подключен ✓" : "Нет"}
                               </span>
-                              <span className={loc.yandex_maps_url ? "text-emerald-600" : "text-slate-300 dark:text-zinc-600"}>
+                              <span className={loc.yandex_maps_url ? "text-emerald-600 dark:text-emerald-500" : "text-slate-300 dark:text-zinc-600"}>
                                 Яндекс: {loc.yandex_maps_url ? "Подключен ✓" : "Нет"}
                               </span>
                             </div>
@@ -795,7 +795,7 @@ export function DashboardPage({
                             <button
                               type="button"
                               onClick={() => handleDeleteLocation(loc.id)}
-                              className="rounded-full bg-red-50 dark:bg-red-950/20 hover:bg-red-100 dark:hover:bg-red-950/40 px-4 py-2 text-xs font-semibold text-red-600 dark:text-red-300 border border-red-100 dark:border-red-900/30 transition-colors"
+                              className="rounded-full bg-red-50 dark:bg-red-950/20 hover:bg-red-100 dark:hover:bg-red-900/60 px-4 py-2 text-xs font-semibold text-red-600 dark:text-red-300 border border-red-100 dark:border-red-900/30 dark:hover:border-red-900/60 transition-all"
                             >
                               Удалить
                             </button>

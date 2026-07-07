@@ -69,32 +69,31 @@ export function Sidebar({
           <IconBell className="h-5 w-5" />
         </button>
 
-        <div className="flex flex-col gap-2 rounded-2xl bg-slate-200/50 dark:bg-zinc-800/50 p-1.5 transition-colors">
-          <button
-            type="button"
-            onClick={() => setDarkMode(false)}
+        <button
+          type="button"
+          onClick={() => setDarkMode(!darkMode)}
+          className="flex flex-col gap-2 rounded-2xl bg-slate-200/50 dark:bg-zinc-800/50 p-1.5 transition-colors cursor-pointer group"
+          aria-label="Переключить тему"
+        >
+          <div
             className={`flex h-9 w-9 items-center justify-center rounded-xl transition-all ${
               !darkMode
                 ? "bg-white text-slate-800 shadow-sm"
-                : "text-slate-400 hover:text-slate-200"
+                : "text-slate-400 group-hover:text-slate-200"
             }`}
-            aria-label="Светлая тема"
           >
             <IconSun className="h-4 w-4" />
-          </button>
-          <button
-            type="button"
-            onClick={() => setDarkMode(true)}
+          </div>
+          <div
             className={`flex h-9 w-9 items-center justify-center rounded-xl transition-all ${
               darkMode
                 ? "bg-[var(--dashboard-bg)] text-[var(--brand)] shadow-sm"
-                : "text-slate-400 hover:text-slate-200"
+                : "text-slate-400 group-hover:text-slate-200"
             }`}
-            aria-label="Тёмная тема"
           >
             <IconMoon className="h-4 w-4" />
-          </button>
-        </div>
+          </div>
+        </button>
 
         <div className="h-11 w-11 overflow-hidden rounded-full border-2 border-[var(--border-subtle)] bg-gradient-to-br from-slate-200 to-slate-300 shadow-sm" />
       </div>
