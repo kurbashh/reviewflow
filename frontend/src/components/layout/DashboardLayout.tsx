@@ -25,8 +25,8 @@ export function DashboardLayout({
   }, [darkMode]);
 
   return (
-    <div className="min-h-screen bg-[var(--dashboard-bg)] p-3 sm:p-4 lg:p-6 transition-colors duration-200">
-      <div className="mx-auto flex min-h-[calc(100vh-1.5rem)] max-w-[1440px] overflow-hidden rounded-[var(--radius-shell)] bg-[var(--surface)] shadow-[var(--shadow-card)] lg:min-h-[calc(100vh-3rem)] transition-colors duration-200">
+    <div className="h-screen overflow-hidden bg-[var(--dashboard-bg)] p-3 sm:p-4 lg:p-6 transition-colors duration-200">
+      <div className="mx-auto flex h-full max-w-[1440px] overflow-hidden rounded-[var(--radius-shell)] bg-[var(--surface)] shadow-[var(--shadow-card)] transition-colors duration-200">
         <Sidebar
           activeTab={activeTab}
           setActiveTab={setActiveTab}
