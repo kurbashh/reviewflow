@@ -327,8 +327,8 @@ export function DashboardPage({
         <header className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="text-sm font-semibold tracking-wide text-brand uppercase"> ReviewFlow.kz</p>
-            <h1 className="mt-1 text-2xl font-bold tracking-tight text-slate-900 sm:text-[1.85rem]">
-              {settings?.name || "Личный кабинет мерчанта"}
+            <h1 className="mt-1 text-2xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-[1.85rem]">
+              {settings ? settings.name : "Панель управления"}
             </h1>
           </div>
 
@@ -439,7 +439,7 @@ export function DashboardPage({
                   <CardShell>
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                       <div>
-                        <h3 className="text-lg font-semibold text-slate-900">Динамика отправки и ответов</h3>
+                        <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Динамика отправки и ответов</h3>
                         <p className="mt-1 text-sm text-slate-400">Новые запросы и полученные оценки за 7 дней</p>
                       </div>
                       <div className="flex items-center gap-4 text-xs">
@@ -518,7 +518,7 @@ export function DashboardPage({
                   {/* Location Stats */}
                   <CardShell>
                     <div>
-                      <h3 className="text-lg font-semibold text-slate-900">Показатели по точкам</h3>
+                      <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Показатели по точкам</h3>
                       <p className="mt-1 text-sm text-slate-400">Активность сбора отзывов по филиалам</p>
                     </div>
 
@@ -527,10 +527,10 @@ export function DashboardPage({
                         <p className="text-center text-xs text-slate-400 py-8">Локации пока не настроены.</p>
                       ) : (
                         stats.location_stats.map((loc) => (
-                          <div key={loc.name} className="rounded-2xl border border-slate-100 p-4">
+                          <div key={loc.name} className="rounded-2xl border border-[var(--border-subtle)] p-4">
                             <div className="flex items-center justify-between">
-                              <p className="text-sm font-bold text-slate-800">{loc.name}</p>
-                              <span className="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-600">
+                              <p className="text-sm font-bold text-slate-800 dark:text-slate-200">{loc.name}</p>
+                              <span className="rounded-full bg-blue-50 dark:bg-blue-950/20 px-2.5 py-1 text-xs font-semibold text-blue-600 dark:text-blue-300">
                                 ★ {loc.avg_rating}
                               </span>
                             </div>
@@ -552,7 +552,7 @@ export function DashboardPage({
                   <CardShell>
                     <div className="flex items-center justify-between">
                       <div>
-                        <h3 className="text-lg font-semibold text-slate-900">Последние отзывы</h3>
+                        <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Последние отзывы</h3>
                         <p className="mt-1 text-sm text-slate-400">Недавние ответы и оценки клиентов</p>
                       </div>
                       <button
@@ -587,13 +587,13 @@ export function DashboardPage({
                             </div>
 
                             {review.rating !== null && review.rating <= 3 && review.owner_feedback && (
-                              <div className="rounded-xl bg-orange-50/85 dark:bg-orange-950/20 border border-orange-100 dark:border-orange-900/30 p-3 text-xs text-orange-950 dark:text-orange-300">
+                              <div className="rounded-xl bg-orange-50 dark:bg-orange-950/20 border border-orange-200 dark:border-orange-900/30 p-3 text-xs text-orange-800 dark:text-orange-300">
                                 <b>Жалоба клиента:</b> "{review.owner_feedback}"
                               </div>
                             )}
 
                             {review.rating !== null && review.rating >= 4 && review.generated_review && (
-                              <div className="ai-glow-effect rounded-xl p-3 text-xs italic">
+                              <div className="ai-glow-effect rounded-xl p-3 text-xs italic text-[var(--brand)]">
                                 "{review.generated_review}"
                               </div>
                             )}
@@ -634,7 +634,7 @@ export function DashboardPage({
               <CardShell>
                 <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
                   <div>
-                    <h3 className="text-lg font-semibold text-slate-900">История сбора отзывов</h3>
+                    <h3 className="text-lg font-semibold text-slate-900 dark:text-white">История сбора отзывов</h3>
                     <p className="mt-1 text-sm text-slate-400">Все диалоги и оценки по вашему бизнесу</p>
                   </div>
 
@@ -705,11 +705,11 @@ export function DashboardPage({
                             </td>
                             <td className="py-4 max-w-xs">
                               {review.rating !== null && review.rating <= 3 && review.owner_feedback ? (
-                                <div className="text-xs text-orange-700 dark:text-orange-300 bg-orange-50 dark:bg-orange-950/20 border border-orange-100 dark:border-orange-900/30 rounded-xl p-2.5">
+                                <div className="text-xs text-orange-800 dark:text-orange-300 bg-orange-50 dark:bg-orange-950/20 border border-orange-200 dark:border-orange-900/30 rounded-xl p-2.5">
                                   <b>Жалоба:</b> "{review.owner_feedback}"
                                 </div>
                               ) : review.generated_review ? (
-                                <div className="ai-glow-effect rounded-xl p-2.5 text-xs italic max-h-20 overflow-y-auto">
+                                <div className="ai-glow-effect rounded-xl p-2.5 text-xs italic text-[var(--brand)] max-h-20 overflow-y-auto">
                                   "{review.generated_review}"
                                 </div>
                               ) : (
@@ -759,7 +759,7 @@ export function DashboardPage({
                 {/* Locations list */}
                 <CardShell>
                   <div>
-                    <h3 className="text-lg font-semibold text-slate-900">Управление филиалами</h3>
+                    <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Управление филиалами</h3>
                     <p className="mt-1 text-sm text-slate-400">Настройка ссылок на карты и слагов перенаправления для каждой точки</p>
                   </div>
 
@@ -809,7 +809,7 @@ export function DashboardPage({
                 {/* Add/Edit Location form */}
                 <CardShell>
                   <div>
-                    <h3 className="text-lg font-semibold text-slate-900">
+                    <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
                       {editingLocId ? "Редактировать локацию" : "Добавить новый филиал"}
                     </h3>
                     <p className="mt-1 text-sm text-slate-400">
@@ -898,7 +898,7 @@ export function DashboardPage({
             {activeTab === "settings" && settings && (
               <CardShell className="max-w-3xl mx-auto">
                 <div>
-                  <h3 className="text-lg font-semibold text-slate-900">Настройки бизнеса и интеграций</h3>
+                  <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Настройки бизнеса и интеграций</h3>
                   <p className="mt-1 text-sm text-slate-400">Настройте общие параметры бизнеса, ключи подключения CRM и оповещения</p>
                 </div>
 
@@ -1041,7 +1041,7 @@ export function DashboardPage({
                 {/* Subscription Details Card */}
                 <CardShell>
                   <div>
-                    <h3 className="text-lg font-semibold text-slate-900">Управление подпиской</h3>
+                    <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Управление подпиской</h3>
                     <p className="mt-1 text-sm text-slate-400">Сведения о вашем тарифном плане и платежах</p>
                   </div>
 
