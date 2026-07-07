@@ -6,7 +6,7 @@ import {
   Avatar,
 } from "../components/ui/icons";
 
-const API_BASE = "http://167.233.118.175/api/dashboard";
+const API_BASE = "https://167-233-118-175.sslip.io/api/dashboard";
 
 interface Location {
   id: string;
@@ -772,7 +772,7 @@ export function DashboardPage({
                           <div className="space-y-1">
                             <h4 className="font-bold text-slate-800 text-base">{loc.name}</h4>
                             <p className="text-xs text-slate-400 font-mono">
-                              Редирект: <a href={`http://167.233.118.175/api/redirect/${loc.redirect_slug}`} target="_blank" rel="noopener noreferrer" className="text-brand hover:underline">/go/{loc.redirect_slug}</a>
+                              Редирект: <a href={`https://167-233-118-175.sslip.io/api/redirect/${loc.redirect_slug}`} target="_blank" rel="noopener noreferrer" className="text-brand hover:underline">/go/{loc.redirect_slug}</a>
                             </p>
                             <div className="flex flex-wrap gap-x-4 gap-y-1 pt-1 text-[11px]">
                               <span className={loc.gis_2gis_url ? "text-emerald-600" : "text-slate-300"}>
@@ -846,7 +846,7 @@ export function DashboardPage({
                         className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm focus:border-brand focus:outline-none disabled:bg-slate-50 disabled:text-slate-400 transition-colors"
                       />
                       {!editingLocId && (
-                        <p className="text-[10px] text-slate-400">Будет создана ссылка: <b>http://167.233.118.175/api/redirect/{newLocSlug || "слаг"}</b></p>
+                        <p className="text-[10px] text-slate-400">Будет создана ссылка: <b>https://167-233-118-175.sslip.io/api/redirect/{newLocSlug || "слаг"}</b></p>
                       )}
                     </div>
 
