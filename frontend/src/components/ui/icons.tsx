@@ -268,7 +268,7 @@ export function CardShell({
   className?: string;
 }) {
   return (
-    <section className={`rounded-card border border-[var(--border-subtle)] bg-[var(--dashboard-bg)] text-[var(--text-main)] p-6 shadow-[var(--shadow-soft)] transition-colors duration-200 ${className}`}>
+    <section className={`rounded-card border border-[var(--border-subtle)] bg-[var(--surface)] text-[var(--text-main)] p-6 shadow-[var(--shadow-soft)] transition-colors duration-200 ${className}`}>
       {children}
     </section>
   );

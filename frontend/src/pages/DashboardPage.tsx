@@ -339,28 +339,28 @@ export function DashboardPage({
               value={businessId}
               onChange={(e) => setBusinessId(e.target.value.trim())}
               placeholder="UUID бизнеса"
-              className="rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-mono text-slate-700 focus:border-brand focus:outline-none"
+              className="rounded-full border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-4 py-2 text-xs font-mono text-slate-700 dark:text-slate-200 placeholder-slate-400 dark:placeholder-zinc-500 focus:border-brand focus:outline-none shadow-sm transition-colors"
             />
           </div>
         </header>
 
         {/* Global Loading / Error */}
         {loading && (
-          <div className="flex h-64 items-center justify-center rounded-3xl bg-white shadow-soft">
+          <div className="flex h-64 items-center justify-center rounded-3xl bg-[var(--surface)] border border-[var(--border-subtle)] shadow-soft transition-colors duration-200">
             <div className="text-center">
               <div className="h-8 w-8 animate-spin rounded-full border-4 border-brand border-t-transparent mx-auto"></div>
-              <p className="mt-4 text-sm text-slate-500">Загрузка данных...</p>
+              <p className="mt-4 text-sm text-slate-500 dark:text-slate-400">Загрузка данных...</p>
             </div>
           </div>
         )}
 
         {error && (
-          <div className="rounded-3xl bg-red-50 p-6 text-red-800 shadow-soft">
+          <div className="rounded-3xl bg-red-50 dark:bg-red-950/20 text-red-800 dark:text-red-300 border border-red-100 dark:border-red-900/30 p-6 shadow-soft transition-colors">
             <h3 className="font-semibold text-lg">Произошла ошибка при загрузке</h3>
             <p className="mt-1 text-sm">{error}</p>
             <button
               onClick={() => window.location.reload()}
-              className="mt-4 rounded-full bg-red-100 px-4 py-2 text-xs font-semibold text-red-800 hover:bg-red-200 transition-colors"
+              className="mt-4 rounded-full bg-red-100 dark:bg-red-900/40 px-4 py-2 text-xs font-semibold text-red-800 dark:text-red-200 hover:bg-red-200 dark:hover:bg-red-900/60 transition-colors"
             >
               Попробовать снова
             </button>
@@ -375,15 +375,15 @@ export function DashboardPage({
               <div className="space-y-8">
                 
                 {/* Hero / Overview Welcome */}
-                <section className="relative overflow-hidden rounded-[2rem] bg-white p-8 shadow-[var(--shadow-card)] lg:p-10">
-                  <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-orange-400 via-purple-400 to-blue-400" />
+                <section className="relative overflow-hidden rounded-[2rem] bg-[var(--surface)] border border-[var(--border-subtle)] p-8 shadow-[var(--shadow-card)] lg:p-10 transition-colors duration-200">
+                  <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[var(--success)] to-[var(--brand)]" />
                   <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
                     <div className="max-w-xl">
                       <p className="text-sm font-semibold tracking-wide text-brand uppercase">Добро пожаловать</p>
-                      <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl lg:text-[2.25rem] lg:leading-[1.1]">
+                      <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-4xl lg:text-[2.25rem] lg:leading-[1.1]">
                         Эффективность сбора отзывов
                       </h2>
-                      <p className="mt-4 max-w-lg text-sm leading-6 text-slate-500">
+                      <p className="mt-4 max-w-lg text-sm leading-6 text-slate-500 dark:text-slate-400">
                         Автосбор работает стабильно. AI-модель успешно генерирует тексты отзывов для лояльных клиентов, а негативные оценки перехватываются и пересылаются вам.
                       </p>
                       <div className="mt-8 flex flex-wrap items-center gap-3">
@@ -587,7 +587,7 @@ export function DashboardPage({
                             </div>
 
                             {review.rating !== null && review.rating <= 3 && review.owner_feedback && (
-                              <div className="rounded-xl bg-orange-50/80 p-3 text-xs text-orange-950">
+                              <div className="rounded-xl bg-orange-50/85 dark:bg-orange-950/20 border border-orange-100 dark:border-orange-900/30 p-3 text-xs text-orange-950 dark:text-orange-300">
                                 <b>Жалоба клиента:</b> "{review.owner_feedback}"
                               </div>
                             )}
@@ -609,19 +609,19 @@ export function DashboardPage({
                     <div>
                       <span className="rounded-full bg-brand/20 px-3 py-1 text-xs font-semibold text-brand tracking-wider uppercase">ReviewFlow.kz</span>
                       <h4 className="mt-4 text-xl font-bold tracking-tight text-white">Рейтинг защищен</h4>
-                      <p className="mt-2 text-xs text-slate-400 leading-relaxed">
+                      <p className="mt-2 text-xs text-slate-300 leading-relaxed">
                         Недовольные клиенты перенаправляются на форму обратной связи, предотвращая публикацию негативных отзывов на картах.
                       </p>
                     </div>
 
                     <div className="mt-8 pt-8 border-t border-slate-800/80 grid grid-cols-2 gap-4">
                       <div>
-                        <p className="text-2xl font-bold text-white">{stats.reviews_completed}</p>
-                        <p className="text-[10px] text-slate-400">Сгенерировано AI</p>
+                        <p className="text-2xl font-bold text-white font-mono">{stats.reviews_completed}</p>
+                        <p className="text-[10px] text-slate-300">Сгенерировано AI</p>
                       </div>
                       <div>
-                        <p className="text-2xl font-bold text-brand">{stats.negative_captured}</p>
-                        <p className="text-[10px] text-slate-400">Перехвачено жалоб</p>
+                        <p className="text-2xl font-bold text-brand font-mono">{stats.negative_captured}</p>
+                        <p className="text-[10px] text-slate-300">Перехвачено жалоб</p>
                       </div>
                     </div>
                   </CardShell>
@@ -639,11 +639,11 @@ export function DashboardPage({
                   </div>
 
                   {/* Filter tabs */}
-                  <div className="flex items-center gap-1 rounded-full bg-slate-100 p-1">
+                  <div className="flex items-center gap-1 rounded-full bg-slate-100 dark:bg-zinc-800 p-1">
                     <button
                       onClick={() => handleReviewFilterChange("all")}
                       className={`rounded-full px-4 py-1.5 text-xs font-semibold transition-colors ${
-                        reviewFilter === "all" ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-800"
+                        reviewFilter === "all" ? "bg-white dark:bg-zinc-900 text-slate-900 dark:text-slate-100 shadow-sm" : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
                       }`}
                     >
                       Все отзывы
@@ -651,7 +651,7 @@ export function DashboardPage({
                     <button
                       onClick={() => handleReviewFilterChange("negative")}
                       className={`rounded-full px-4 py-1.5 text-xs font-semibold transition-colors ${
-                        reviewFilter === "negative" ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-800"
+                        reviewFilter === "negative" ? "bg-white dark:bg-zinc-900 text-slate-900 dark:text-slate-100 shadow-sm" : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
                       }`}
                     >
                       Негатив (1-3★)
@@ -705,7 +705,7 @@ export function DashboardPage({
                             </td>
                             <td className="py-4 max-w-xs">
                               {review.rating !== null && review.rating <= 3 && review.owner_feedback ? (
-                                <div className="text-xs text-orange-700 bg-orange-50 rounded-xl p-2.5">
+                                <div className="text-xs text-orange-700 dark:text-orange-300 bg-orange-50 dark:bg-orange-950/20 border border-orange-100 dark:border-orange-900/30 rounded-xl p-2.5">
                                   <b>Жалоба:</b> "{review.owner_feedback}"
                                 </div>
                               ) : review.generated_review ? (
@@ -768,17 +768,17 @@ export function DashboardPage({
                       <p className="text-center text-xs text-slate-400 py-12">Точки еще не добавлены. Добавьте филиал справа.</p>
                     ) : (
                       settings.locations.map((loc) => (
-                        <div key={loc.id} className="rounded-2xl border border-slate-100 p-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between hover:bg-slate-50/20 transition-colors">
+                        <div key={loc.id} className="rounded-2xl border border-[var(--border-subtle)] p-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between hover:bg-slate-50/20 dark:hover:bg-zinc-800/20 transition-colors">
                           <div className="space-y-1">
-                            <h4 className="font-bold text-slate-800 text-base">{loc.name}</h4>
+                            <h4 className="font-bold text-slate-800 dark:text-slate-200 text-base">{loc.name}</h4>
                             <p className="text-xs text-slate-400 font-mono">
                               Редирект: <a href={`https://167-233-118-175.sslip.io/api/redirect/${loc.redirect_slug}`} target="_blank" rel="noopener noreferrer" className="text-brand hover:underline">/go/{loc.redirect_slug}</a>
                             </p>
                             <div className="flex flex-wrap gap-x-4 gap-y-1 pt-1 text-[11px]">
-                              <span className={loc.gis_2gis_url ? "text-emerald-600" : "text-slate-300"}>
+                              <span className={loc.gis_2gis_url ? "text-emerald-600" : "text-slate-300 dark:text-zinc-600"}>
                                 2ГИС: {loc.gis_2gis_url ? "Подключен ✓" : "Нет"}
                               </span>
-                              <span className={loc.yandex_maps_url ? "text-emerald-600" : "text-slate-300"}>
+                              <span className={loc.yandex_maps_url ? "text-emerald-600" : "text-slate-300 dark:text-zinc-600"}>
                                 Яндекс: {loc.yandex_maps_url ? "Подключен ✓" : "Нет"}
                               </span>
                             </div>
@@ -788,14 +788,14 @@ export function DashboardPage({
                             <button
                               type="button"
                               onClick={() => handleStartEditLocation(loc)}
-                              className="rounded-full bg-slate-100 hover:bg-slate-200 px-4 py-2 text-xs font-semibold text-slate-700 transition-colors"
+                              className="rounded-full bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 dark:hover:bg-zinc-700 px-4 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 transition-colors"
                             >
                               Редактировать
                             </button>
                             <button
                               type="button"
                               onClick={() => handleDeleteLocation(loc.id)}
-                              className="rounded-full bg-red-50 hover:bg-red-100 px-4 py-2 text-xs font-semibold text-red-600 transition-colors"
+                              className="rounded-full bg-red-50 dark:bg-red-950/20 hover:bg-red-100 dark:hover:bg-red-950/40 px-4 py-2 text-xs font-semibold text-red-600 dark:text-red-300 border border-red-100 dark:border-red-900/30 transition-colors"
                             >
                               Удалить
                             </button>
@@ -830,7 +830,7 @@ export function DashboardPage({
                         value={newLocName}
                         onChange={(e) => setNewLocName(e.target.value)}
                         placeholder="Например, Dostyk Ave"
-                        className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm focus:border-brand focus:outline-none transition-colors"
+                        className="w-full rounded-2xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:border-brand focus:outline-none transition-colors"
                       />
                     </div>
 
@@ -843,7 +843,7 @@ export function DashboardPage({
                         value={newLocSlug}
                         onChange={(e) => setNewLocSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-_]/g, ""))}
                         placeholder="Например, dostyk"
-                        className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm focus:border-brand focus:outline-none disabled:bg-slate-50 disabled:text-slate-400 transition-colors"
+                        className="w-full rounded-2xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:border-brand focus:outline-none disabled:bg-slate-50 disabled:dark:bg-zinc-900/50 disabled:text-slate-400 disabled:dark:text-zinc-500 transition-colors"
                       />
                       {!editingLocId && (
                         <p className="text-[10px] text-slate-400">Будет создана ссылка: <b>https://167-233-118-175.sslip.io/api/redirect/{newLocSlug || "слаг"}</b></p>
@@ -857,7 +857,7 @@ export function DashboardPage({
                         value={newLocGis}
                         onChange={(e) => setNewLocGis(e.target.value)}
                         placeholder="Ссылка на филиал в 2ГИС"
-                        className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm focus:border-brand focus:outline-none transition-colors"
+                        className="w-full rounded-2xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:border-brand focus:outline-none transition-colors"
                       />
                     </div>
 
@@ -868,7 +868,7 @@ export function DashboardPage({
                         value={newLocYandex}
                         onChange={(e) => setNewLocYandex(e.target.value)}
                         placeholder="Ссылка на филиал в Яндекс.Картах"
-                        className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm focus:border-brand focus:outline-none transition-colors"
+                        className="w-full rounded-2xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:border-brand focus:outline-none transition-colors"
                       />
                     </div>
 
@@ -883,7 +883,7 @@ export function DashboardPage({
                         <button
                           type="button"
                           onClick={handleCancelEditLocation}
-                          className="rounded-full bg-slate-100 hover:bg-slate-200 px-5 py-3 text-sm font-semibold text-slate-700 transition-colors"
+                          className="rounded-full bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 dark:hover:bg-zinc-700 px-5 py-3 text-sm font-semibold text-slate-700 dark:text-slate-200 transition-colors"
                         >
                           Отмена
                         </button>
@@ -923,7 +923,7 @@ export function DashboardPage({
                           required
                           value={settingsForm.name}
                           onChange={(e) => setSettingsForm({ ...settingsForm, name: e.target.value })}
-                          className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm focus:border-brand focus:outline-none transition-colors"
+                          className="w-full rounded-2xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:border-brand focus:outline-none transition-colors"
                         />
                       </div>
                       <div className="space-y-1">
@@ -934,7 +934,7 @@ export function DashboardPage({
                           value={settingsForm.category}
                           onChange={(e) => setSettingsForm({ ...settingsForm, category: e.target.value })}
                           placeholder="Например, Салон красоты"
-                          className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm focus:border-brand focus:outline-none transition-colors"
+                          className="w-full rounded-2xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:border-brand focus:outline-none transition-colors"
                         />
                       </div>
                     </div>
@@ -946,7 +946,7 @@ export function DashboardPage({
                         required
                         value={settingsForm.phone}
                         onChange={(e) => setSettingsForm({ ...settingsForm, phone: e.target.value })}
-                        className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm focus:border-brand focus:outline-none transition-colors"
+                        className="w-full rounded-2xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:border-brand focus:outline-none transition-colors"
                       />
                     </div>
                   </div>
@@ -961,7 +961,7 @@ export function DashboardPage({
                         <select
                           value={settingsForm.crm_type}
                           onChange={(e) => setSettingsForm({ ...settingsForm, crm_type: e.target.value })}
-                          className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm focus:border-brand focus:outline-none transition-colors"
+                          className="w-full rounded-2xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:border-brand focus:outline-none transition-colors"
                         >
                           <option value="">Без интеграции (вручную)</option>
                           <option value="yclients">YClients</option>
@@ -976,7 +976,7 @@ export function DashboardPage({
                           type="text"
                           readOnly
                           value={settings.crm_webhook_secret}
-                          className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-mono text-slate-500 focus:outline-none"
+                          className="w-full rounded-2xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900/50 px-4 py-3 text-sm font-mono text-slate-500 dark:text-slate-400 focus:outline-none"
                         />
                         <p className="text-[10px] text-slate-400">Используйте этот секрет для проверки входящих событий</p>
                       </div>
@@ -994,7 +994,7 @@ export function DashboardPage({
                         value={settingsForm.gis_2gis_url}
                         onChange={(e) => setSettingsForm({ ...settingsForm, gis_2gis_url: e.target.value })}
                         placeholder="Будет использоваться, если у филиала нет индивидуальной ссылки"
-                        className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm focus:border-brand focus:outline-none transition-colors"
+                        className="w-full rounded-2xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:border-brand focus:outline-none transition-colors"
                       />
                     </div>
 
@@ -1005,7 +1005,7 @@ export function DashboardPage({
                         value={settingsForm.yandex_maps_url}
                         onChange={(e) => setSettingsForm({ ...settingsForm, yandex_maps_url: e.target.value })}
                         placeholder="Будет использоваться, если у филиала нет индивидуальной ссылки"
-                        className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm focus:border-brand focus:outline-none transition-colors"
+                        className="w-full rounded-2xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:border-brand focus:outline-none transition-colors"
                       />
                     </div>
 
@@ -1016,7 +1016,7 @@ export function DashboardPage({
                         value={settingsForm.telegram_chat_id}
                         onChange={(e) => setSettingsForm({ ...settingsForm, telegram_chat_id: e.target.value.trim() })}
                         placeholder="Chat ID вашего Telegram бота для алертов об оценках 1-3"
-                        className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm focus:border-brand focus:outline-none transition-colors"
+                        className="w-full rounded-2xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:border-brand focus:outline-none transition-colors"
                       />
                       <p className="text-[10px] text-slate-400">На этот чат будут приходить уведомления о перехваченном негативе</p>
                     </div>
@@ -1046,9 +1046,9 @@ export function DashboardPage({
                   </div>
 
                   <div className="mt-8 grid gap-6 sm:grid-cols-2">
-                    <div className="rounded-2xl bg-slate-50 p-5 space-y-1">
+                    <div className="rounded-2xl bg-slate-50 dark:bg-zinc-800/40 p-5 space-y-1">
                       <p className="text-xs text-slate-400 font-semibold uppercase">Тарифный план</p>
-                      <p className="text-2xl font-extrabold text-slate-900 uppercase">{billing.plan}</p>
+                      <p className="text-2xl font-extrabold text-slate-900 dark:text-slate-100 uppercase">{billing.plan}</p>
                       <p className="text-[10px] text-slate-400 pt-1">
                         {billing.plan === "light" ? "До 150 рассылок в месяц" :
                          billing.plan === "standard" ? "До 500 рассылок в месяц + AI" :
@@ -1056,7 +1056,7 @@ export function DashboardPage({
                       </p>
                     </div>
 
-                    <div className="rounded-2xl bg-slate-50 p-5 space-y-1">
+                    <div className="rounded-2xl bg-slate-50 dark:bg-zinc-800/40 p-5 space-y-1">
                       <p className="text-xs text-slate-400 font-semibold uppercase">Статус подписки</p>
                       <p className="text-2xl font-extrabold text-brand uppercase">{billing.status}</p>
                       <p className="text-[10px] text-slate-400 pt-1">
@@ -1067,31 +1067,31 @@ export function DashboardPage({
                     </div>
                   </div>
 
-                  <div className="mt-6 border-t border-slate-100 pt-6 space-y-4 text-sm text-slate-600">
+                  <div className="mt-6 border-t border-[var(--border-subtle)] pt-6 space-y-4 text-sm text-slate-600 dark:text-slate-400">
                     <div className="flex justify-between">
                       <span>Дата подключения:</span>
-                      <span className="font-bold text-slate-800">
+                      <span className="font-bold text-slate-800 dark:text-slate-200">
                         {new Date(billing.created_at).toLocaleDateString("ru-RU")}
                       </span>
                     </div>
                     <div className="flex justify-between">
                       <span>Пробный период действует до:</span>
-                      <span className="font-bold text-slate-800">
+                      <span className="font-bold text-slate-800 dark:text-slate-200">
                         {new Date(billing.trial_ends_at).toLocaleDateString("ru-RU")}
                       </span>
                     </div>
-                    <div className="flex justify-between border-t border-slate-50 pt-4 text-base font-bold">
-                      <span className="text-slate-800">К оплате за следующий месяц:</span>
+                    <div className="flex justify-between border-t border-[var(--border-subtle)] pt-4 text-base font-bold">
+                      <span className="text-slate-800 dark:text-slate-200">К оплате за следующий месяц:</span>
                       <span className="text-brand">{billing.amount_due.toLocaleString()} ₸</span>
                     </div>
                   </div>
                 </CardShell>
 
                 {/* Kaspi Pay trigger card */}
-                <CardShell className="bg-orange-50 border-orange-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+                <CardShell className="bg-orange-50 dark:bg-orange-950/20 border-orange-100 dark:border-orange-900/30 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 transition-colors">
                   <div className="space-y-1">
-                    <h4 className="font-bold text-orange-950 text-base">Быстрая оплата подписки через Kaspi Pay</h4>
-                    <p className="text-xs text-orange-800">Оплачивайте подписку юридического лица мгновенно и без комиссий</p>
+                    <h4 className="font-bold text-orange-950 dark:text-orange-300 text-base">Быстрая оплата подписки через Kaspi Pay</h4>
+                    <p className="text-xs text-orange-850 dark:text-orange-400">Оплачивайте подписку юридического лица мгновенно и без комиссий</p>
                   </div>
 
                   <a

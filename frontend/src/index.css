@@ -17,36 +17,6 @@
 
   --radius-card: 12px;
   --radius-button: 12px;
-
-  /* Map Tailwind colors dynamically to our theme variables for automatic dark mode support */
-  --color-slate-950: var(--dashboard-bg);
-  --color-slate-900: var(--text-main);
-  --color-slate-800: var(--text-main);
-  --color-slate-700: var(--text-main);
-  --color-slate-600: var(--text-muted);
-  --color-slate-500: var(--text-muted);
-  --color-slate-400: var(--text-muted);
-  --color-slate-300: var(--border-subtle);
-  --color-slate-200: var(--border-subtle);
-  --color-slate-100: var(--border-subtle);
-  --color-slate-50: var(--surface);
-
-  --color-zinc-950: var(--dashboard-bg);
-  --color-zinc-900: var(--text-main);
-  --color-zinc-800: var(--text-main);
-  --color-zinc-700: var(--text-main);
-  --color-zinc-600: var(--text-muted);
-  --color-zinc-500: var(--text-muted);
-  --color-zinc-400: var(--text-muted);
-  --color-zinc-300: var(--border-subtle);
-  --color-zinc-200: var(--border-subtle);
-  --color-zinc-100: var(--border-subtle);
-  --color-zinc-50: var(--surface);
-
-  --color-emerald-600: var(--success);
-  --color-emerald-500: var(--success);
-  --color-emerald-400: var(--success);
-  --color-emerald-50: var(--surface);
 }
 
 :root {
