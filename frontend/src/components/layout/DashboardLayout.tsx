@@ -34,7 +34,7 @@ export function DashboardLayout({
           setDarkMode={setDarkMode}
         />
 
-        <main className="flex-1 overflow-auto rounded-[calc(var(--radius-shell)-0.5rem)] bg-[var(--surface)] p-6 sm:p-8 lg:p-10 transition-colors duration-200">
+        <main className="flex-1 overflow-auto rounded-[calc(var(--radius-shell)-0.5rem)] bg-[var(--dashboard-bg)] p-6 sm:p-8 lg:p-10 transition-colors duration-200">
           {children}
         </main>
       </div>

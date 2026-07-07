@@ -20,8 +20,8 @@
 }
 
 :root {
-  --dashboard-bg: #FDFDFD;
-  --surface: #F4F4F5;
+  --dashboard-bg: #F4F4F5; /* Жемчужно-серый фон дашборда */
+  --surface: #FDFDFD;      /* Чистый белый холст для карточек */
   --brand: #7C3AED;
   --brand-hover: #6D28D9;
   --success: #059669;
@@ -32,8 +32,8 @@
 
 /* Dark theme class */
 .dark {
-  --dashboard-bg: #09090B;
-  --surface: #18181B;
+  --dashboard-bg: #09090B; /* Глубокий OLED-черный */
+  --surface: #18181B;      /* Угольный для карточек */
   --brand: #A78BFA;
   --brand-hover: #C084FC;
   --success: #34D399;
