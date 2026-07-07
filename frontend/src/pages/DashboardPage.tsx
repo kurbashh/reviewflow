@@ -5,6 +5,7 @@ import {
   CardShell,
   Avatar,
 } from "../components/ui/icons";
+import { RiStarFill, RiMagicFill, RiChatSmile3Fill } from "@remixicon/react";
 
 const API_BASE = "https://167-233-118-175.sslip.io/api/dashboard";
 
@@ -400,9 +401,15 @@ export function DashboardPage({
                     <div className="relative mx-auto flex h-48 w-full max-w-sm items-center justify-center rounded-2xl mesh-gradient-flow lg:h-56 shadow-lg">
                       <div className="absolute inset-6 rounded-xl border border-white/20 bg-white/30 dark:bg-black/30 backdrop-blur-md shadow-sm" />
                       <div className="relative grid grid-cols-3 gap-6 p-6">
-                        <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-[var(--surface)] text-[var(--success)] shadow-sm text-lg font-bold">★</div>
-                        <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-[var(--brand)] text-white shadow-md text-lg font-bold">AI</div>
-                        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--surface)] text-[var(--text-main)] shadow-sm text-lg font-bold">💬</div>
+                        <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-[var(--surface)] text-[#10B981] shadow-sm">
+                          <RiStarFill className="h-7 w-7" />
+                        </div>
+                        <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-[var(--brand)] text-white shadow-md">
+                          <RiMagicFill className="h-7 w-7" />
+                        </div>
+                        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--surface)] text-[var(--text-main)] shadow-sm">
+                          <RiChatSmile3Fill className="h-7 w-7" />
+                        </div>
                       </div>
                     </div>
                   </div>
