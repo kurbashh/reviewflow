@@ -1,19 +1,109 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap");
+
 @import "tailwindcss";
 
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --color-brand: #ff6b35;
-  --color-brand-hover: #e85a28;
-  --color-surface: #f8f9fa;
-  --color-muted: #64748b;
-  --radius-card: 1.5rem;
-  --radius-shell: 2.5rem;
-  --shadow-soft: 0 1px 3px rgb(15 23 42 / 0.04), 0 8px 24px rgb(15 23 42 / 0.04);
-  --shadow-card: 0 1px 2px rgb(15 23 42 / 0.03), 0 12px 32px rgb(15 23 42 / 0.05);
+  --font-mono: "Space Grotesk", "JetBrains Mono", monospace;
+  
+  --color-brand: var(--brand);
+  --color-brand-hover: var(--brand-hover);
+  --color-surface: var(--surface);
+  --color-dashboard-bg: var(--dashboard-bg);
+  --color-text-main: var(--text-main);
+  --color-text-muted: var(--text-muted);
+  --color-success: var(--success);
+  --color-border-subtle: var(--border-subtle);
+
+  --radius-card: 12px;
+  --radius-button: 12px;
+
+  /* Map Tailwind colors dynamically to our theme variables for automatic dark mode support */
+  --color-slate-950: var(--dashboard-bg);
+  --color-slate-900: var(--text-main);
+  --color-slate-800: var(--text-main);
+  --color-slate-700: var(--text-main);
+  --color-slate-600: var(--text-muted);
+  --color-slate-500: var(--text-muted);
+  --color-slate-400: var(--text-muted);
+  --color-slate-300: var(--border-subtle);
+  --color-slate-200: var(--border-subtle);
+  --color-slate-100: var(--border-subtle);
+  --color-slate-50: var(--surface);
+
+  --color-zinc-950: var(--dashboard-bg);
+  --color-zinc-900: var(--text-main);
+  --color-zinc-800: var(--text-main);
+  --color-zinc-700: var(--text-main);
+  --color-zinc-600: var(--text-muted);
+  --color-zinc-500: var(--text-muted);
+  --color-zinc-400: var(--text-muted);
+  --color-zinc-300: var(--border-subtle);
+  --color-zinc-200: var(--border-subtle);
+  --color-zinc-100: var(--border-subtle);
+  --color-zinc-50: var(--surface);
+
+  --color-emerald-600: var(--success);
+  --color-emerald-500: var(--success);
+  --color-emerald-400: var(--success);
+  --color-emerald-50: var(--surface);
+}
+
+:root {
+  --dashboard-bg: #FDFDFD;
+  --surface: #F4F4F5;
+  --brand: #7C3AED;
+  --brand-hover: #6D28D9;
+  --success: #059669;
+  --text-main: #18181B;
+  --text-muted: #71717A;
+  --border-subtle: #E4E4E7;
+}
+
+/* Dark theme class */
+.dark {
+  --dashboard-bg: #09090B;
+  --surface: #18181B;
+  --brand: #A78BFA;
+  --brand-hover: #C084FC;
+  --success: #34D399;
+  --text-main: #FAFAFA;
+  --text-muted: #A1A1AA;
+  --border-subtle: #27272A;
 }
 
 @layer base {
   body {
-    @apply bg-slate-100 font-sans text-slate-900 antialiased;
+    background-color: var(--dashboard-bg);
+    color: var(--text-main);
+    font-family: var(--font-sans);
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
   }
+}
+
+/* Mesh gradient animation */
+@keyframes flowGradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.mesh-gradient-flow {
+  background: linear-gradient(-45deg, #059669, #7C3AED, #34D399, #A78BFA);
+  background-size: 400% 400%;
+  animation: flowGradient 15s ease infinite;
+}
+
+/* Glow Effect for AI */
+.ai-glow-effect {
+  box-shadow: 0 0 15px rgba(124, 58, 237, 0.08);
+  border: 1px solid rgba(124, 58, 237, 0.15);
+  background-color: rgba(124, 58, 237, 0.03);
+  transition: all 0.2s ease;
+}
+
+.dark .ai-glow-effect {
+  box-shadow: 0 0 20px rgba(167, 139, 250, 0.15);
+  border: 1px solid rgba(167, 139, 250, 0.25);
+  background-color: rgba(167, 139, 250, 0.05);
 }

@@ -397,12 +397,12 @@ export function DashboardPage({
                       </div>
                     </div>
                     
-                    <div className="relative mx-auto flex h-48 w-full max-w-sm items-center justify-center rounded-[1.75rem] bg-gradient-to-br from-slate-50 via-orange-50 to-purple-50 lg:h-56">
-                      <div className="absolute inset-6 rounded-[1.5rem] border border-white/70 bg-white/60 backdrop-blur-sm shadow-sm" />
+                    <div className="relative mx-auto flex h-48 w-full max-w-sm items-center justify-center rounded-[1.75rem] mesh-gradient-flow lg:h-56 shadow-lg">
+                      <div className="absolute inset-6 rounded-[1.5rem] border border-white/20 bg-white/30 dark:bg-black/30 backdrop-blur-md shadow-sm" />
                       <div className="relative grid grid-cols-3 gap-6 p-6">
-                        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white text-brand shadow-sm text-lg font-bold">★</div>
-                        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand text-white shadow-md text-lg font-bold">AI</div>
-                        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white text-slate-700 shadow-sm text-lg font-bold">💬</div>
+                        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--surface)] text-[var(--success)] shadow-sm text-lg font-bold">★</div>
+                        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--brand)] text-white shadow-md text-lg font-bold">AI</div>
+                        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--surface)] text-[var(--text-main)] shadow-sm text-lg font-bold">💬</div>
                       </div>
                     </div>
                   </div>
@@ -412,22 +412,22 @@ export function DashboardPage({
                 <section className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
                   <CardShell>
                     <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Всего запросов</p>
-                    <p className="mt-3 text-3xl font-bold text-slate-900">{stats.sent}</p>
+                    <p className="mt-3 text-3xl font-bold font-mono text-slate-900">{stats.sent}</p>
                     <p className="mt-1 text-xs text-slate-400">Отправлено в WhatsApp</p>
                   </CardShell>
                   <CardShell>
                     <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Средняя оценка</p>
-                    <p className="mt-3 text-3xl font-bold text-blue-600">★ {stats.avg_rating}</p>
+                    <p className="mt-3 text-3xl font-bold font-mono text-emerald-600">★ {stats.avg_rating}</p>
                     <p className="mt-1 text-xs text-slate-400">Оценка на основе {stats.rated} ответов</p>
                   </CardShell>
                   <CardShell>
                     <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Конверсия ответов</p>
-                    <p className="mt-3 text-3xl font-bold text-brand">{stats.response_rate}%</p>
+                    <p className="mt-3 text-3xl font-bold font-mono text-brand">{stats.response_rate}%</p>
                     <p className="mt-1 text-xs text-slate-400">Процент ответивших клиентов</p>
                   </CardShell>
                   <CardShell>
                     <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Ожидают ответа</p>
-                    <p className="mt-3 text-3xl font-bold text-emerald-600">{stats.pending_replies}</p>
+                    <p className="mt-3 text-3xl font-bold font-mono text-slate-900">{stats.pending_replies}</p>
                     <p className="mt-1 text-xs text-slate-400">Активные диалоги</p>
                   </CardShell>
                 </section>
@@ -593,7 +593,7 @@ export function DashboardPage({
                             )}
 
                             {review.rating !== null && review.rating >= 4 && review.generated_review && (
-                              <div className="rounded-xl bg-slate-50 p-3 text-xs text-slate-600 italic">
+                              <div className="ai-glow-effect rounded-xl p-3 text-xs italic">
                                 "{review.generated_review}"
                               </div>
                             )}
@@ -709,7 +709,7 @@ export function DashboardPage({
                                   <b>Жалоба:</b> "{review.owner_feedback}"
                                 </div>
                               ) : review.generated_review ? (
-                                <div className="text-xs text-slate-500 italic max-h-16 overflow-y-auto">
+                                <div className="ai-glow-effect rounded-xl p-2.5 text-xs italic max-h-20 overflow-y-auto">
                                   "{review.generated_review}"
                                 </div>
                               ) : (
