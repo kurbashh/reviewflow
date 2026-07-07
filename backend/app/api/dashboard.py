@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import uuid
+import secrets
 from typing import Any
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
@@ -113,6 +114,7 @@ async def complete_onboarding(
         owner_id=current_user.id,
         name=payload.name,
         phone=payload.phone,
+        crm_webhook_secret=secrets.token_urlsafe(32),
     )
     session.add(business)
     await session.commit()
