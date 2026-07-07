@@ -81,13 +81,12 @@ async def root() -> dict[str, str]:
 # --------------------------------------------------------------------------
 from app.api.webhooks import router as webhooks_router          # Этап 2
 from app.api.redirect import router as redirect_router          # Этап 3
-
-# from app.api.crm_yclients import router as crm_yclients_router  # Этап 4
+from app.api.crm_yclients import router as crm_yclients_router  # Этап 4
 # from app.api.dashboard import router as dashboard_router        # Этап 5
 # from app.api.billing import router as billing_router            # Этап 7
 
 app.include_router(webhooks_router, tags=["webhooks"])
 app.include_router(redirect_router, tags=["redirect"])
-# app.include_router(crm_yclients_router, tags=["crm"])
+app.include_router(crm_yclients_router, tags=["crm"])
 # app.include_router(dashboard_router, prefix="/api/dashboard", tags=["dashboard"])
 # app.include_router(billing_router, prefix="/api/billing", tags=["billing"])
