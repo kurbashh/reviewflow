@@ -40,6 +40,9 @@ async_engine: AsyncEngine = create_async_engine(
     pool_size=settings.db_pool_size,
     max_overflow=settings.db_max_overflow,
     pool_pre_ping=True,  # проверка "мёртвых" соединений — критично для Supabase pooler'а
+    connect_args={
+        "statement_cache_size": 0,  # Отключает подготовленные выражения (критично для PgBouncer/Supabase Pooler)
+    },
 )
 
 AsyncSessionLocal: async_sessionmaker[AsyncSession] = async_sessionmaker(
