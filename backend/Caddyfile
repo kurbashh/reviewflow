@@ -1,0 +1,12 @@
+# Caddyfile configuration for ReviewFlow.kz
+#
+# Если у вас есть домен (например, api.reviewflow.kz), замените ":80" на ваш домен.
+# Caddy автоматически выпустит и продлит SSL-сертификат от Let's Encrypt.
+
+:80 {
+    reverse_proxy api:8000
+
+    log {
+        output file /var/log/caddy/access.log
+    }
+}

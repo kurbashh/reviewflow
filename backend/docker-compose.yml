@@ -86,9 +86,27 @@ services:
     networks:
       - reviewflow
 
+  caddy:
+    image: caddy:2.9-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+      - ./logs/caddy:/var/log/caddy
+    depends_on:
+      - api
+    networks:
+      - reviewflow
+
 volumes:
   redis_data:
   celery_beat_data:
+  caddy_data:
+  caddy_config:
 
 networks:
   reviewflow:

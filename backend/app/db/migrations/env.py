@@ -23,7 +23,8 @@ config = context.config
 
 # DSN берём исключительно из app/config.py (Supabase Postgres), а не из
 # alembic.ini — единая точка правды для секретов, как и во всём проекте.
-config.set_main_option("sqlalchemy.url", settings.async_database_url)
+# Экранируем '%' в '%%' для предотвращения ошибок интерполяции configparser (при url-encoded паролях).
+config.set_main_option("sqlalchemy.url", settings.async_database_url.replace("%", "%%"))
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
