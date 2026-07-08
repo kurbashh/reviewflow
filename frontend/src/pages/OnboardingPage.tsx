@@ -61,7 +61,7 @@ export function OnboardingPage({ token, onComplete }: OnboardingProps) {
   };
 
   return (
-    <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-[var(--dashboard-bg)] p-4 transition-colors duration-500">
+    <div className="relative flex min-h-[100dvh] flex-col items-center justify-center overflow-hidden bg-[var(--dashboard-bg)] p-[var(--spacing-fluid-md)] transition-colors duration-500">
       {/* Background Mesh */}
       <div className="absolute inset-0 mesh-gradient-flow opacity-30" />
       

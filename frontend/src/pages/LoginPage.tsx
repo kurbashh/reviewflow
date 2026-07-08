@@ -44,7 +44,7 @@ export function LoginPage({ onLogin, onRegister }: LoginPageProps) {
   };
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[var(--dashboard-bg)] p-4 transition-colors duration-200">
+    <div className="relative flex min-h-[100dvh] items-center justify-center overflow-hidden bg-[var(--dashboard-bg)] p-[var(--spacing-fluid-md)] transition-colors duration-200">
       {/* Animated mesh background */}
       <div className="absolute inset-0 mesh-gradient-flow opacity-20" />
 

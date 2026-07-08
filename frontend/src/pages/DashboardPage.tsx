@@ -470,7 +470,7 @@ export function DashboardPage({
                 </section>
 
                 {/* Metrics Grid */}
-                <section className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
+                <section className="grid gap-[var(--spacing-fluid-md)] grid-cols-[repeat(auto-fit,minmax(240px,1fr))]">
                   <CardShell>
                     <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Всего запросов</p>
                     <p className="mt-3 text-3xl font-bold font-mono text-slate-900 dark:text-white">{stats.sent}</p>
@@ -976,7 +976,7 @@ export function DashboardPage({
                   <div className="space-y-4">
                     <h4 className="text-xs font-bold text-brand uppercase tracking-wider">Профиль бизнеса</h4>
                     
-                    <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="grid gap-[var(--spacing-fluid-md)] grid-cols-[repeat(auto-fit,minmax(280px,1fr))]">
                       <div className="space-y-1">
                         <label className="text-xs font-bold text-slate-500 uppercase">Название бизнеса *</label>
                         <input
@@ -1016,7 +1016,7 @@ export function DashboardPage({
                   <div className="space-y-4 pt-4 border-t border-slate-100">
                     <h4 className="text-xs font-bold text-brand uppercase tracking-wider">Интеграция CRM</h4>
                     
-                    <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="grid gap-[var(--spacing-fluid-md)] grid-cols-[repeat(auto-fit,minmax(280px,1fr))]">
                       <div className="space-y-1">
                         <label className="text-xs font-bold text-slate-500 uppercase">Тип CRM</label>
                         <select
@@ -1116,7 +1116,7 @@ export function DashboardPage({
                   )}
                 </div>
 
-                <div className="grid gap-6 sm:grid-cols-3">
+                <div className="grid gap-[var(--spacing-fluid-md)] grid-cols-[repeat(auto-fit,minmax(280px,1fr))]">
                   {/* START Plan */}
                   <div className={`relative rounded-3xl p-6 border ${billing.plan === "light" ? "border-brand bg-brand/5 shadow-md" : "border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900"} transition-all`}>
                     {billing.plan === "light" && <div className="absolute top-0 right-0 rounded-bl-xl rounded-tr-3xl bg-brand px-3 py-1 text-[10px] font-bold text-white uppercase tracking-wider">Текущий</div>}
