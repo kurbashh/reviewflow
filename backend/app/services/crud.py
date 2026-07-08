@@ -102,7 +102,7 @@ async def create_review_request(
         status=ReviewRequestStatus.PENDING,
     )
     session.add(request)
-    await session.flush()  # чтобы request.id был доступен до commit (его делает get_session)
+    await session.commit()  # чтобы request.id был доступен до commit (его делает get_session)
     return request
 
 
@@ -410,7 +410,7 @@ async def update_business_settings(
         if field in settings_data:
             setattr(business, field, settings_data[field])
 
-    await session.flush()
+    await session.commit()
     return business
 
 
@@ -439,7 +439,7 @@ async def create_location(
         yandex_maps_url=yandex_maps_url,
     )
     session.add(location)
-    await session.flush()
+    await session.commit()
     return location
 
 
@@ -457,7 +457,7 @@ async def update_location(
     location.name = name
     location.gis_2gis_url = gis_2gis_url
     location.yandex_maps_url = yandex_maps_url
-    await session.flush()
+    await session.commit()
     return location
 
 
@@ -470,5 +470,5 @@ async def delete_location(
     if not location or location.business_id != business_id:
         return False
     await session.delete(location)
-    await session.flush()
+    await session.commit()
     return True

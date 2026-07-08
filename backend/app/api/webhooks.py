@@ -102,7 +102,7 @@ async def webhook_intake(request: Request, payload: WebhookIntakePayload, sessio
         master_name=payload.master_name,
         location_id=payload.location_id,
     )
-    await session.flush()
+    await session.commit()
 
     # request.id уже присвоен (flush в create_review_request), но commit ещё не
     # произошёл — он случится в get_session после успешного возврата из роута.
