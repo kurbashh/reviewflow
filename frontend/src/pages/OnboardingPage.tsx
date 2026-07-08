@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { RiStore2Line, RiPhoneLine, RiArrowRightLine, RiCheckLine } from "@remixicon/react";
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || "";
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://167-233-118-175.sslip.io";
 
 interface OnboardingProps {
   token: string;
