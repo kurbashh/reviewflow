@@ -189,3 +189,51 @@ async def webhook_reply(request: Request, payload: GreenApiWebhookPayload, sessi
         return {"status": "ok"}
 
     return {"status": "no_match"}
+
+
+class KaspiWebhookPayload(BaseModel):
+    # Mocking generic Kaspi webhook fields, normally it contains invoice info
+    business_id: str
+    plan: BusinessPlan
+    status: str
+    amount: int
+    
+@router.post("/kaspi")
+async def kaspi_webhook(
+    request: Request,
+    payload: KaspiWebhookPayload,
+    session: AsyncSession = Depends(get_session)
+):
+    """
+    Приём уведомления об оплате от Kaspi Pay.
+    Проверяет подпись запроса (HMAC-SHA256) и активирует подписку.
+    """
+    from app.config import settings
+    import hmac
+    import hashlib
+    
+    signature = request.headers.get("X-Webhook-Signature")
+    if not signature:
+        raise HTTPException(status_code=403, detail="Missing signature")
+        
+    body = await request.body()
+    expected_sig = hmac.new(
+        settings.kaspi_pay_secret.encode(), 
+        body, 
+        hashlib.sha256
+    ).hexdigest()
+    
+    if not hmac.compare_digest(expected_sig, signature):
+        raise HTTPException(status_code=403, detail="Invalid signature")
+
+    business = await get_business(session, payload.business_id)
+    if not business:
+        raise HTTPException(status_code=404, detail="Business not found")
+        
+    if payload.status == "PAID":
+        # Активация подписки
+        business.plan = payload.plan
+        business.status = BusinessStatus.ACTIVE
+        await session.commit()
+
+    return {"status": "accepted"}

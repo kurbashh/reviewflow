@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 
-const API_BASE = "https://167-233-118-175.sslip.io";
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 
 interface Business {
   id: string;

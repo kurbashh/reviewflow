@@ -62,8 +62,8 @@ app.add_middleware(SlowAPIMiddleware)
 # бьют напрямую в бэкенд без браузера, CORS на них не влияет.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=False,
+    allow_origins=settings.cors_allowed_origins,
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )

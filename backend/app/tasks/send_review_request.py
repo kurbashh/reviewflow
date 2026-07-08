@@ -21,7 +21,7 @@ TEMPLATE = (
     "Здравствуйте, {name}! Оцените, пожалуйста, ваш сегодняшний визит "
     "в {business_name} по шкале от 1 до 5 звёзд 🙂\n"
     "Ответьте одной цифрой.\n\n"
-    "Отписаться от рассылки: {opt_out_link}"
+    "(Отправьте «стоп» или «stop» в ответ, если больше не хотите получать наши сообщения)"
 )
 
 
@@ -33,7 +33,6 @@ def send_review_request_task(self, request_id: str) -> None:
         text = TEMPLATE.format(
             name=request.client_name or "уважаемый клиент",
             business_name=request.business.name,
-            opt_out_link=f"{_opt_out_base_url()}/opt-out/{request.id}",
         )
 
         try:
@@ -50,7 +49,3 @@ def send_review_request_task(self, request_id: str) -> None:
         update_status_sync(session, request_id, status=ReviewRequestStatus.SENT)
 
 
-def _opt_out_base_url() -> str:
-    from app.config import settings
-
-    return settings.app_base_url.rstrip("/")

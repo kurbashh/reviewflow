@@ -143,7 +143,7 @@ async def get_dashboard_stats(
     except ValueError:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Неверный формат UUID бизнеса")
 
-    business = await crud.get_business(session, business_id)
+    business = await crud.get_owned_business(session, business_id, current_user.id)
     if not business:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Бизнес не найден")
 
@@ -157,13 +157,14 @@ async def get_dashboard_reviews(
     offset: int = 0,
     rating_lte: int | None = None,
     session: AsyncSession = Depends(get_session),
+    current_user: User = Depends(get_current_user),
 ):
     try:
         business_uuid = uuid.UUID(business_id)
     except ValueError:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Неверный формат UUID бизнеса")
 
-    business = await crud.get_business(session, business_id)
+    business = await crud.get_owned_business(session, business_id, current_user.id)
     if not business:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Бизнес не найден")
 
@@ -196,13 +197,14 @@ async def get_dashboard_reviews(
 async def get_dashboard_settings(
     business_id: str,
     session: AsyncSession = Depends(get_session),
+    current_user: User = Depends(get_current_user),
 ):
     try:
         business_uuid = uuid.UUID(business_id)
     except ValueError:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Неверный формат UUID бизнеса")
 
-    business = await crud.get_business(session, business_id)
+    business = await crud.get_owned_business(session, business_id, current_user.id)
     if not business:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Бизнес не найден")
 
@@ -230,11 +232,16 @@ async def update_dashboard_settings(
     business_id: str,
     payload: BusinessSettingsUpdate,
     session: AsyncSession = Depends(get_session),
+    current_user: User = Depends(get_current_user),
 ):
     try:
         business_uuid = uuid.UUID(business_id)
     except ValueError:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Неверный формат UUID бизнеса")
+
+    business = await crud.get_owned_business(session, business_id, current_user.id)
+    if not business:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Бизнес не найден")
 
     updated = await crud.update_business_settings(session, business_uuid, payload.model_dump(exclude_unset=True))
     if not updated:
@@ -247,13 +254,14 @@ async def update_dashboard_settings(
 async def get_dashboard_locations(
     business_id: str,
     session: AsyncSession = Depends(get_session),
+    current_user: User = Depends(get_current_user),
 ):
     try:
         business_uuid = uuid.UUID(business_id)
     except ValueError:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Неверный формат UUID бизнеса")
 
-    business = await crud.get_business(session, business_id)
+    business = await crud.get_owned_business(session, business_id, current_user.id)
     if not business:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Бизнес не найден")
 
@@ -266,13 +274,14 @@ async def create_dashboard_location(
     business_id: str,
     payload: LocationCreate,
     session: AsyncSession = Depends(get_session),
+    current_user: User = Depends(get_current_user),
 ):
     try:
         business_uuid = uuid.UUID(business_id)
     except ValueError:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Неверный формат UUID бизнеса")
 
-    business = await crud.get_business(session, business_id)
+    business = await crud.get_owned_business(session, business_id, current_user.id)
     if not business:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Бизнес не найден")
 
@@ -298,14 +307,21 @@ async def update_dashboard_location(
     location_id: str,
     payload: LocationUpdate,
     session: AsyncSession = Depends(get_session),
+    current_user: User = Depends(get_current_user),
 ):
     try:
+        business_uuid = uuid.UUID(business_id)
         loc_uuid = uuid.UUID(location_id)
     except ValueError:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Неверный формат UUID локации")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Неверный формат UUID")
+
+    business = await crud.get_owned_business(session, business_id, current_user.id)
+    if not business:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Бизнес не найден")
 
     updated = await crud.update_location(
         session,
+        business_uuid,
         loc_uuid,
         name=payload.name,
         gis_2gis_url=payload.gis_2gis_url,
@@ -322,13 +338,19 @@ async def delete_dashboard_location(
     business_id: str,
     location_id: str,
     session: AsyncSession = Depends(get_session),
+    current_user: User = Depends(get_current_user),
 ):
     try:
+        business_uuid = uuid.UUID(business_id)
         loc_uuid = uuid.UUID(location_id)
     except ValueError:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Неверный формат UUID локации")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Неверный формат UUID")
 
-    deleted = await crud.delete_location(session, loc_uuid)
+    business = await crud.get_owned_business(session, business_id, current_user.id)
+    if not business:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Бизнес не найден")
+
+    deleted = await crud.delete_location(session, business_uuid, loc_uuid)
     if not deleted:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Локация не найдена")
 
@@ -339,13 +361,14 @@ async def delete_dashboard_location(
 async def get_dashboard_billing(
     business_id: str,
     session: AsyncSession = Depends(get_session),
+    current_user: User = Depends(get_current_user),
 ):
     try:
         business_uuid = uuid.UUID(business_id)
     except ValueError:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Неверный формат UUID бизнеса")
 
-    business = await crud.get_business(session, business_id)
+    business = await crud.get_owned_business(session, business_id, current_user.id)
     if not business:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Бизнес не найден")
 
@@ -373,18 +396,29 @@ async def subscribe_billing(
     business_id: str,
     payload: BillingSubscribeRequest,
     session: AsyncSession = Depends(get_session),
+    current_user: User = Depends(get_current_user),
 ):
     try:
         business_uuid = uuid.UUID(business_id)
     except ValueError:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Неверный формат UUID")
 
-    business = await crud.get_business(session, business_id)
+    business = await crud.get_owned_business(session, business_id, current_user.id)
     if not business:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Бизнес не найден")
 
     from datetime import datetime, timedelta, timezone
-    # Обновляем тариф, статус и время окончания
+    
+    # -------------------------------------------------------------------------
+    # ЗАКОММЕНТИРОВАНО ДЛЯ ТЕСТИРОВАНИЯ НА ФРОНТЕНДЕ (ТЗ P0.2)
+    # В реальном приложении здесь должна возвращаться ссылка на оплату Kaspi,
+    # а смена тарифа и статуса происходить только в app/api/webhooks.py
+    # 
+    # payment_link = f"https://pay.kaspi.kz/pay/reviewflow?merchant_id=rf_{business.id}&plan={payload.plan}"
+    # return {"status": "success", "payment_link": payment_link}
+    # -------------------------------------------------------------------------
+
+    # Обновляем тариф, статус и время окончания (ТЕСТОВЫЙ РЕЖИМ)
     business.plan = payload.plan
     business.status = BusinessStatus.ACTIVE
     business.subscription_ends_at = datetime.now(timezone.utc) + timedelta(days=30)
@@ -399,8 +433,9 @@ async def pause_billing(
     business_id: str,
     payload: BillingPauseRequest,
     session: AsyncSession = Depends(get_session),
+    current_user: User = Depends(get_current_user),
 ):
-    business = await crud.get_business(session, business_id)
+    business = await crud.get_owned_business(session, business_id, current_user.id)
     if not business:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Бизнес не найден")
 
@@ -414,8 +449,12 @@ async def lifetime_billing(
     business_id: str,
     payload: BillingLifetimeRequest,
     session: AsyncSession = Depends(get_session),
+    current_user: User = Depends(get_current_user),
 ):
-    business = await crud.get_business(session, business_id)
+    if not current_user.is_superuser:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Только администратор может выдавать пожизненный доступ")
+
+    business = await crud.get_owned_business(session, business_id, current_user.id)
     if not business:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Бизнес не найден")
 

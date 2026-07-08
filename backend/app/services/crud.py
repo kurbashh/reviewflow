@@ -38,6 +38,12 @@ async def get_business(session: AsyncSession, business_id: str) -> Business | No
     return await session.get(Business, business_uuid)
 
 
+async def get_owned_business(session: AsyncSession, business_id: str, owner_id: uuid.UUID) -> Business | None:
+    business = await get_business(session, business_id)
+    if business and business.owner_id == owner_id:
+        return business
+    return None
+
 async def is_opted_out(session: AsyncSession, phone: str, business_id: str) -> bool:
     stmt = select(OptedOutNumber).where(
         OptedOutNumber.phone == phone,
@@ -439,13 +445,14 @@ async def create_location(
 
 async def update_location(
     session: AsyncSession,
+    business_id: uuid.UUID,
     location_id: uuid.UUID,
     name: str,
     gis_2gis_url: str | None = None,
     yandex_maps_url: str | None = None,
 ) -> Location | None:
     location = await session.get(Location, location_id)
-    if not location:
+    if not location or location.business_id != business_id:
         return None
     location.name = name
     location.gis_2gis_url = gis_2gis_url
@@ -456,10 +463,11 @@ async def update_location(
 
 async def delete_location(
     session: AsyncSession,
+    business_id: uuid.UUID,
     location_id: uuid.UUID,
 ) -> bool:
     location = await session.get(Location, location_id)
-    if not location:
+    if not location or location.business_id != business_id:
         return False
     await session.delete(location)
     await session.flush()

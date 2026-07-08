@@ -7,7 +7,8 @@ import {
 } from "../components/ui/icons";
 import { RiStarFill, RiMagicFill, RiChatSmile3Fill, RiFileCopyLine, RiCheckLine } from "@remixicon/react";
 
-const API_BASE = "https://167-233-118-175.sslip.io/api/dashboard";
+const API_BASE = `${import.meta.env.VITE_API_BASE_URL || "http://localhost:8000"}/api/dashboard`;
+const REDIRECT_BASE = `${import.meta.env.VITE_API_BASE_URL || "http://localhost:8000"}/api/redirect`;
 
 interface Location {
   id: string;
@@ -833,7 +834,7 @@ export function DashboardPage({
                           <div className="space-y-1">
                             <h4 className="font-bold text-slate-800 dark:text-slate-200 text-base">{loc.name}</h4>
                             <p className="text-xs text-slate-400 font-mono">
-                              Редирект: <a href={`https://167-233-118-175.sslip.io/api/redirect/${loc.redirect_slug}`} target="_blank" rel="noopener noreferrer" className="text-brand hover:underline">/go/{loc.redirect_slug}</a>
+                              Редирект: <a href={`${REDIRECT_BASE}/${loc.redirect_slug}`} target="_blank" rel="noopener noreferrer" className="text-brand hover:underline">/go/{loc.redirect_slug}</a>
                             </p>
                             <div className="flex flex-wrap gap-x-4 gap-y-1 pt-1 text-[11px]">
                               <span className={loc.gis_2gis_url ? "text-emerald-600 dark:text-emerald-500" : "text-slate-300 dark:text-zinc-600"}>
@@ -907,7 +908,7 @@ export function DashboardPage({
                         className="w-full rounded-2xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:border-brand focus:outline-none disabled:bg-slate-50 disabled:dark:bg-zinc-900/50 disabled:text-slate-400 disabled:dark:text-zinc-500 transition-colors"
                       />
                       {!editingLocId && (
-                        <p className="text-[10px] text-slate-400">Будет создана ссылка: <b>https://167-233-118-175.sslip.io/api/redirect/{newLocSlug || "слаг"}</b></p>
+                        <p className="text-[10px] text-slate-400">Будет создана ссылка: <b>{REDIRECT_BASE}/{newLocSlug || "слаг"}</b></p>
                       )}
                     </div>
 

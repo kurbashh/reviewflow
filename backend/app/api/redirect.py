@@ -13,6 +13,7 @@ app/api/redirect.py
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.session import get_session
@@ -23,7 +24,7 @@ router = APIRouter()
 
 
 @router.get("/api/redirect/{slug}")
-async def resolve_redirect(slug: str, session: AsyncSession = Depends(get_session)) -> dict:
+async def resolve_redirect(slug: str, session: AsyncSession = Depends(get_session)):
     location = await get_location_by_slug(session, slug)
     if location is None:
         raise HTTPException(status_code=404, detail="redirect slug not found")
@@ -40,4 +41,4 @@ async def resolve_redirect(slug: str, session: AsyncSession = Depends(get_sessio
             detail="У бизнеса не настроена ни одна ссылка на площадку отзывов",
         )
 
-    return {"redirect_url": target}
+    return RedirectResponse(url=target, status_code=302)

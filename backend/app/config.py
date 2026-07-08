@@ -40,23 +40,11 @@ class Settings(BaseSettings):
     )
 
     # ------------------------------------------------------------------
-    # Supabase Auth / API (JWT verification, admin & user-scoped clients)
+    # Billing
     # ------------------------------------------------------------------
-    supabase_url: str = Field(
-        default="",
-        description="Project URL, e.g. https://<ref>.supabase.co",
-    )
-    supabase_publishable_key: str = Field(
-        default="",
-        description="Publishable (anon) API key — safe for user-scoped clients",
-    )
-    supabase_secret_key: str = Field(
-        default="",
-        description="Secret service-role key — server-side only, never expose to clients",
-    )
-    supabase_jwks_url: str = Field(
-        default="",
-        description="JWKS endpoint for verifying Supabase Auth JWTs",
+    kaspi_pay_secret: str = Field(
+        default="mock_kaspi_secret_for_tests",
+        description="Секрет для верификации вебхуков Kaspi Pay",
     )
 
     # ------------------------------------------------------------------

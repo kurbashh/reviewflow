@@ -51,3 +51,4 @@ logs/
 npm-debug.log*
 
 *.md
+*.patch

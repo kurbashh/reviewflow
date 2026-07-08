@@ -26,7 +26,6 @@ redis==6.4.0
 # --- Внешние интеграции ---
 openai==2.44.0              # генерация текста отзыва (gpt-4o-mini), Этап 3
 httpx==0.28.1                # Green API, Telegram Bot API, Kaspi Pay — единый HTTP-клиент
-supabase==2.31.0             # Supabase Auth + API clients (Python equivalent of @supabase/server)
 
 # --- Авторизация ---
 bcrypt==4.3.0                # хэширование паролей
