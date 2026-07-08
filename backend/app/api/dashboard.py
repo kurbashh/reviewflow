@@ -137,6 +137,7 @@ async def complete_onboarding(
 async def get_dashboard_stats(
     business_id: str,
     session: AsyncSession = Depends(get_session),
+    current_user: User = Depends(get_current_user),
 ) -> dict[str, Any]:
     try:
         business_uuid = uuid.UUID(business_id)
