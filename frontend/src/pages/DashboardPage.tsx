@@ -7,8 +7,8 @@ import {
 } from "../components/ui/icons";
 import { RiStarFill, RiMagicFill, RiChatSmile3Fill, RiFileCopyLine, RiCheckLine } from "@remixicon/react";
 
-const API_BASE = `${import.meta.env.VITE_API_BASE_URL || "https://167-233-118-175.sslip.io"}/api/dashboard`;
-const REDIRECT_BASE = `${import.meta.env.VITE_API_BASE_URL || "https://167-233-118-175.sslip.io"}/api/redirect`;
+const API_BASE = `${import.meta.env.VITE_API_BASE_URL || ""}/api/dashboard`;
+const REDIRECT_BASE = `${import.meta.env.VITE_API_BASE_URL || ""}/api/redirect`;
 
 const authFetch = async (url: string, options: RequestInit = {}) => {
   const token = localStorage.getItem("rf_token");
