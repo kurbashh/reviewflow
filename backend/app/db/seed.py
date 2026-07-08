@@ -4,7 +4,7 @@ from datetime import datetime, timedelta, timezone
 from sqlalchemy.orm import Session
 from app.db.session import SyncSessionLocal
 from app.db.models import Business, Location, ReviewRequest, ReviewRequestStatus, BusinessPlan, BusinessStatus, CrmType, User
-from app.api.auth import get_password_hash
+from app.api.auth import _hash_password
 
 BUSINESS_ID = "b1111111-1111-1111-1111-111111111111"
 
@@ -18,7 +18,7 @@ def seed_db():
             user = User(
                 id=uuid.uuid4(),
                 email="daulet@gmail.com",
-                password_hash=get_password_hash("test"),
+                password_hash=_hash_password("test"),
                 full_name="Daulet",
                 is_active=True,
                 is_superuser=True
