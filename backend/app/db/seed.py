@@ -3,7 +3,8 @@ import random
 from datetime import datetime, timedelta, timezone
 from sqlalchemy.orm import Session
 from app.db.session import SyncSessionLocal
-from app.db.models import Business, Location, ReviewRequest, ReviewRequestStatus, BusinessPlan, BusinessStatus, CrmType
+from app.db.models import Business, Location, ReviewRequest, ReviewRequestStatus, BusinessPlan, BusinessStatus, CrmType, User
+from app.api.auth import get_password_hash
 
 BUSINESS_ID = "b1111111-1111-1111-1111-111111111111"
 
@@ -11,11 +12,28 @@ def seed_db():
     print("Starting database seeding...")
     session: Session = SyncSessionLocal()
     try:
-        # 1. Create or get Business
+        # 1. Create a test user
+        user = session.query(User).filter_by(email="daulet@gmail.com").first()
+        if not user:
+            user = User(
+                id=uuid.uuid4(),
+                email="daulet@gmail.com",
+                password_hash=get_password_hash("test"),
+                full_name="Daulet",
+                is_active=True,
+                is_superuser=True
+            )
+            session.add(user)
+            session.commit()
+            session.refresh(user)
+            print("Created test user daulet@gmail.com (pass: test)")
+
+        # 2. Create or get Business
         business = session.get(Business, uuid.UUID(BUSINESS_ID))
         if not business:
             business = Business(
                 id=uuid.UUID(BUSINESS_ID),
+                owner_id=user.id,
                 name="BeautyLab Almaty",
                 category="Салон красоты",
                 phone="+77011234567",
