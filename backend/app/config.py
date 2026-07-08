@@ -151,7 +151,12 @@ class Settings(BaseSettings):
     )
 
     cors_allowed_origins: list[str] = Field(
-        default_factory=lambda: ["https://reviewflow.kz", "http://localhost:3000", "http://localhost:5173"]
+        default_factory=lambda: [
+            "https://reviewflow.kz",
+            "http://localhost:3000",
+            "http://localhost:5173",
+            "https://reviewflow-pearl.vercel.app"
+        ]
     )
 
 
