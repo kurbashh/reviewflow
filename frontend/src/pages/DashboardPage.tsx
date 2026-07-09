@@ -516,7 +516,7 @@ export function DashboardPage({
           <div>
             <p className="text-sm font-semibold tracking-wide text-brand uppercase"> ReviewFlow.kz</p>
             <h1 className="mt-1 text-2xl font-bold tracking-tight text-text-main sm:text-[1.85rem]">
-              {activeTab === "profile" ? "Профиль пользователя" : (settings ? settings.name : "Панель управления")}
+              {activeTab === "profile" ? "Профиль пользователя" : (user?.businesses?.[0]?.name || "Панель управления")}
             </h1>
           </div>
 
