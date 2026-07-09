@@ -118,9 +118,9 @@ class BillingPauseRequest(BaseModel):
 class BillingLifetimeRequest(BaseModel):
     is_lifetime: bool
 
-# --------------------------------------------------------------------------
-# Endpoints
-# --------------------------------------------------------------------------
+import logging
+
+logger = logging.getLogger(__name__)
 
 @router.post("/onboarding/send-code", status_code=status.HTTP_200_OK)
 async def send_onboarding_code(
@@ -130,6 +130,7 @@ async def send_onboarding_code(
     """Генерация и отправка SMS/WhatsApp кода для верификации номера."""
     # Генерируем 4-значный код
     code = f"{random.randint(1000, 9999)}"
+    logger.info(f"Generated OTP code {code} for phone {payload.phone}")
     redis = get_redis()
     
     # Сохраняем в Redis с TTL 300 сек (5 минут)
