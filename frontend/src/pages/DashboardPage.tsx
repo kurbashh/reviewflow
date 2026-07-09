@@ -480,6 +480,9 @@ export function DashboardPage({
         {!loading && !error && (
           <>
             {/* OVERVIEW TAB */}
+            {activeTab === "overview" && stats && (
+              <div className="space-y-8">
+                
                 {/* Overview & Metrics Layout */}
                 <div className="grid gap-[var(--spacing-fluid-lg)] lg:grid-cols-[1fr_300px]">
                   {/* Left Column: Welcome & Volume */}
