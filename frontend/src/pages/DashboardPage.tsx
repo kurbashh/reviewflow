@@ -229,6 +229,7 @@ export function DashboardPage({
       if (activeTab === "overview") {
         await fetchStats();
         await fetchReviews(0, false);
+        await fetchBilling();
       } else if (activeTab === "reviews") {
         setReviewsOffset(0);
         await fetchReviews(0, reviewFilter === "negative");
