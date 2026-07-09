@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { AuthUser } from "../hooks/useAuth";
 import { DashboardLayout } from "../components/layout/DashboardLayout";
 import {
   CardShell,
@@ -76,11 +77,15 @@ export function DashboardPage({
   activeTab,
   setActiveTab,
   businessId,
+  user,
+  refreshUser,
   onLogout,
 }: {
   activeTab: string;
   setActiveTab: (tab: string) => void;
   businessId: string;
+  user: AuthUser;
+  refreshUser: () => void;
   onLogout?: () => void;
 }) {
   // Loading & State
@@ -166,6 +171,29 @@ export function DashboardPage({
     }
   };
 
+  // Profile Form State
+  const [profileForm, setProfileForm] = useState({
+    full_name: user?.full_name || "",
+    email: user?.email || "",
+    current_password: "",
+    new_password: "",
+  });
+  const [profileMsg, setProfileMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
+
+  useEffect(() => {
+    if (user) {
+      setProfileForm(prev => ({
+        ...prev,
+        full_name: user.full_name,
+        email: user.email,
+      }));
+    }
+  }, [user]);
+
+  const handleProfileChange = (field: keyof typeof profileForm, val: string) => {
+    setProfileForm(prev => ({ ...prev, [field]: val }));
+  };
+
   // Fetch functions
   const fetchStats = async () => {
     try {
@@ -236,7 +264,7 @@ export function DashboardPage({
       } else if (activeTab === "reviews") {
         setReviewsOffset(0);
         await fetchReviews(0, reviewFilter === "negative");
-      } else if (activeTab === "locations" || activeTab === "settings") {
+      } else if (activeTab === "locations" || activeTab === "settings" || activeTab === "profile") {
         await fetchSettings();
       } else if (activeTab === "billing") {
         await fetchBilling();
@@ -384,6 +412,46 @@ export function DashboardPage({
     );
   };
 
+  const handleSaveProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setProfileMsg(null);
+    try {
+      const payload: any = {};
+      if (profileForm.full_name !== user?.full_name) payload.full_name = profileForm.full_name;
+      if (profileForm.email !== user?.email) payload.email = profileForm.email;
+      if (profileForm.new_password) payload.new_password = profileForm.new_password;
+      
+      if (payload.email || payload.new_password) {
+        if (!profileForm.current_password) {
+          throw new Error("Для смены email или пароля требуется текущий пароль");
+        }
+        payload.current_password = profileForm.current_password;
+      }
+
+      if (Object.keys(payload).length === 0) {
+         setProfileMsg({ type: "success", text: "Нет изменений для сохранения." });
+         return;
+      }
+
+      const res = await apiFetch(`${API_BASE}/api/auth/me`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.detail || "Не удалось обновить профиль");
+      }
+      
+      setProfileMsg({ type: "success", text: "Профиль успешно обновлен!" });
+      setProfileForm(prev => ({ ...prev, current_password: "", new_password: "" }));
+      refreshUser();
+    } catch (err: any) {
+      setProfileMsg({ type: "error", text: err.message });
+    }
+  };
+
   const handleSubscribe = async (planName: string) => {
     if (!businessId) return;
     if (confirm(`Вы будете перенаправлены на Kaspi Pay для оплаты тарифа ${planName.toUpperCase()}. Продолжить?`)) {
@@ -434,11 +502,18 @@ export function DashboardPage({
           <div>
             <p className="text-sm font-semibold tracking-wide text-brand uppercase"> ReviewFlow.kz</p>
             <h1 className="mt-1 text-2xl font-bold tracking-tight text-text-main sm:text-[1.85rem]">
-              {settings ? settings.name : "Панель управления"}
+              {activeTab === "profile" ? "Профиль пользователя" : (settings ? settings.name : "Панель управления")}
             </h1>
           </div>
 
-          <div className="flex items-center">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => setActiveTab("profile")}
+              className="flex items-center gap-2 hover:opacity-80 transition-opacity focus:outline-none focus:ring-2 focus:ring-[var(--brand)] rounded-full p-1"
+              title="Перейти в профиль"
+            >
+              <Avatar name={user?.full_name || "Пользователь"} className="h-10 w-10" />
+            </button>
             <button
               onClick={() => {
                 navigator.clipboard.writeText(businessId);
@@ -1351,6 +1426,109 @@ export function DashboardPage({
                   </button>
                 </CardShell>
 
+              </div>
+            )}
+
+            {/* PROFILE TAB */}
+            {activeTab === "profile" && (
+              <div className="max-w-3xl space-y-6">
+                <CardShell>
+                  <div>
+                    <h3 className="text-lg font-bold text-text-main">Личные данные</h3>
+                    <p className="mt-1 text-sm text-text-muted">Управляйте настройками вашего профиля и безопасностью.</p>
+                  </div>
+
+                  <form onSubmit={handleSaveProfile} className="mt-6 space-y-6">
+                    <div className="grid gap-6 sm:grid-cols-2">
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-text-muted">Имя пользователя</label>
+                        <input
+                          type="text"
+                          value={profileForm.full_name}
+                          onChange={(e) => handleProfileChange("full_name", e.target.value)}
+                          className="w-full rounded-xl border border-[var(--border-subtle)] bg-[var(--dashboard-bg)] px-4 py-3 text-sm text-text-main placeholder-slate-400 focus:border-[var(--brand)] focus:outline-none focus:ring-1 focus:ring-[var(--brand)] transition-colors"
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-text-muted">Email (Логин)</label>
+                        <input
+                          type="email"
+                          value={profileForm.email}
+                          onChange={(e) => handleProfileChange("email", e.target.value)}
+                          className="w-full rounded-xl border border-[var(--border-subtle)] bg-[var(--dashboard-bg)] px-4 py-3 text-sm text-text-main placeholder-slate-400 focus:border-[var(--brand)] focus:outline-none focus:ring-1 focus:ring-[var(--brand)] transition-colors"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div className="border-t border-border-subtle pt-6">
+                      <h4 className="text-sm font-semibold text-text-main mb-4">Смена пароля (если требуется)</h4>
+                      <div className="grid gap-6 sm:grid-cols-2">
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium text-text-muted">Текущий пароль</label>
+                          <input
+                            type="password"
+                            value={profileForm.current_password}
+                            onChange={(e) => handleProfileChange("current_password", e.target.value)}
+                            placeholder="Введите для подтверждения"
+                            className="w-full rounded-xl border border-[var(--border-subtle)] bg-[var(--dashboard-bg)] px-4 py-3 text-sm text-text-main placeholder-slate-400 focus:border-[var(--brand)] focus:outline-none focus:ring-1 focus:ring-[var(--brand)] transition-colors"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium text-text-muted">Новый пароль</label>
+                          <input
+                            type="password"
+                            value={profileForm.new_password}
+                            onChange={(e) => handleProfileChange("new_password", e.target.value)}
+                            placeholder="Минимум 12 символов"
+                            className="w-full rounded-xl border border-[var(--border-subtle)] bg-[var(--dashboard-bg)] px-4 py-3 text-sm text-text-main placeholder-slate-400 focus:border-[var(--brand)] focus:outline-none focus:ring-1 focus:ring-[var(--brand)] transition-colors"
+                          />
+                        </div>
+                      </div>
+                      <p className="mt-2 text-xs text-text-muted">
+                        Внимание: для сохранения нового email или пароля необходимо ввести текущий пароль.
+                      </p>
+                    </div>
+
+                    <div className="pt-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                      <div className="flex-1">
+                        {profileMsg && (
+                          <div className={`rounded-xl p-3 text-sm font-medium flex items-center gap-2 ${
+                            profileMsg.type === "success" 
+                              ? "bg-[var(--success)]/10 text-[var(--success)]" 
+                              : "bg-[var(--error)]/10 text-[var(--error)]"
+                          }`}>
+                            {profileMsg.text}
+                          </div>
+                        )}
+                      </div>
+                      <button
+                        type="submit"
+                        className="w-full sm:w-auto shrink-0 rounded-full bg-[var(--brand)] px-8 py-3 text-sm font-semibold text-white shadow-md hover:bg-brand-hover hover:shadow-lg transition-all focus:outline-none focus:ring-2 focus:ring-[var(--brand)]/30 active:scale-[0.98]"
+                      >
+                        Сохранить изменения
+                      </button>
+                    </div>
+                  </form>
+                </CardShell>
+
+                <CardShell className="border-red-200 dark:border-red-900/30">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                      <h4 className="text-sm font-bold text-red-600 dark:text-red-500">Завершение сеанса</h4>
+                      <p className="text-xs text-text-muted mt-1">Выйти из учетной записи на этом устройстве.</p>
+                    </div>
+                    {onLogout && (
+                      <button
+                        onClick={onLogout}
+                        className="rounded-full bg-red-50 dark:bg-red-900/20 px-6 py-2.5 text-sm font-semibold text-red-600 dark:text-red-500 hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors border border-red-200 dark:border-red-800/30"
+                      >
+                        Выйти из аккаунта
+                      </button>
+                    )}
+                  </div>
+                </CardShell>
               </div>
             )}
           </>

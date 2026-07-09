@@ -45,6 +45,8 @@ export default function App() {
         setActiveTab={setActiveTab}
         businessId={businessId}
         onLogout={logout}
+        user={user!}
+        refreshUser={refreshUser}
       />
     );
   }

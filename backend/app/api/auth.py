@@ -43,6 +43,13 @@ class LoginRequest(BaseModel):
     password: str = Field(..., min_length=1, max_length=128)
 
 
+class UpdateProfileRequest(BaseModel):
+    full_name: str | None = Field(None, min_length=1, max_length=255)
+    email: EmailStr | None = None
+    current_password: str | None = None
+    new_password: str | None = Field(None, min_length=12, max_length=128)
+
+
 class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
@@ -175,4 +182,56 @@ async def login(payload: LoginRequest, session: AsyncSession = Depends(get_sessi
 @router.get("/me", response_model=UserResponse)
 async def me(current_user: User = Depends(get_current_user)):
     """Возвращает данные текущего авторизованного пользователя."""
+    return current_user
+
+
+@router.patch("/me", response_model=UserResponse)
+async def update_profile(
+    payload: UpdateProfileRequest,
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session)
+):
+    """Обновляет профиль пользователя. Для смены email или пароля требуется current_password."""
+    
+    # Смена пароля
+    if payload.new_password:
+        if not payload.current_password:
+            raise HTTPException(status_code=400, detail="Для смены пароля необходимо указать текущий пароль")
+        if not _verify_password(payload.current_password, current_user.password_hash):
+            raise HTTPException(status_code=400, detail="Неверный текущий пароль")
+        
+        is_pwned = await check_pwned_password(payload.new_password)
+        if is_pwned:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Этот пароль слишком предсказуем или найден в базах утечек, пожалуйста, выберите другой.",
+            )
+        
+        current_user.password_hash = _hash_password(payload.new_password)
+
+    # Смена email
+    if payload.email and payload.email.lower() != current_user.email:
+        if not payload.current_password:
+            raise HTTPException(status_code=400, detail="Для смены email необходимо указать текущий пароль")
+        if not _verify_password(payload.current_password, current_user.password_hash):
+            raise HTTPException(status_code=400, detail="Неверный текущий пароль")
+            
+        existing = await session.execute(
+            select(User).where(User.email == payload.email.lower())
+        )
+        if existing.scalar_one_or_none():
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Пользователь с таким email уже существует",
+            )
+        current_user.email = payload.email.lower()
+
+    # Смена имени
+    if payload.full_name:
+        current_user.full_name = payload.full_name
+
+    session.add(current_user)
+    await session.commit()
+    await session.refresh(current_user)
+    
     return current_user

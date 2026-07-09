@@ -10,7 +10,7 @@ interface Business {
   status: string;
 }
 
-interface AuthUser {
+export interface AuthUser {
   id: string;
   email: string;
   full_name: string;
