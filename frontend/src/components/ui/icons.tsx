@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import {
   RiDashboardLine,
-  RiMessage3Line,
+  RiChat3Line,
   RiBarChartBoxLine,
   RiMapPin2Line,
   RiSettings4Line,
@@ -24,7 +24,7 @@ export function IconOverview({ className }: IconProps) {
 }
 
 export function IconReviews({ className }: IconProps) {
-  return <RiMessage3Line className={className} />;
+  return <RiChat3Line className={className} />;
 }
 
 export function IconAnalytics({ className }: IconProps) {

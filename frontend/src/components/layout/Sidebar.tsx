@@ -54,35 +54,18 @@ export function Sidebar({
               type="button"
               onClick={() => setActiveTab(id)}
               aria-current={isActive ? "page" : undefined}
-              className={`group relative flex h-12 w-12 items-center justify-center rounded-2xl transition-all ${
+              className={`group relative flex h-12 w-12 items-center justify-center transition-all ${
                 isActive
-                  ? "bg-[var(--dashboard-bg)] text-[var(--text-main)] shadow-[var(--shadow-soft)]"
-                  : "text-[var(--text-muted)] hover:bg-[var(--dashboard-bg)]/50 hover:text-[var(--text-main)]"
+                  ? "text-[var(--brand)]"
+                  : "text-[var(--text-muted)] hover:text-[var(--text-main)]"
               }`}
               title={label}
             >
-              {isActive && (
-                <span className="absolute -bottom-1 md:-bottom-auto md:-right-1 left-1/2 md:left-auto md:top-1/2 w-4 md:w-1 h-1 md:h-8 -translate-x-1/2 md:translate-x-0 md:-translate-y-1/2 rounded-full bg-gradient-to-r md:bg-gradient-to-b from-purple-400 to-[var(--brand)]" />
-              )}
               <Icon className="h-5 w-5" />
             </button>
           );
         })}
         
-        {/* Separator on mobile to detach logout */}
-        <div className="w-[1px] h-8 bg-[var(--border-subtle)] md:hidden mx-1"></div>
-
-        {onLogout && (
-          <button
-            type="button"
-            onClick={() => setShowLogoutModal(true)}
-            className="flex h-12 w-12 md:hidden items-center justify-center rounded-2xl text-[var(--text-muted)] transition-colors hover:bg-red-500/10 hover:text-red-500"
-            aria-label="Выйти"
-            title="Выйти из аккаунта"
-          >
-            <RiLogoutBoxRLine className="h-5 w-5" />
-          </button>
-        )}
       </nav>
 
       {/* Desktop Bottom Actions */}
@@ -90,27 +73,11 @@ export function Sidebar({
         <button
           type="button"
           onClick={() => setDarkMode(!darkMode)}
-          className="flex flex-col gap-2 rounded-2xl bg-slate-200/50 dark:bg-zinc-800/50 p-1.5 transition-colors cursor-pointer group"
+          className="flex h-12 w-12 items-center justify-center rounded-2xl text-[var(--text-muted)] transition-colors hover:text-[var(--text-main)]"
           aria-label="Переключить тему"
+          title="Переключить тему"
         >
-          <div
-            className={`flex h-9 w-9 items-center justify-center rounded-xl transition-all ${
-              !darkMode
-                ? "bg-white text-slate-800 shadow-sm"
-                : "text-slate-400 group-hover:text-slate-200"
-            }`}
-          >
-            <IconSun className="h-4 w-4" />
-          </div>
-          <div
-            className={`flex h-9 w-9 items-center justify-center rounded-xl transition-all ${
-              darkMode
-                ? "bg-[var(--dashboard-bg)] text-[var(--brand)] shadow-sm"
-                : "text-slate-400 group-hover:text-slate-200"
-            }`}
-          >
-            <IconMoon className="h-4 w-4" />
-          </div>
+          {darkMode ? <IconSun className="h-5 w-5" /> : <IconMoon className="h-5 w-5" />}
         </button>
 
         {onLogout && (
