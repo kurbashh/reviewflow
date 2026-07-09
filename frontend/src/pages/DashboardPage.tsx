@@ -97,6 +97,20 @@ export function DashboardPage({
   const [error, setError] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState(false);
 
+  const [darkMode, setDarkMode] = useState<boolean>(() => {
+    return localStorage.getItem("rf_theme") === "dark";
+  });
+
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("rf_theme", "dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("rf_theme", "light");
+    }
+  }, [darkMode]);
+
   // Reviews Tab Filters & Pagination
   const [reviewFilter, setReviewFilter] = useState<"all" | "negative">("all");
   const [reviewsOffset, setReviewsOffset] = useState(0);
@@ -494,11 +508,11 @@ export function DashboardPage({
   };
 
   return (
-    <DashboardLayout activeTab={activeTab} setActiveTab={setActiveTab} onLogout={onLogout}>
+    <DashboardLayout activeTab={activeTab} setActiveTab={setActiveTab} darkMode={darkMode} setDarkMode={setDarkMode}>
       <div className="space-y-8">
         
         {/* Header */}
-        <header className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+        <header className="sticky top-0 z-30 -mx-[var(--spacing-fluid-md)] px-[var(--spacing-fluid-md)] lg:-mx-[var(--spacing-fluid-lg)] lg:px-[var(--spacing-fluid-lg)] -mt-[var(--spacing-fluid-md)] pt-[var(--spacing-fluid-md)] lg:-mt-[var(--spacing-fluid-lg)] lg:pt-[var(--spacing-fluid-lg)] pb-4 bg-[var(--dashboard-bg)]/80 backdrop-blur-md flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between border-b border-[var(--border-subtle)] mb-8">
           <div>
             <p className="text-sm font-semibold tracking-wide text-brand uppercase"> ReviewFlow.kz</p>
             <h1 className="mt-1 text-2xl font-bold tracking-tight text-text-main sm:text-[1.85rem]">
@@ -1514,19 +1528,34 @@ export function DashboardPage({
                 </CardShell>
 
                 <CardShell className="border-red-200 dark:border-red-900/30">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div>
-                      <h4 className="text-sm font-bold text-red-600 dark:text-red-500">Завершение сеанса</h4>
-                      <p className="text-xs text-text-muted mt-1">Выйти из учетной записи на этом устройстве.</p>
-                    </div>
-                    {onLogout && (
+                  <div className="flex flex-col gap-4">
+                    <div className="flex flex-row items-center justify-between">
+                      <div>
+                        <h4 className="text-sm font-bold text-text-main">Тема оформления</h4>
+                        <p className="text-xs text-text-muted mt-1">Переключение между светлой и темной темой.</p>
+                      </div>
                       <button
-                        onClick={onLogout}
-                        className="rounded-full bg-red-50 dark:bg-red-900/20 px-6 py-2.5 text-sm font-semibold text-red-600 dark:text-red-500 hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors border border-red-200 dark:border-red-800/30"
+                        onClick={() => setDarkMode(!darkMode)}
+                        className="rounded-full bg-slate-100 dark:bg-zinc-800 px-6 py-2.5 text-sm font-semibold text-text-main hover:bg-slate-200 dark:hover:bg-zinc-700 transition-colors border border-[var(--border-subtle)]"
                       >
-                        Выйти из аккаунта
+                        {darkMode ? "Светлая тема" : "Темная тема"}
                       </button>
-                    )}
+                    </div>
+                    <div className="border-t border-red-200 dark:border-red-900/30 my-2"></div>
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                      <div>
+                        <h4 className="text-sm font-bold text-red-600 dark:text-red-500">Завершение сеанса</h4>
+                        <p className="text-xs text-text-muted mt-1">Выйти из учетной записи на этом устройстве.</p>
+                      </div>
+                      {onLogout && (
+                        <button
+                          onClick={onLogout}
+                          className="rounded-full bg-red-50 dark:bg-red-900/20 px-6 py-2.5 text-sm font-semibold text-red-600 dark:text-red-500 hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors border border-red-200 dark:border-red-800/30"
+                        >
+                          Выйти из аккаунта
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </CardShell>
               </div>
