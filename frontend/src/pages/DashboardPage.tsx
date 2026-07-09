@@ -105,6 +105,7 @@ export function DashboardPage({
   const [newLocYandex, setNewLocYandex] = useState("");
   const [locError, setLocError] = useState<string | null>(null);
   const [editingLocId, setEditingLocId] = useState<string | null>(null);
+  const [locToDelete, setLocToDelete] = useState<string | null>(null);
 
   const [locFieldErrors, setLocFieldErrors] = useState<{ name?: string; slug?: string }>({});
   const [locTouched, setLocTouched] = useState<{ name?: boolean; slug?: boolean }>({});
@@ -305,16 +306,22 @@ export function DashboardPage({
   };
 
   // Delete Location
-  const handleDeleteLocation = async (locId: string) => {
-    if (!confirm("Вы уверены, что хотите удалить эту локацию?")) return;
+  const handleDeleteLocation = (locId: string) => {
+    setLocToDelete(locId);
+  };
+
+  const confirmDeleteLocation = async () => {
+    if (!locToDelete) return;
     try {
-      const res = await apiFetch(`${API_BASE}/${businessId}/locations/${locId}`, {
+      const res = await apiFetch(`${API_BASE}/${businessId}/locations/${locToDelete}`, {
         method: "DELETE",
       });
       if (!res.ok) throw new Error("Не удалось удалить локацию");
+      setLocToDelete(null);
       await fetchSettings();
     } catch (err: any) {
-      alert(err.message);
+      setLocError(err.message);
+      setLocToDelete(null);
     }
   };
 
@@ -1263,6 +1270,32 @@ export function DashboardPage({
           </>
         )}
       </div>
+
+      {/* Delete Location Modal */}
+      {locToDelete && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4 transition-all animate-fade-in">
+          <div className="w-full max-w-sm rounded-3xl bg-[var(--surface)] p-8 shadow-2xl border border-[var(--border-subtle)] text-center transform transition-all scale-100">
+            <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Удаление локации</h2>
+            <p className="mt-4 text-sm text-slate-500 dark:text-slate-400">
+              Вы уверены, что хотите безвозвратно удалить эту локацию? Это действие нельзя отменить.
+            </p>
+            <div className="mt-8 flex gap-3">
+              <button
+                onClick={() => setLocToDelete(null)}
+                className="flex-1 rounded-full bg-slate-100 dark:bg-zinc-800 py-3 text-sm font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-zinc-700 transition-colors active:scale-95 focus:ring-2 focus:ring-slate-300 dark:focus:ring-zinc-600 focus:outline-none"
+              >
+                Отмена
+              </button>
+              <button
+                onClick={confirmDeleteLocation}
+                className="flex-1 rounded-full bg-red-500 py-3 text-sm font-semibold text-white hover:bg-red-600 transition-colors active:scale-95 focus:ring-2 focus:ring-red-500/50 focus:outline-none"
+              >
+                Удалить
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </DashboardLayout>
   );
 }
