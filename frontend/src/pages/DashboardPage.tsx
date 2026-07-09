@@ -1195,7 +1195,7 @@ export function DashboardPage({
                       <li className="flex gap-2"><RiCheckLine className="h-5 w-5 text-green-500 shrink-0"/> Перехват негатива в Telegram</li>
                       <li className="flex gap-2"><RiCheckLine className="h-5 w-5 text-green-500 shrink-0"/> Маршрутизация на 2GIS/Yandex</li>
                     </ul>
-                    <button onClick={() => handleSubscribe("light")} className={`w-full rounded-full py-2.5 text-sm font-semibold transition-colors ${billing.plan === "light" ? "bg-slate-100 text-slate-400 cursor-default" : "bg-brand text-white hover:bg-brand-hover"}`} disabled={billing.plan === "light"}>
+                    <button onClick={() => handleSubscribe("light")} className={`w-full rounded-full py-3 text-sm font-semibold transition-all focus:outline-none focus:ring-2 ${billing.plan === "light" ? "opacity-50 cursor-not-allowed bg-slate-100 text-slate-400 dark:bg-zinc-800/50 dark:text-zinc-500 border border-transparent" : "bg-transparent border border-slate-200 dark:border-zinc-800 text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-zinc-800 active:scale-[0.96] focus:ring-slate-300 dark:focus:ring-zinc-600"}`} disabled={billing.plan === "light"}>
                       {billing.plan === "light" ? "Активен" : "Выбрать Start"}
                     </button>
                   </div>
@@ -1212,7 +1212,7 @@ export function DashboardPage({
                       <li className="flex gap-2 font-medium text-slate-900 dark:text-slate-200"><RiCheckLine className="h-5 w-5 text-orange-500 shrink-0"/> ИИ-генерация отзывов</li>
                       <li className="flex gap-2 font-medium text-slate-900 dark:text-slate-200"><RiCheckLine className="h-5 w-5 text-orange-500 shrink-0"/> Умный тайминг отправки</li>
                     </ul>
-                    <button onClick={() => handleSubscribe("standard")} className={`w-full rounded-full py-2.5 text-sm font-semibold transition-colors ${billing.plan === "standard" ? "bg-slate-100 text-slate-400 cursor-default" : "bg-brand text-white hover:bg-brand-hover shadow-md hover:shadow-lg"}`} disabled={billing.plan === "standard"}>
+                    <button onClick={() => handleSubscribe("standard")} className={`w-full rounded-full py-3 text-sm font-semibold transition-all focus:outline-none focus:ring-2 ${billing.plan === "standard" ? "opacity-50 cursor-not-allowed bg-slate-100 text-slate-400 dark:bg-zinc-800/50 dark:text-zinc-500 border border-transparent" : "bg-brand text-white hover:bg-brand-hover active:scale-[0.96] shadow-md hover:shadow-lg focus:ring-[var(--brand)]/30"}`} disabled={billing.plan === "standard"}>
                       {billing.plan === "standard" ? "Активен" : "Выбрать Pro"}
                     </button>
                   </div>
@@ -1228,7 +1228,7 @@ export function DashboardPage({
                       <li className="flex gap-2"><RiCheckLine className="h-5 w-5 text-green-500 shrink-0"/> Несколько локаций/филиалов</li>
                       <li className="flex gap-2"><RiCheckLine className="h-5 w-5 text-green-500 shrink-0"/> Приоритетная поддержка</li>
                     </ul>
-                    <button onClick={() => handleSubscribe("network")} className={`w-full rounded-full py-2.5 text-sm font-semibold transition-colors ${billing.plan === "network" ? "bg-slate-100 text-slate-400 cursor-default" : "bg-slate-900 text-white dark:bg-white dark:text-slate-900 hover:opacity-90"}`} disabled={billing.plan === "network"}>
+                    <button onClick={() => handleSubscribe("network")} className={`w-full rounded-full py-3 text-sm font-semibold transition-all focus:outline-none focus:ring-2 ${billing.plan === "network" ? "opacity-50 cursor-not-allowed bg-slate-100 text-slate-400 dark:bg-zinc-800/50 dark:text-zinc-500 border border-transparent" : "bg-transparent border border-slate-200 dark:border-zinc-800 text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-zinc-800 active:scale-[0.96] focus:ring-slate-300 dark:focus:ring-zinc-600"}`} disabled={billing.plan === "network"}>
                       {billing.plan === "network" ? "Активен" : "Связаться с нами"}
                     </button>
                   </div>
