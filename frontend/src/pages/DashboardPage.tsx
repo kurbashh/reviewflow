@@ -490,11 +490,19 @@ export function DashboardPage({
                     <section className="rounded-card bg-[var(--surface)] shadow-sm p-6 sm:p-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                       <div className="flex items-center gap-4">
                         <div className="relative flex h-3 w-3 shrink-0">
-                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--success)] opacity-75"></span>
-                          <span className="relative inline-flex rounded-full h-3 w-3 bg-[var(--success)]"></span>
+                          {(!billing?.is_manually_paused && (billing?.status !== "churned" || billing?.is_lifetime_access)) ? (
+                            <>
+                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--success)] opacity-75"></span>
+                              <span className="relative inline-flex rounded-full h-3 w-3 bg-[var(--success)]"></span>
+                            </>
+                          ) : (
+                            <span className="relative inline-flex rounded-full h-3 w-3 bg-orange-500"></span>
+                          )}
                         </div>
                         <h2 className="text-2xl font-bold text-text-main leading-tight">
-                          Сбор отзывов активен
+                          {(!billing?.is_manually_paused && (billing?.status !== "churned" || billing?.is_lifetime_access)) 
+                            ? "Сбор отзывов активен" 
+                            : "Сбор отзывов приостановлен"}
                         </h2>
                       </div>
                       <button
