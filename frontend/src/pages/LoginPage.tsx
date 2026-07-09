@@ -177,7 +177,6 @@ export function LoginPage({ onLogin, onRegister }: LoginPageProps) {
                   placeholder={isLogin ? "••••••••" : "Парольная фраза (мин. 12 символов)"}
                   className="w-full rounded-xl border border-[var(--border-subtle)] bg-[var(--dashboard-bg)] py-3 pl-11 pr-11 text-sm text-[var(--text-main)] placeholder-[var(--text-muted)] outline-none transition-all focus:border-[var(--brand)] focus:ring-2 focus:ring-[var(--brand)]/20"
                   required
-                  minLength={isLogin ? 1 : 12}
                   autoComplete={isLogin ? "current-password" : "new-password"}
                 />
                 <button
