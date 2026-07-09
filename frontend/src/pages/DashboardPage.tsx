@@ -4,7 +4,7 @@ import {
   CardShell,
   Avatar,
 } from "../components/ui/icons";
-import { RiStarFill, RiFileCopyLine, RiCheckLine, RiEditLine, RiDeleteBinLine } from "@remixicon/react";
+import { RiStarFill, RiFileCopyLine, RiCheckLine, RiEditLine, RiDeleteBinLine, RiErrorWarningFill } from "@remixicon/react";
 
 const API_BASE = `${import.meta.env.VITE_API_BASE_URL || "https://167-233-118-175.sslip.io"}/api/dashboard`;
 const REDIRECT_BASE = `${import.meta.env.VITE_API_BASE_URL || "https://167-233-118-175.sslip.io"}/api/redirect`;
@@ -371,10 +371,11 @@ export function DashboardPage({
   // Render Star Utility
   const renderStars = (rating: number | null) => {
     if (rating === null) return <span className="text-slate-300">-</span>;
+    const starColor = rating <= 3 ? "text-error" : "text-amber-500";
     return (
-      <span className="text-amber-500 font-semibold">
+      <span className={`${starColor} font-semibold`}>
         {"★".repeat(rating)}
-        <span className="text-slate-200">{"★".repeat(5 - rating)}</span>
+        <span className="text-slate-200 dark:text-zinc-700">{"★".repeat(5 - rating)}</span>
       </span>
     );
   };
@@ -791,7 +792,7 @@ export function DashboardPage({
                     <button
                       onClick={() => handleReviewFilterChange("all")}
                       className={`rounded-full px-4 py-1.5 text-xs font-semibold transition-colors ${
-                        reviewFilter === "all" ? "bg-surface text-text-main dark:text-slate-100 shadow-sm" : "text-text-muted hover:text-slate-800 dark:hover:text-slate-200"
+                        reviewFilter === "all" ? "bg-surface text-text-main dark:text-slate-100 shadow-sm" : "text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
                       }`}
                     >
                       Все отзывы
@@ -799,7 +800,7 @@ export function DashboardPage({
                     <button
                       onClick={() => handleReviewFilterChange("negative")}
                       className={`rounded-full px-4 py-1.5 text-xs font-semibold transition-colors ${
-                        reviewFilter === "negative" ? "bg-surface text-text-main dark:text-slate-100 shadow-sm" : "text-text-muted hover:text-slate-800 dark:hover:text-slate-200"
+                        reviewFilter === "negative" ? "bg-surface text-text-main dark:text-slate-100 shadow-sm" : "text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
                       }`}
                     >
                       Негативные (1-3★)
@@ -807,22 +808,21 @@ export function DashboardPage({
                   </div>
                 </div>
 
-                <div className="mt-6 overflow-x-auto">
+                <div className="mt-6 overflow-x-auto max-w-5xl">
                   <table className="w-full border-collapse text-left text-sm text-text-muted">
                     <thead>
                       <tr className="border-b border-slate-100 text-xs font-semibold uppercase tracking-wider text-text-muted">
-                        <th className="py-4 pl-4">Клиент</th>
-                        <th className="py-4">Детали услуги</th>
-                        <th className="py-4">Оценка</th>
-                        <th className="py-4">Статус</th>
-                        <th className="py-4">Результат</th>
-                        <th className="py-4 pr-4 text-right">Дата</th>
+                        <th className="py-4 pl-4 w-1/4">Клиент</th>
+                        <th className="py-4 w-1/4">Детали услуги</th>
+                        <th className="py-4 w-1/6">Оценка</th>
+                        <th className="py-4 w-1/6">Статус</th>
+                        <th className="py-4 pr-4 w-auto">Результат</th>
                       </tr>
                     </thead>
                     <tbody>
                       {reviewsData.reviews.length === 0 ? (
                         <tr>
-                          <td colSpan={6} className="py-12 text-center text-xs text-text-muted">
+                          <td colSpan={5} className="py-12 text-center text-xs text-text-muted">
                             Подходящие отзывы не найдены.
                           </td>
                         </tr>
@@ -840,32 +840,29 @@ export function DashboardPage({
                             <td className="py-4 font-medium">{renderStars(review.rating)}</td>
                             <td className="py-4">
                               <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                                review.status === "completed" ? "bg-emerald-50 text-emerald-700" :
-                                review.status === "sent" ? "bg-blue-50 text-blue-700" :
-                                review.status === "awaiting_feedback" ? "bg-orange-50 text-orange-700" :
-                                "bg-slate-100 text-slate-600"
+                                (review.rating !== null || review.status === "completed") ? "bg-[var(--success)]/10 text-[var(--success)]" : "bg-slate-100 text-slate-600 dark:bg-zinc-800 dark:text-slate-400"
                               }`}>
-                                {review.status === "completed" ? "Завершен" :
-                                 review.status === "sent" ? "Отправлен" :
-                                 review.status === "awaiting_feedback" ? "Ждем фидбек" :
-                                 review.status}
+                                {(review.rating !== null || review.status === "completed") ? "Получен" : "Ожидает"}
                               </span>
+                              <div className="text-[10px] text-text-muted mt-1 font-medium">
+                                {new Date(review.created_at).toLocaleDateString("ru-RU")}
+                              </div>
                             </td>
-                            <td className="py-4 max-w-xs">
+                            <td className="py-4 pr-4">
                               {review.rating !== null && review.rating <= 3 && review.owner_feedback ? (
-                                <div className="text-xs text-orange-800 dark:text-orange-300 bg-orange-50 dark:bg-orange-950/20 border border-orange-200 dark:border-orange-900/30 rounded-xl p-2.5">
-                                  <b>Жалоба:</b> "{review.owner_feedback}"
+                                <div className="flex items-start gap-1.5">
+                                  <RiErrorWarningFill className="h-4 w-4 text-error shrink-0 mt-0.5" />
+                                  <span className="text-xs text-text-main line-clamp-2" title={review.owner_feedback}>
+                                    {review.owner_feedback}
+                                  </span>
                                 </div>
                               ) : review.generated_review ? (
-                                <div className="ai-glow-effect rounded-xl p-2.5 text-xs italic text-[var(--brand)] max-h-20 overflow-y-auto">
-                                  "{review.generated_review}"
+                                <div className="text-xs text-text-main line-clamp-2" title={review.generated_review}>
+                                  {review.generated_review}
                                 </div>
                               ) : (
                                 <span className="text-slate-300">-</span>
                               )}
-                            </td>
-                            <td className="py-4 pr-4 text-right text-xs text-text-muted font-medium">
-                              {new Date(review.created_at).toLocaleDateString("ru-RU")}
                             </td>
                           </tr>
                         ))
