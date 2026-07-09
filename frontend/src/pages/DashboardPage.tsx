@@ -876,67 +876,6 @@ export function DashboardPage({
                   </div>
                 </section>
 
-                {/* Recent Reviews Summary */}
-                <section className="grid gap-6 lg:grid-cols-[1.6fr_1fr]">
-                  
-                  {/* Reviews List */}
-                  <CardShell>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="text-lg font-semibold text-text-main">Последние отзывы</h3>
-                        <p className="mt-1 text-sm text-text-muted">Недавние ответы и оценки клиентов</p>
-                      </div>
-                      <button
-                        onClick={() => setActiveTab("reviews")}
-                        className="text-xs font-bold text-brand hover:text-brand-hover transition-colors"
-                      >
-                        Смотреть все
-                      </button>
-                    </div>
-
-                    <ul className="mt-6 space-y-4">
-                      {!reviewsData || reviewsData.reviews.length === 0 ? (
-                        <p className="text-center text-xs text-text-muted py-8">Отзывов пока нет.</p>
-                      ) : (
-                        reviewsData.reviews.slice(0, 4).map((review) => (
-                          <li
-                            key={review.id}
-                            className="flex flex-col gap-3 rounded-2xl border border-[var(--border-subtle)] p-4 hover:bg-slate-50 dark:hover:bg-zinc-800/50 transition-all cursor-pointer"
-                          >
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-3">
-                                <Avatar name={review.client_name || "К"} className="h-9 w-9 shrink-0" />
-                                <div>
-                                  <p className="text-sm font-bold text-slate-800 dark:text-slate-200">{review.client_name || "Клиент"}</p>
-                                  <p className="text-xs text-text-muted">{review.service_name || "Услуга не указана"}</p>
-                                </div>
-                              </div>
-                              <div className="text-right">
-                                {renderStars(review.rating)}
-                                <p className="text-[10px] text-text-muted mt-0.5">{review.client_phone}</p>
-                              </div>
-                            </div>
-
-                            {review.rating !== null && review.rating <= 3 && review.owner_feedback && (
-                              <div className="rounded-xl bg-orange-50 dark:bg-orange-950/20 border border-orange-200 dark:border-orange-900/30 p-3 text-xs text-orange-800 dark:text-orange-300">
-                                <b>Жалоба клиента:</b> "{review.owner_feedback}"
-                              </div>
-                            )}
-
-                            {review.rating !== null && review.rating >= 4 && review.generated_review && (
-                              <div className="ai-glow-effect rounded-xl p-3 text-xs italic text-[var(--brand)]">
-                                "{review.generated_review}"
-                              </div>
-                            )}
-                          </li>
-                        ))
-                      )}
-                    </ul>
-                  </CardShell>
-
-
-                </section>
-
                 {/* Master Analytics */}
                 {masters.length > 0 && (
                   <section className="rounded-card bg-[var(--surface)] shadow-sm p-6 sm:p-8">
@@ -1015,6 +954,68 @@ export function DashboardPage({
                   </section>
                 )}
               </div>
+
+                {/* Recent Reviews Summary */}
+                <section className="grid gap-6 lg:grid-cols-[1.6fr_1fr]">
+                  
+                  {/* Reviews List */}
+                  <CardShell>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="text-lg font-semibold text-text-main">Последние отзывы</h3>
+                        <p className="mt-1 text-sm text-text-muted">Недавние ответы и оценки клиентов</p>
+                      </div>
+                      <button
+                        onClick={() => setActiveTab("reviews")}
+                        className="text-xs font-bold text-brand hover:text-brand-hover transition-colors"
+                      >
+                        Смотреть все
+                      </button>
+                    </div>
+
+                    <ul className="mt-6 space-y-4">
+                      {!reviewsData || reviewsData.reviews.length === 0 ? (
+                        <p className="text-center text-xs text-text-muted py-8">Отзывов пока нет.</p>
+                      ) : (
+                        reviewsData.reviews.slice(0, 4).map((review) => (
+                          <li
+                            key={review.id}
+                            className="flex flex-col gap-3 rounded-2xl border border-[var(--border-subtle)] p-4 hover:bg-slate-50 dark:hover:bg-zinc-800/50 transition-all cursor-pointer"
+                          >
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-3">
+                                <Avatar name={review.client_name || "К"} className="h-9 w-9 shrink-0" />
+                                <div>
+                                  <p className="text-sm font-bold text-slate-800 dark:text-slate-200">{review.client_name || "Клиент"}</p>
+                                  <p className="text-xs text-text-muted">{review.service_name || "Услуга не указана"}</p>
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                {renderStars(review.rating)}
+                                <p className="text-[10px] text-text-muted mt-0.5">{review.client_phone}</p>
+                              </div>
+                            </div>
+
+                            {review.rating !== null && review.rating <= 3 && review.owner_feedback && (
+                              <div className="rounded-xl bg-orange-50 dark:bg-orange-950/20 border border-orange-200 dark:border-orange-900/30 p-3 text-xs text-orange-800 dark:text-orange-300">
+                                <b>Жалоба клиента:</b> "{review.owner_feedback}"
+                              </div>
+                            )}
+
+                            {review.rating !== null && review.rating >= 4 && review.generated_review && (
+                              <div className="ai-glow-effect rounded-xl p-3 text-xs italic text-[var(--brand)]">
+                                "{review.generated_review}"
+                              </div>
+                            )}
+                          </li>
+                        ))
+                      )}
+                    </ul>
+                  </CardShell>
+
+
+                </section>
+
             )}
 
             {/* REVIEWS HISTORY TAB */}
