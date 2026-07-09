@@ -811,7 +811,7 @@ export function DashboardPage({
                   </div>
                 </div>
 
-                <div className="mt-6 overflow-x-auto max-w-5xl">
+                <div className="mt-6 overflow-x-auto">
                   <table className="w-full border-collapse text-left text-sm text-text-muted">
                     <thead>
                       <tr className="border-b border-slate-100 text-xs font-semibold uppercase tracking-wider text-text-muted">
