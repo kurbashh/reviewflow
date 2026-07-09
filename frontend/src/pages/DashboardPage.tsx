@@ -508,11 +508,11 @@ export function DashboardPage({
   };
 
   return (
-    <DashboardLayout activeTab={activeTab} setActiveTab={setActiveTab} darkMode={darkMode} setDarkMode={setDarkMode}>
+    <DashboardLayout activeTab={activeTab} setActiveTab={setActiveTab}>
       <div className="space-y-8">
         
         {/* Header */}
-        <header className="sticky top-0 z-30 -mx-[var(--spacing-fluid-md)] px-[var(--spacing-fluid-md)] lg:-mx-[var(--spacing-fluid-lg)] lg:px-[var(--spacing-fluid-lg)] -mt-[var(--spacing-fluid-md)] pt-[var(--spacing-fluid-md)] lg:-mt-[var(--spacing-fluid-lg)] lg:pt-[var(--spacing-fluid-lg)] pb-4 bg-[var(--dashboard-bg)]/80 backdrop-blur-md flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between border-b border-[var(--border-subtle)] mb-8">
+        <header className="sticky top-0 z-30 -mx-[var(--spacing-fluid-md)] px-[var(--spacing-fluid-md)] lg:-mx-[var(--spacing-fluid-lg)] lg:px-[var(--spacing-fluid-lg)] -mt-[var(--spacing-fluid-md)] pt-[var(--spacing-fluid-md)] lg:-mt-[var(--spacing-fluid-lg)] lg:pt-[var(--spacing-fluid-lg)] pb-4 bg-[var(--dashboard-bg)] flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between border-b border-[var(--border-subtle)] mb-8">
           <div>
             <p className="text-sm font-semibold tracking-wide text-brand uppercase"> ReviewFlow.kz</p>
             <h1 className="mt-1 text-2xl font-bold tracking-tight text-text-main sm:text-[1.85rem]">

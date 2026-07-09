@@ -1,11 +1,9 @@
 import {
   IconAnalytics,
   IconLocations,
-  IconMoon,
   IconOverview,
   IconReviews,
   IconSettings,
-  IconSun,
   LogoMark,
 } from "../ui/icons";
 
@@ -20,13 +18,9 @@ const navItems = [
 export function Sidebar({
   activeTab,
   setActiveTab,
-  darkMode,
-  setDarkMode,
 }: {
   activeTab: string;
   setActiveTab: (tab: string) => void;
-  darkMode: boolean;
-  setDarkMode: (val: boolean) => void;
 }) {
   return (
 
@@ -61,19 +55,6 @@ export function Sidebar({
         
       </nav>
 
-      {/* Desktop Bottom Actions */}
-      <div className="hidden md:flex flex-col items-center gap-4 mt-auto">
-        <button
-          type="button"
-          onClick={() => setDarkMode(!darkMode)}
-          className="flex h-12 w-12 items-center justify-center rounded-2xl text-[var(--text-muted)] transition-colors hover:text-[var(--text-main)]"
-          aria-label="Переключить тему"
-          title="Переключить тему"
-        >
-          {darkMode ? <IconSun className="h-5 w-5" /> : <IconMoon className="h-5 w-5" />}
-        </button>
-
-      </div>
     </aside>
   );
 }

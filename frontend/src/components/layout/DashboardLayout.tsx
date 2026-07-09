@@ -5,14 +5,10 @@ export function DashboardLayout({
   children,
   activeTab,
   setActiveTab,
-  darkMode,
-  setDarkMode,
 }: {
   children: ReactNode;
   activeTab: string;
   setActiveTab: (tab: string) => void;
-  darkMode: boolean;
-  setDarkMode: (val: boolean) => void;
 }) {
 
   return (
@@ -20,8 +16,6 @@ export function DashboardLayout({
       <Sidebar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
-        darkMode={darkMode}
-        setDarkMode={setDarkMode}
       />
 
       <main className="flex-1 overflow-auto p-[var(--spacing-fluid-md)] lg:p-[var(--spacing-fluid-lg)] transition-colors duration-200 pb-20 md:pb-[var(--spacing-fluid-md)] lg:pb-[var(--spacing-fluid-lg)]">
