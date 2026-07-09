@@ -16,6 +16,7 @@
   --color-text-main: var(--text-main);
   --color-text-muted: var(--text-muted);
   --color-success: var(--success);
+  --color-error: var(--error);
   --color-border-subtle: var(--border-subtle);
 
   --radius-card: 12px;
@@ -35,6 +36,7 @@
   --brand: #7C3AED;
   --brand-hover: #6D28D9;
   --success: #059669;
+  --error: #EF4444;
   --text-main: #18181B;
   --text-muted: #71717A;
   --border-subtle: #E4E4E7;
@@ -47,6 +49,7 @@
   --brand: #A78BFA;
   --brand-hover: #C084FC;
   --success: #34D399;
+  --error: #EF4444;
   --text-main: #FAFAFA;
   --text-muted: #A1A1AA;
   --border-subtle: #27272A;

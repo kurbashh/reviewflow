@@ -171,7 +171,7 @@ export function LoginPage({ onLogin, onRegister }: LoginPageProps) {
 
             {/* Error message */}
             {error && (
-              <div className="rounded-xl bg-red-500/10 border border-red-500/20 p-3 text-sm text-red-500 text-center">
+              <div className="rounded-xl bg-red-500/10 border border-red-500/20 p-3 text-sm text-error text-center">
                 {error}
               </div>
             )}
@@ -199,7 +199,7 @@ export function LoginPage({ onLogin, onRegister }: LoginPageProps) {
                   />
                 </div>
                 {fieldErrors.fullName && (
-                  <p className="mt-1.5 text-xs text-red-500 animate-fade-in">{fieldErrors.fullName}</p>
+                  <p className="mt-1.5 text-xs text-error animate-fade-in">{fieldErrors.fullName}</p>
                 )}
               </div>
             )}
@@ -227,7 +227,7 @@ export function LoginPage({ onLogin, onRegister }: LoginPageProps) {
                 />
               </div>
               {fieldErrors.email && (
-                <p className="mt-1.5 text-xs text-red-500 animate-fade-in">{fieldErrors.email}</p>
+                <p className="mt-1.5 text-xs text-error animate-fade-in">{fieldErrors.email}</p>
               )}
             </div>
 
@@ -263,14 +263,14 @@ export function LoginPage({ onLogin, onRegister }: LoginPageProps) {
                 </button>
               </div>
               {fieldErrors.password && (
-                <p className="mt-1.5 text-xs text-red-500 animate-fade-in">{fieldErrors.password}</p>
+                <p className="mt-1.5 text-xs text-error animate-fade-in">{fieldErrors.password}</p>
               )}
               {!isLogin && !fieldErrors.password && (
                 <div className="mt-2 flex items-center gap-2 text-xs">
                   <div className={`flex h-4 w-4 items-center justify-center rounded-full transition-colors ${password.length >= 12 ? 'bg-emerald-500 text-white' : 'bg-slate-200 dark:bg-zinc-700 text-transparent'}`}>
                     <RiCheckLine className="h-3 w-3" />
                   </div>
-                  <span className={`transition-colors ${password.length >= 12 ? 'text-emerald-600 dark:text-emerald-400 font-medium' : 'text-slate-500 dark:text-slate-400'}`}>
+                  <span className={`transition-colors ${password.length >= 12 ? 'text-emerald-600 dark:text-emerald-400 font-medium' : 'text-text-muted'}`}>
                     Минимум 12 символов (можно фразы и пробелы)
                   </span>
                 </div>

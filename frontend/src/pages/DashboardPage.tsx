@@ -428,13 +428,13 @@ export function DashboardPage({
         <header className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="text-sm font-semibold tracking-wide text-brand uppercase"> ReviewFlow.kz</p>
-            <h1 className="mt-1 text-2xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-[1.85rem]">
+            <h1 className="mt-1 text-2xl font-bold tracking-tight text-text-main sm:text-[1.85rem]">
               {settings ? settings.name : "Панель управления"}
             </h1>
           </div>
 
           <div className="flex items-center gap-3">
-            <span className="text-xs font-medium text-slate-500">ID бизнеса:</span>
+            <span className="text-xs font-medium text-text-muted">ID бизнеса:</span>
             <button
               onClick={() => {
                 navigator.clipboard.writeText(businessId);
@@ -442,13 +442,13 @@ export function DashboardPage({
                 setTimeout(() => setCopiedId(false), 2000);
               }}
               title="Копировать ID бизнеса"
-              className="group flex items-center gap-2 rounded-full border border-slate-200 dark:border-zinc-700 bg-white/50 dark:bg-zinc-800/50 px-4 py-2 text-xs font-mono text-slate-700 dark:text-slate-300 transition-all hover:bg-slate-100 hover:dark:bg-zinc-700"
+              className="group flex items-center gap-2 rounded-full border border-border-subtle bg-white/50 dark:bg-zinc-800/50 px-4 py-2 text-xs font-mono text-slate-700 dark:text-slate-300 transition-all hover:bg-slate-100 hover:dark:bg-zinc-700"
             >
               <span className="truncate max-w-[120px] sm:max-w-[160px]">{businessId}</span>
               {copiedId ? (
                 <RiCheckLine className="h-4 w-4 text-green-500" />
               ) : (
-                <RiFileCopyLine className="h-4 w-4 text-slate-400 group-hover:text-[var(--brand)] transition-colors" />
+                <RiFileCopyLine className="h-4 w-4 text-text-muted group-hover:text-[var(--brand)] transition-colors" />
               )}
             </button>
           </div>
@@ -459,7 +459,7 @@ export function DashboardPage({
           <div className="flex h-64 items-center justify-center rounded-3xl bg-[var(--surface)] border border-[var(--border-subtle)] shadow-soft transition-colors duration-200">
             <div className="text-center">
               <div className="h-8 w-8 animate-spin rounded-full border-4 border-brand border-t-transparent mx-auto"></div>
-              <p className="mt-4 text-sm text-slate-500 dark:text-slate-400">Загрузка данных...</p>
+              <p className="mt-4 text-sm text-text-muted">Загрузка данных...</p>
             </div>
           </div>
         )}
@@ -490,10 +490,10 @@ export function DashboardPage({
                   <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
                     <div className="max-w-xl">
                       <p className="text-sm font-semibold tracking-wide text-brand uppercase">Добро пожаловать</p>
-                      <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-4xl lg:text-[2.25rem] lg:leading-[1.1]">
+                      <h2 className="mt-3 text-3xl font-bold tracking-tight text-text-main sm:text-4xl lg:text-[2.25rem] lg:leading-[1.1]">
                         Эффективность сбора отзывов
                       </h2>
-                      <p className="mt-4 max-w-lg text-sm leading-6 text-slate-500 dark:text-slate-400">
+                      <p className="mt-4 max-w-lg text-sm leading-6 text-text-muted">
                         Автосбор работает стабильно. AI-модель успешно генерирует тексты отзывов для лояльных клиентов, а негативные оценки перехватываются и пересылаются вам.
                       </p>
                       <div className="mt-8 flex flex-wrap items-center gap-3">
@@ -527,24 +527,24 @@ export function DashboardPage({
                 {/* Metrics Grid */}
                 <section className="grid gap-[var(--spacing-fluid-md)] grid-cols-[repeat(auto-fit,minmax(240px,1fr))]">
                   <CardShell>
-                    <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Всего запросов</p>
-                    <p className="mt-3 text-3xl font-bold font-mono text-slate-900 dark:text-white">{stats.sent}</p>
-                    <p className="mt-1 text-xs text-slate-400">Отправлено в WhatsApp</p>
+                    <p className="text-xs font-semibold uppercase tracking-wider text-text-muted">Всего запросов</p>
+                    <p className="mt-3 text-3xl font-bold font-mono text-text-main">{stats.sent}</p>
+                    <p className="mt-1 text-xs text-text-muted">Отправлено в WhatsApp</p>
                   </CardShell>
                   <CardShell>
-                    <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Средняя оценка</p>
+                    <p className="text-xs font-semibold uppercase tracking-wider text-text-muted">Средняя оценка</p>
                     <p className="mt-3 text-3xl font-bold font-mono text-emerald-600 dark:text-emerald-400">★ {stats.avg_rating}</p>
-                    <p className="mt-1 text-xs text-slate-400">Оценка на основе {stats.rated} ответов</p>
+                    <p className="mt-1 text-xs text-text-muted">Оценка на основе {stats.rated} ответов</p>
                   </CardShell>
                   <CardShell>
-                    <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Конверсия ответов</p>
+                    <p className="text-xs font-semibold uppercase tracking-wider text-text-muted">Конверсия ответов</p>
                     <p className="mt-3 text-3xl font-bold font-mono text-brand">{stats.response_rate}%</p>
-                    <p className="mt-1 text-xs text-slate-400">Процент ответивших клиентов</p>
+                    <p className="mt-1 text-xs text-text-muted">Процент ответивших клиентов</p>
                   </CardShell>
                   <CardShell>
-                    <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Ожидают ответа</p>
-                    <p className="mt-3 text-3xl font-bold font-mono text-slate-900 dark:text-white">{stats.pending_replies}</p>
-                    <p className="mt-1 text-xs text-slate-400">Активные диалоги</p>
+                    <p className="text-xs font-semibold uppercase tracking-wider text-text-muted">Ожидают ответа</p>
+                    <p className="mt-3 text-3xl font-bold font-mono text-text-main">{stats.pending_replies}</p>
+                    <p className="mt-1 text-xs text-text-muted">Активные диалоги</p>
                   </CardShell>
                 </section>
 
@@ -555,8 +555,8 @@ export function DashboardPage({
                   <CardShell>
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                       <div>
-                        <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Динамика отправки и ответов</h3>
-                        <p className="mt-1 text-sm text-slate-400">Новые запросы и полученные оценки за 7 дней</p>
+                        <h3 className="text-lg font-semibold text-text-main">Динамика отправки и ответов</h3>
+                        <p className="mt-1 text-sm text-text-muted">Новые запросы и полученные оценки за 7 дней</p>
                       </div>
                       <div className="flex items-center gap-4 text-xs">
                         <span className="flex items-center gap-1.5 text-slate-600 dark:text-slate-300 font-medium">
@@ -634,13 +634,13 @@ export function DashboardPage({
                   {/* Location Stats */}
                   <CardShell>
                     <div>
-                      <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Показатели по точкам</h3>
-                      <p className="mt-1 text-sm text-slate-400">Активность сбора отзывов по филиалам</p>
+                      <h3 className="text-lg font-semibold text-text-main">Показатели по точкам</h3>
+                      <p className="mt-1 text-sm text-text-muted">Активность сбора отзывов по филиалам</p>
                     </div>
 
                     <div className="mt-6 space-y-4">
                       {stats.location_stats.length === 0 ? (
-                        <p className="text-center text-xs text-slate-400 py-8">Локации пока не настроены.</p>
+                        <p className="text-center text-xs text-text-muted py-8">Локации пока не настроены.</p>
                       ) : (
                         stats.location_stats.map((loc) => (
                           <div key={loc.name} className="rounded-2xl border border-[var(--border-subtle)] p-4">
@@ -650,7 +650,7 @@ export function DashboardPage({
                                 ★ {loc.avg_rating}
                               </span>
                             </div>
-                            <div className="mt-3 flex items-center justify-between text-xs text-slate-400">
+                            <div className="mt-3 flex items-center justify-between text-xs text-text-muted">
                               <span>Отправлено: <b>{loc.sent}</b></span>
                               <span>С ответом: <b>{loc.rated}</b></span>
                             </div>
@@ -668,8 +668,8 @@ export function DashboardPage({
                   <CardShell>
                     <div className="flex items-center justify-between">
                       <div>
-                        <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Последние отзывы</h3>
-                        <p className="mt-1 text-sm text-slate-400">Недавние ответы и оценки клиентов</p>
+                        <h3 className="text-lg font-semibold text-text-main">Последние отзывы</h3>
+                        <p className="mt-1 text-sm text-text-muted">Недавние ответы и оценки клиентов</p>
                       </div>
                       <button
                         onClick={() => setActiveTab("reviews")}
@@ -681,7 +681,7 @@ export function DashboardPage({
 
                     <ul className="mt-6 space-y-4">
                       {!reviewsData || reviewsData.reviews.length === 0 ? (
-                        <p className="text-center text-xs text-slate-400 py-8">Отзывов пока нет.</p>
+                        <p className="text-center text-xs text-text-muted py-8">Отзывов пока нет.</p>
                       ) : (
                         reviewsData.reviews.slice(0, 4).map((review) => (
                           <li
@@ -693,12 +693,12 @@ export function DashboardPage({
                                 <Avatar name={review.client_name || "К"} className="h-9 w-9 shrink-0" />
                                 <div>
                                   <p className="text-sm font-bold text-slate-800 dark:text-slate-200">{review.client_name || "Клиент"}</p>
-                                  <p className="text-xs text-slate-400">{review.service_name || "Услуга не указана"}</p>
+                                  <p className="text-xs text-text-muted">{review.service_name || "Услуга не указана"}</p>
                                 </div>
                               </div>
                               <div className="text-right">
                                 {renderStars(review.rating)}
-                                <p className="text-[10px] text-slate-400 mt-0.5">{review.client_phone}</p>
+                                <p className="text-[10px] text-text-muted mt-0.5">{review.client_phone}</p>
                               </div>
                             </div>
 
@@ -750,8 +750,8 @@ export function DashboardPage({
               <CardShell>
                 <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
                   <div>
-                    <h3 className="text-lg font-semibold text-slate-900 dark:text-white">История сбора отзывов</h3>
-                    <p className="mt-1 text-sm text-slate-400">Все диалоги и оценки по вашему бизнесу</p>
+                    <h3 className="text-lg font-semibold text-text-main">История сбора отзывов</h3>
+                    <p className="mt-1 text-sm text-text-muted">Все диалоги и оценки по вашему бизнесу</p>
                   </div>
 
                   {/* Filter tabs */}
@@ -759,7 +759,7 @@ export function DashboardPage({
                     <button
                       onClick={() => handleReviewFilterChange("all")}
                       className={`rounded-full px-4 py-1.5 text-xs font-semibold transition-colors ${
-                        reviewFilter === "all" ? "bg-white dark:bg-zinc-900 text-slate-900 dark:text-slate-100 shadow-sm" : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
+                        reviewFilter === "all" ? "bg-surface text-text-main dark:text-slate-100 shadow-sm" : "text-text-muted hover:text-slate-800 dark:hover:text-slate-200"
                       }`}
                     >
                       Все отзывы
@@ -767,7 +767,7 @@ export function DashboardPage({
                     <button
                       onClick={() => handleReviewFilterChange("negative")}
                       className={`rounded-full px-4 py-1.5 text-xs font-semibold transition-colors ${
-                        reviewFilter === "negative" ? "bg-white dark:bg-zinc-900 text-slate-900 dark:text-slate-100 shadow-sm" : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
+                        reviewFilter === "negative" ? "bg-surface text-text-main dark:text-slate-100 shadow-sm" : "text-text-muted hover:text-slate-800 dark:hover:text-slate-200"
                       }`}
                     >
                       Негативные (1-3★)
@@ -776,9 +776,9 @@ export function DashboardPage({
                 </div>
 
                 <div className="mt-6 overflow-x-auto">
-                  <table className="w-full border-collapse text-left text-sm text-slate-500">
+                  <table className="w-full border-collapse text-left text-sm text-text-muted">
                     <thead>
-                      <tr className="border-b border-slate-100 text-xs font-semibold uppercase tracking-wider text-slate-400">
+                      <tr className="border-b border-slate-100 text-xs font-semibold uppercase tracking-wider text-text-muted">
                         <th className="py-4 pl-4">Клиент</th>
                         <th className="py-4">Детали услуги</th>
                         <th className="py-4">Оценка</th>
@@ -790,20 +790,20 @@ export function DashboardPage({
                     <tbody>
                       {reviewsData.reviews.length === 0 ? (
                         <tr>
-                          <td colSpan={6} className="py-12 text-center text-xs text-slate-400">
+                          <td colSpan={6} className="py-12 text-center text-xs text-text-muted">
                             Подходящие отзывы не найдены.
                           </td>
                         </tr>
                       ) : (
                         reviewsData.reviews.map((review) => (
                           <tr key={review.id} className="border-b border-[var(--border-subtle)] hover:bg-slate-50 dark:hover:bg-zinc-800/40 transition-colors cursor-pointer">
-                            <td className="py-4 pl-4 font-semibold text-slate-900 dark:text-white">
+                            <td className="py-4 pl-4 font-semibold text-text-main">
                               <div>{review.client_name || "Без имени"}</div>
-                              <div className="text-xs text-slate-400 font-mono mt-0.5">{review.client_phone}</div>
+                              <div className="text-xs text-text-muted font-mono mt-0.5">{review.client_phone}</div>
                             </td>
                             <td className="py-4">
                               <div className="text-slate-700 dark:text-slate-200 font-medium">{review.service_name || "Не указана"}</div>
-                              <div className="text-xs text-slate-400">Мастер: {review.master_name || "Не указан"}</div>
+                              <div className="text-xs text-text-muted">Мастер: {review.master_name || "Не указан"}</div>
                             </td>
                             <td className="py-4 font-medium">{renderStars(review.rating)}</td>
                             <td className="py-4">
@@ -832,7 +832,7 @@ export function DashboardPage({
                                 <span className="text-slate-300">-</span>
                               )}
                             </td>
-                            <td className="py-4 pr-4 text-right text-xs text-slate-400 font-medium">
+                            <td className="py-4 pr-4 text-right text-xs text-text-muted font-medium">
                               {new Date(review.created_at).toLocaleDateString("ru-RU")}
                             </td>
                           </tr>
@@ -844,7 +844,7 @@ export function DashboardPage({
 
                 {/* Pagination */}
                 <div className="mt-6 flex items-center justify-between border-t border-slate-100 pt-4 text-xs">
-                  <span className="text-slate-400 font-medium">
+                  <span className="text-text-muted font-medium">
                     Показано <b>{reviewsOffset + 1}-{Math.min(reviewsOffset + REVIEWS_LIMIT, reviewsData.total_count)}</b> из <b>{reviewsData.total_count}</b>
                   </span>
                   
@@ -875,19 +875,19 @@ export function DashboardPage({
                 {/* Locations list */}
                 <CardShell>
                   <div>
-                    <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Управление филиалами</h3>
-                    <p className="mt-1 text-sm text-slate-400">Настройка ссылок на карты и слагов перенаправления для каждой точки</p>
+                    <h3 className="text-lg font-semibold text-text-main">Управление филиалами</h3>
+                    <p className="mt-1 text-sm text-text-muted">Настройка ссылок на карты и слагов перенаправления для каждой точки</p>
                   </div>
 
                   <div className="mt-6 space-y-4">
                     {settings.locations.length === 0 ? (
-                      <p className="text-center text-xs text-slate-400 py-12">Точки еще не добавлены. Добавьте филиал справа.</p>
+                      <p className="text-center text-xs text-text-muted py-12">Точки еще не добавлены. Добавьте филиал справа.</p>
                     ) : (
                       settings.locations.map((loc) => (
                         <div key={loc.id} className="rounded-2xl border border-[var(--border-subtle)] p-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between hover:bg-slate-100 dark:hover:bg-zinc-800/50 transition-colors cursor-pointer">
                           <div className="space-y-1">
                             <h4 className="font-bold text-slate-800 dark:text-slate-200 text-base">{loc.name}</h4>
-                            <p className="text-xs text-slate-400 font-mono">
+                            <p className="text-xs text-text-muted font-mono">
                               Редирект: <a href={`${REDIRECT_BASE}/${loc.redirect_slug}`} target="_blank" rel="noopener noreferrer" className="text-brand hover:underline">/go/{loc.redirect_slug}</a>
                             </p>
                             <div className="flex flex-wrap gap-x-4 gap-y-1 pt-1 text-[11px]">
@@ -905,7 +905,7 @@ export function DashboardPage({
                               type="button"
                               onClick={() => handleStartEditLocation(loc)}
                               title="Редактировать"
-                              className="flex h-8 w-8 items-center justify-center rounded-full text-slate-400 hover:bg-slate-100 hover:text-[var(--brand)] dark:hover:bg-zinc-800 transition-colors active:scale-95 focus:ring-2 focus:ring-[var(--brand)] focus:outline-none"
+                              className="flex h-8 w-8 items-center justify-center rounded-full text-text-muted hover:bg-slate-100 hover:text-[var(--brand)] dark:hover:bg-zinc-800 transition-colors active:scale-95 focus:ring-2 focus:ring-[var(--brand)] focus:outline-none"
                             >
                               <RiEditLine className="h-4 w-4" />
                             </button>
@@ -913,7 +913,7 @@ export function DashboardPage({
                               type="button"
                               onClick={() => handleDeleteLocation(loc.id)}
                               title="Удалить"
-                              className="flex h-8 w-8 items-center justify-center rounded-full text-slate-400 hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-950/20 dark:hover:text-red-400 transition-colors active:scale-95 focus:ring-2 focus:ring-red-500 focus:outline-none"
+                              className="flex h-8 w-8 items-center justify-center rounded-full text-text-muted hover:bg-red-50 hover:text-error dark:hover:bg-red-950/20 dark:hover:text-red-400 transition-colors active:scale-95 focus:ring-2 focus:ring-red-500 focus:outline-none"
                             >
                               <RiDeleteBinLine className="h-4 w-4" />
                             </button>
@@ -927,10 +927,10 @@ export function DashboardPage({
                 {/* Add/Edit Location form */}
                 <CardShell>
                   <div>
-                    <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
+                    <h3 className="text-lg font-semibold text-text-main">
                       {editingLocId ? "Редактировать локацию" : "Добавить новый филиал"}
                     </h3>
-                    <p className="mt-1 text-sm text-slate-400">
+                    <p className="mt-1 text-sm text-text-muted">
                       {editingLocId ? "Изменение ссылок для выбранной точки" : "Создание новой точки с уникальным слагом редиректа"}
                     </p>
                   </div>
@@ -941,7 +941,7 @@ export function DashboardPage({
                     )}
 
                     <div className="space-y-1">
-                      <label className="text-xs font-bold text-slate-500 uppercase">Название филиала *</label>
+                      <label className="text-xs font-bold text-text-muted uppercase">Название филиала *</label>
                       <input
                         type="text"
                         required
@@ -949,13 +949,13 @@ export function DashboardPage({
                         onChange={(e) => handleLocChange("name", e.target.value)}
                         onBlur={() => handleLocBlur("name")}
                         placeholder="Например, Dostyk Ave"
-                        className={`w-full rounded-2xl border bg-white dark:bg-zinc-800 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:outline-none transition-colors ${locFieldErrors.name ? 'border-red-500 focus:border-red-500 ring-2 ring-red-500/20' : 'border-slate-200 dark:border-zinc-700 focus:border-brand focus:ring-2 focus:ring-brand/20'}`}
+                        className={`w-full rounded-2xl border bg-surface px-4 py-3 text-sm text-text-main dark:text-slate-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:outline-none transition-colors ${locFieldErrors.name ? 'border-red-500 focus:border-red-500 ring-2 ring-red-500/20' : 'border-border-subtle focus:border-brand focus:ring-2 focus:ring-brand/20'}`}
                       />
-                      {locFieldErrors.name && <p className="mt-1 text-xs text-red-500 animate-fade-in">{locFieldErrors.name}</p>}
+                      {locFieldErrors.name && <p className="mt-1 text-xs text-error animate-fade-in">{locFieldErrors.name}</p>}
                     </div>
 
                     <div className="space-y-1">
-                      <label className="text-xs font-bold text-slate-500 uppercase">Слаг для редиректа *</label>
+                      <label className="text-xs font-bold text-text-muted uppercase">Слаг для редиректа *</label>
                       <input
                         type="text"
                         required
@@ -964,33 +964,33 @@ export function DashboardPage({
                         onChange={(e) => handleLocChange("slug", e.target.value)}
                         onBlur={() => handleLocBlur("slug")}
                         placeholder="Например, dostyk"
-                        className={`w-full rounded-2xl border bg-white dark:bg-zinc-800 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:outline-none disabled:bg-slate-50 disabled:dark:bg-zinc-900/50 disabled:text-slate-400 disabled:dark:text-zinc-500 transition-colors ${locFieldErrors.slug ? 'border-red-500 focus:border-red-500 ring-2 ring-red-500/20' : 'border-slate-200 dark:border-zinc-700 focus:border-brand focus:ring-2 focus:ring-brand/20'}`}
+                        className={`w-full rounded-2xl border bg-surface px-4 py-3 text-sm text-text-main dark:text-slate-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:outline-none disabled:bg-slate-50 disabled:dark:bg-zinc-900/50 disabled:text-text-muted disabled:dark:text-zinc-500 transition-colors ${locFieldErrors.slug ? 'border-red-500 focus:border-red-500 ring-2 ring-red-500/20' : 'border-border-subtle focus:border-brand focus:ring-2 focus:ring-brand/20'}`}
                       />
-                      {locFieldErrors.slug && <p className="mt-1 text-xs text-red-500 animate-fade-in">{locFieldErrors.slug}</p>}
+                      {locFieldErrors.slug && <p className="mt-1 text-xs text-error animate-fade-in">{locFieldErrors.slug}</p>}
                       {!editingLocId && !locFieldErrors.slug && (
-                        <p className="text-[10px] text-slate-400">Будет создана ссылка: <b>{REDIRECT_BASE}/{newLocSlug || "слаг"}</b></p>
+                        <p className="text-[10px] text-text-muted">Будет создана ссылка: <b>{REDIRECT_BASE}/{newLocSlug || "слаг"}</b></p>
                       )}
                     </div>
 
                     <div className="space-y-1">
-                      <label className="text-xs font-bold text-slate-500 uppercase">Ссылка 2ГИС (опционально)</label>
+                      <label className="text-xs font-bold text-text-muted uppercase">Ссылка 2ГИС (опционально)</label>
                       <input
                         type="url"
                         value={newLocGis}
                         onChange={(e) => setNewLocGis(e.target.value)}
                         placeholder="Ссылка на филиал в 2ГИС"
-                        className="w-full rounded-2xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:border-brand focus:outline-none transition-colors"
+                        className="w-full rounded-2xl border border-border-subtle bg-surface px-4 py-3 text-sm text-text-main dark:text-slate-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:border-brand focus:outline-none transition-colors"
                       />
                     </div>
 
                     <div className="space-y-1">
-                      <label className="text-xs font-bold text-slate-500 uppercase">Ссылка Яндекс.Карты (опционально)</label>
+                      <label className="text-xs font-bold text-text-muted uppercase">Ссылка Яндекс.Карты (опционально)</label>
                       <input
                         type="url"
                         value={newLocYandex}
                         onChange={(e) => setNewLocYandex(e.target.value)}
                         placeholder="Ссылка на филиал в Яндекс.Картах"
-                        className="w-full rounded-2xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:border-brand focus:outline-none transition-colors"
+                        className="w-full rounded-2xl border border-border-subtle bg-surface px-4 py-3 text-sm text-text-main dark:text-slate-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:border-brand focus:outline-none transition-colors"
                       />
                     </div>
 
@@ -1005,7 +1005,7 @@ export function DashboardPage({
                         <button
                           type="button"
                           onClick={handleCancelEditLocation}
-                          className="rounded-full bg-transparent hover:bg-slate-100 dark:hover:bg-zinc-800 border border-slate-200 dark:border-zinc-700 px-5 py-3 text-sm font-semibold text-slate-600 dark:text-slate-300 transition-colors active:scale-95 focus:ring-2 focus:ring-slate-300 dark:focus:ring-zinc-600 focus:outline-none"
+                          className="rounded-full bg-transparent hover:bg-slate-100 dark:hover:bg-zinc-800 border border-border-subtle px-5 py-3 text-sm font-semibold text-slate-600 dark:text-slate-300 transition-colors active:scale-95 focus:ring-2 focus:ring-slate-300 dark:focus:ring-zinc-600 focus:outline-none"
                         >
                           Отмена
                         </button>
@@ -1020,8 +1020,8 @@ export function DashboardPage({
             {activeTab === "settings" && settings && (
               <CardShell className="max-w-3xl mx-auto">
                 <div>
-                  <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Настройки бизнеса и интеграций</h3>
-                  <p className="mt-1 text-sm text-slate-400">Настройте общие параметры бизнеса, ключи подключения CRM и оповещения</p>
+                  <h3 className="text-lg font-semibold text-text-main">Настройки бизнеса и интеграций</h3>
+                  <p className="mt-1 text-sm text-text-muted">Настройте общие параметры бизнеса, ключи подключения CRM и оповещения</p>
                 </div>
 
                 <form onSubmit={handleSaveSettings} className="mt-8 space-y-6">
@@ -1039,19 +1039,19 @@ export function DashboardPage({
                     
                     <div className="grid gap-[var(--spacing-fluid-md)] grid-cols-[repeat(auto-fit,minmax(280px,1fr))]">
                       <div className="space-y-1">
-                        <label className="text-xs font-bold text-slate-500 uppercase">Название бизнеса *</label>
+                        <label className="text-xs font-bold text-text-muted uppercase">Название бизнеса *</label>
                         <input
                           type="text"
                           required
                           value={settingsForm.name}
                           onChange={(e) => handleSettingsChange("name", e.target.value)}
                           onBlur={() => handleSettingsBlur("name")}
-                          className={`w-full rounded-2xl border bg-white dark:bg-zinc-800 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:outline-none transition-colors ${settingsFieldErrors.name ? 'border-red-500 focus:border-red-500 ring-2 ring-red-500/20' : 'border-slate-200 dark:border-zinc-700 focus:border-brand focus:ring-2 focus:ring-brand/20'}`}
+                          className={`w-full rounded-2xl border bg-surface px-4 py-3 text-sm text-text-main dark:text-slate-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:outline-none transition-colors ${settingsFieldErrors.name ? 'border-red-500 focus:border-red-500 ring-2 ring-red-500/20' : 'border-border-subtle focus:border-brand focus:ring-2 focus:ring-brand/20'}`}
                         />
-                        {settingsFieldErrors.name && <p className="mt-1 text-xs text-red-500 animate-fade-in">{settingsFieldErrors.name}</p>}
+                        {settingsFieldErrors.name && <p className="mt-1 text-xs text-error animate-fade-in">{settingsFieldErrors.name}</p>}
                       </div>
                       <div className="space-y-1">
-                        <label className="text-xs font-bold text-slate-500 uppercase">Категория / Сфера *</label>
+                        <label className="text-xs font-bold text-text-muted uppercase">Категория / Сфера *</label>
                         <input
                           type="text"
                           required
@@ -1059,23 +1059,23 @@ export function DashboardPage({
                           onChange={(e) => handleSettingsChange("category", e.target.value)}
                           onBlur={() => handleSettingsBlur("category")}
                           placeholder="Например, Салон красоты"
-                          className={`w-full rounded-2xl border bg-white dark:bg-zinc-800 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:outline-none transition-colors ${settingsFieldErrors.category ? 'border-red-500 focus:border-red-500 ring-2 ring-red-500/20' : 'border-slate-200 dark:border-zinc-700 focus:border-brand focus:ring-2 focus:ring-brand/20'}`}
+                          className={`w-full rounded-2xl border bg-surface px-4 py-3 text-sm text-text-main dark:text-slate-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:outline-none transition-colors ${settingsFieldErrors.category ? 'border-red-500 focus:border-red-500 ring-2 ring-red-500/20' : 'border-border-subtle focus:border-brand focus:ring-2 focus:ring-brand/20'}`}
                         />
-                        {settingsFieldErrors.category && <p className="mt-1 text-xs text-red-500 animate-fade-in">{settingsFieldErrors.category}</p>}
+                        {settingsFieldErrors.category && <p className="mt-1 text-xs text-error animate-fade-in">{settingsFieldErrors.category}</p>}
                       </div>
                     </div>
 
                     <div className="space-y-1">
-                      <label className="text-xs font-bold text-slate-500 uppercase">Контактный телефон *</label>
+                      <label className="text-xs font-bold text-text-muted uppercase">Контактный телефон *</label>
                       <input
                         type="tel"
                         required
                         value={settingsForm.phone}
                         onChange={(e) => handleSettingsChange("phone", e.target.value)}
                         onBlur={() => handleSettingsBlur("phone")}
-                        className={`w-full rounded-2xl border bg-white dark:bg-zinc-800 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:outline-none transition-colors ${settingsFieldErrors.phone ? 'border-red-500 focus:border-red-500 ring-2 ring-red-500/20' : 'border-slate-200 dark:border-zinc-700 focus:border-brand focus:ring-2 focus:ring-brand/20'}`}
+                        className={`w-full rounded-2xl border bg-surface px-4 py-3 text-sm text-text-main dark:text-slate-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:outline-none transition-colors ${settingsFieldErrors.phone ? 'border-red-500 focus:border-red-500 ring-2 ring-red-500/20' : 'border-border-subtle focus:border-brand focus:ring-2 focus:ring-brand/20'}`}
                       />
-                      {settingsFieldErrors.phone && <p className="mt-1 text-xs text-red-500 animate-fade-in">{settingsFieldErrors.phone}</p>}
+                      {settingsFieldErrors.phone && <p className="mt-1 text-xs text-error animate-fade-in">{settingsFieldErrors.phone}</p>}
                     </div>
                   </div>
 
@@ -1085,11 +1085,11 @@ export function DashboardPage({
                     
                     <div className="grid gap-[var(--spacing-fluid-md)] grid-cols-[repeat(auto-fit,minmax(280px,1fr))]">
                       <div className="space-y-1">
-                        <label className="text-xs font-bold text-slate-500 uppercase">Тип CRM</label>
+                        <label className="text-xs font-bold text-text-muted uppercase">Тип CRM</label>
                         <select
                           value={settingsForm.crm_type}
                           onChange={(e) => setSettingsForm({ ...settingsForm, crm_type: e.target.value })}
-                          className="w-full rounded-2xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:border-brand focus:outline-none transition-colors"
+                          className="w-full rounded-2xl border border-border-subtle bg-surface px-4 py-3 text-sm text-text-main dark:text-slate-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:border-brand focus:outline-none transition-colors"
                         >
                           <option value="">Без интеграции (вручную)</option>
                           <option value="yclients">YClients</option>
@@ -1099,14 +1099,14 @@ export function DashboardPage({
                       </div>
                       
                       <div className="space-y-1">
-                        <label className="text-xs font-bold text-slate-500 uppercase">Секрет Вебхука (только чтение)</label>
+                        <label className="text-xs font-bold text-text-muted uppercase">Секрет Вебхука (только чтение)</label>
                         <input
                           type="text"
                           readOnly
                           value={settings.crm_webhook_secret}
-                          className="w-full rounded-2xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900/50 px-4 py-3 text-sm font-mono text-slate-500 dark:text-slate-400 focus:outline-none"
+                          className="w-full rounded-2xl border border-border-subtle bg-dashboard-bg px-4 py-3 text-sm font-mono text-text-muted focus:outline-none"
                         />
-                        <p className="text-[10px] text-slate-400">Используйте этот секрет для проверки входящих событий</p>
+                        <p className="text-[10px] text-text-muted">Используйте этот секрет для проверки входящих событий</p>
                       </div>
                     </div>
                   </div>
@@ -1116,37 +1116,37 @@ export function DashboardPage({
                     <h4 className="text-xs font-bold text-brand uppercase tracking-wider">Глобальные ссылки и оповещения</h4>
                     
                     <div className="space-y-1">
-                      <label className="text-xs font-bold text-slate-500 uppercase">Дефолтная ссылка 2ГИС</label>
+                      <label className="text-xs font-bold text-text-muted uppercase">Дефолтная ссылка 2ГИС</label>
                       <input
                         type="url"
                         value={settingsForm.gis_2gis_url}
                         onChange={(e) => setSettingsForm({ ...settingsForm, gis_2gis_url: e.target.value })}
                         placeholder="Будет использоваться, если у филиала нет индивидуальной ссылки"
-                        className="w-full rounded-2xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:border-brand focus:outline-none transition-colors"
+                        className="w-full rounded-2xl border border-border-subtle bg-surface px-4 py-3 text-sm text-text-main dark:text-slate-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:border-brand focus:outline-none transition-colors"
                       />
                     </div>
 
                     <div className="space-y-1">
-                      <label className="text-xs font-bold text-slate-500 uppercase">Дефолтная ссылка Яндекс.Карты</label>
+                      <label className="text-xs font-bold text-text-muted uppercase">Дефолтная ссылка Яндекс.Карты</label>
                       <input
                         type="url"
                         value={settingsForm.yandex_maps_url}
                         onChange={(e) => setSettingsForm({ ...settingsForm, yandex_maps_url: e.target.value })}
                         placeholder="Будет использоваться, если у филиала нет индивидуальной ссылки"
-                        className="w-full rounded-2xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:border-brand focus:outline-none transition-colors"
+                        className="w-full rounded-2xl border border-border-subtle bg-surface px-4 py-3 text-sm text-text-main dark:text-slate-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:border-brand focus:outline-none transition-colors"
                       />
                     </div>
 
                     <div className="space-y-1">
-                      <label className="text-xs font-bold text-slate-500 uppercase">Telegram Chat ID (Оповещения о негативе)</label>
+                      <label className="text-xs font-bold text-text-muted uppercase">Telegram Chat ID (Оповещения о негативе)</label>
                       <input
                         type="text"
                         value={settingsForm.telegram_chat_id}
                         onChange={(e) => setSettingsForm({ ...settingsForm, telegram_chat_id: e.target.value.trim() })}
                         placeholder="Chat ID вашего Telegram бота для алертов об оценках 1-3"
-                        className="w-full rounded-2xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:border-brand focus:outline-none transition-colors"
+                        className="w-full rounded-2xl border border-border-subtle bg-surface px-4 py-3 text-sm text-text-main dark:text-slate-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:border-brand focus:outline-none transition-colors"
                       />
-                      <p className="text-[10px] text-slate-400">На этот чат будут приходить уведомления о перехваченном негативе</p>
+                      <p className="text-[10px] text-text-muted">На этот чат будут приходить уведомления о перехваченном негативе</p>
                     </div>
                   </div>
 
@@ -1169,8 +1169,8 @@ export function DashboardPage({
                 {/* Subscription Details Header */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                   <div>
-                    <h3 className="text-xl font-bold text-slate-900 dark:text-white">Управление подпиской</h3>
-                    <p className="mt-1 text-sm text-slate-500">
+                    <h3 className="text-xl font-bold text-text-main">Управление подпиской</h3>
+                    <p className="mt-1 text-sm text-text-muted">
                       {billing.is_lifetime_access 
                         ? "Вам предоставлен вечный доступ. Рассылки никогда не будут заблокированы."
                         : "Управляйте тарифами, платежами и статусом рассылок"}
@@ -1185,50 +1185,50 @@ export function DashboardPage({
 
                 <div className="grid gap-[var(--spacing-fluid-md)] grid-cols-[repeat(auto-fit,minmax(280px,1fr))]">
                   {/* START Plan */}
-                  <div className={`relative rounded-3xl p-6 border ${billing.plan === "light" ? "border-brand bg-brand/5 shadow-md" : "border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900"} transition-all`}>
+                  <div className={`relative rounded-3xl p-6 border ${billing.plan === "light" ? "border-brand bg-brand/5 shadow-md" : "border-border-subtle bg-surface"} transition-all`}>
                     {billing.plan === "light" && <div className="absolute top-0 right-0 rounded-bl-xl rounded-tr-3xl bg-brand px-3 py-1 text-[10px] font-bold text-white uppercase tracking-wider">Текущий</div>}
-                    <h4 className="text-lg font-bold text-slate-900 dark:text-white">Start</h4>
-                    <p className="mt-1 text-xs text-slate-500 min-h-[40px]">Базовые возможности для начала</p>
-                    <div className="my-4 text-2xl font-extrabold text-slate-900 dark:text-white">10 000 ₸<span className="text-sm font-normal text-slate-500">/мес</span></div>
-                    <ul className="space-y-3 text-sm text-slate-600 dark:text-slate-400 mb-6">
+                    <h4 className="text-lg font-bold text-text-main">Start</h4>
+                    <p className="mt-1 text-xs text-text-muted min-h-[40px]">Базовые возможности для начала</p>
+                    <div className="my-4 text-2xl font-extrabold text-text-main">10 000 ₸<span className="text-sm font-normal text-text-muted">/мес</span></div>
+                    <ul className="space-y-3 text-sm text-slate-600 dark:text-text-muted mb-6">
                       <li className="flex gap-2"><RiCheckLine className="h-5 w-5 text-green-500 shrink-0"/> Обычная рассылка сообщений</li>
                       <li className="flex gap-2"><RiCheckLine className="h-5 w-5 text-green-500 shrink-0"/> Перехват негатива в Telegram</li>
                       <li className="flex gap-2"><RiCheckLine className="h-5 w-5 text-green-500 shrink-0"/> Маршрутизация на 2GIS/Yandex</li>
                     </ul>
-                    <button onClick={() => handleSubscribe("light")} className={`w-full rounded-full py-3 text-sm font-semibold transition-all focus:outline-none focus:ring-2 ${billing.plan === "light" ? "opacity-50 cursor-not-allowed bg-slate-100 text-slate-400 dark:bg-zinc-800/50 dark:text-zinc-500 border border-transparent" : "bg-transparent border border-slate-200 dark:border-zinc-800 text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-zinc-800 active:scale-[0.96] focus:ring-slate-300 dark:focus:ring-zinc-600"}`} disabled={billing.plan === "light"}>
+                    <button onClick={() => handleSubscribe("light")} className={`w-full rounded-full py-3 text-sm font-semibold transition-all focus:outline-none focus:ring-2 ${billing.plan === "light" ? "opacity-50 cursor-not-allowed bg-slate-100 text-text-muted dark:bg-zinc-800/50 dark:text-zinc-500 border border-transparent" : "bg-transparent border border-border-subtle text-text-main hover:bg-slate-100 dark:hover:bg-zinc-800 active:scale-[0.96] focus:ring-slate-300 dark:focus:ring-zinc-600"}`} disabled={billing.plan === "light"}>
                       {billing.plan === "light" ? "Активен" : "Выбрать Start"}
                     </button>
                   </div>
 
                   {/* PRO Plan */}
-                  <div className={`relative rounded-3xl p-6 border ${billing.plan === "standard" ? "border-brand bg-brand/5 shadow-md transform scale-105" : "border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900"} transition-all`}>
+                  <div className={`relative rounded-3xl p-6 border ${billing.plan === "standard" ? "border-brand bg-brand/5 shadow-md transform scale-105" : "border-border-subtle bg-surface"} transition-all`}>
                     <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-orange-400 to-pink-500 px-3 py-0.5 text-[10px] font-bold text-white uppercase tracking-wider shadow-sm">Популярный</div>
                     {billing.plan === "standard" && <div className="absolute top-0 right-0 rounded-bl-xl rounded-tr-3xl bg-brand px-3 py-1 text-[10px] font-bold text-white uppercase tracking-wider">Текущий</div>}
-                    <h4 className="text-lg font-bold text-slate-900 dark:text-white">Pro</h4>
-                    <p className="mt-1 text-xs text-slate-500 min-h-[40px]">Максимум отзывов с искусственным интеллектом</p>
-                    <div className="my-4 text-2xl font-extrabold text-slate-900 dark:text-white">15 000 ₸<span className="text-sm font-normal text-slate-500">/мес</span></div>
-                    <ul className="space-y-3 text-sm text-slate-600 dark:text-slate-400 mb-6">
+                    <h4 className="text-lg font-bold text-text-main">Pro</h4>
+                    <p className="mt-1 text-xs text-text-muted min-h-[40px]">Максимум отзывов с искусственным интеллектом</p>
+                    <div className="my-4 text-2xl font-extrabold text-text-main">15 000 ₸<span className="text-sm font-normal text-text-muted">/мес</span></div>
+                    <ul className="space-y-3 text-sm text-slate-600 dark:text-text-muted mb-6">
                       <li className="flex gap-2"><RiCheckLine className="h-5 w-5 text-green-500 shrink-0"/> Всё из тарифа Start</li>
-                      <li className="flex gap-2 font-medium text-slate-900 dark:text-slate-200"><RiCheckLine className="h-5 w-5 text-orange-500 shrink-0"/> ИИ-генерация отзывов</li>
-                      <li className="flex gap-2 font-medium text-slate-900 dark:text-slate-200"><RiCheckLine className="h-5 w-5 text-orange-500 shrink-0"/> Умный тайминг отправки</li>
+                      <li className="flex gap-2 font-medium text-text-main dark:text-slate-200"><RiCheckLine className="h-5 w-5 text-orange-500 shrink-0"/> ИИ-генерация отзывов</li>
+                      <li className="flex gap-2 font-medium text-text-main dark:text-slate-200"><RiCheckLine className="h-5 w-5 text-orange-500 shrink-0"/> Умный тайминг отправки</li>
                     </ul>
-                    <button onClick={() => handleSubscribe("standard")} className={`w-full rounded-full py-3 text-sm font-semibold transition-all focus:outline-none focus:ring-2 ${billing.plan === "standard" ? "opacity-50 cursor-not-allowed bg-slate-100 text-slate-400 dark:bg-zinc-800/50 dark:text-zinc-500 border border-transparent" : "bg-brand text-white hover:bg-brand-hover active:scale-[0.96] shadow-md hover:shadow-lg focus:ring-[var(--brand)]/30"}`} disabled={billing.plan === "standard"}>
+                    <button onClick={() => handleSubscribe("standard")} className={`w-full rounded-full py-3 text-sm font-semibold transition-all focus:outline-none focus:ring-2 ${billing.plan === "standard" ? "opacity-50 cursor-not-allowed bg-slate-100 text-text-muted dark:bg-zinc-800/50 dark:text-zinc-500 border border-transparent" : "bg-brand text-white hover:bg-brand-hover active:scale-[0.96] shadow-md hover:shadow-lg focus:ring-[var(--brand)]/30"}`} disabled={billing.plan === "standard"}>
                       {billing.plan === "standard" ? "Активен" : "Выбрать Pro"}
                     </button>
                   </div>
 
                   {/* ENTERPRISE Plan */}
-                  <div className={`relative rounded-3xl p-6 border ${billing.plan === "network" ? "border-brand bg-brand/5 shadow-md" : "border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900"} transition-all`}>
+                  <div className={`relative rounded-3xl p-6 border ${billing.plan === "network" ? "border-brand bg-brand/5 shadow-md" : "border-border-subtle bg-surface"} transition-all`}>
                     {billing.plan === "network" && <div className="absolute top-0 right-0 rounded-bl-xl rounded-tr-3xl bg-brand px-3 py-1 text-[10px] font-bold text-white uppercase tracking-wider">Текущий</div>}
-                    <h4 className="text-lg font-bold text-slate-900 dark:text-white">Enterprise</h4>
-                    <p className="mt-1 text-xs text-slate-500 min-h-[40px]">Для сетей и крупных проектов</p>
-                    <div className="my-4 text-2xl font-extrabold text-slate-900 dark:text-white">Индивидуально</div>
-                    <ul className="space-y-3 text-sm text-slate-600 dark:text-slate-400 mb-6">
+                    <h4 className="text-lg font-bold text-text-main">Enterprise</h4>
+                    <p className="mt-1 text-xs text-text-muted min-h-[40px]">Для сетей и крупных проектов</p>
+                    <div className="my-4 text-2xl font-extrabold text-text-main">Индивидуально</div>
+                    <ul className="space-y-3 text-sm text-slate-600 dark:text-text-muted mb-6">
                       <li className="flex gap-2"><RiCheckLine className="h-5 w-5 text-green-500 shrink-0"/> Всё из тарифа Pro</li>
                       <li className="flex gap-2"><RiCheckLine className="h-5 w-5 text-green-500 shrink-0"/> Несколько локаций/филиалов</li>
                       <li className="flex gap-2"><RiCheckLine className="h-5 w-5 text-green-500 shrink-0"/> Приоритетная поддержка</li>
                     </ul>
-                    <button onClick={() => handleSubscribe("network")} className={`w-full rounded-full py-3 text-sm font-semibold transition-all focus:outline-none focus:ring-2 ${billing.plan === "network" ? "opacity-50 cursor-not-allowed bg-slate-100 text-slate-400 dark:bg-zinc-800/50 dark:text-zinc-500 border border-transparent" : "bg-transparent border border-slate-200 dark:border-zinc-800 text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-zinc-800 active:scale-[0.96] focus:ring-slate-300 dark:focus:ring-zinc-600"}`} disabled={billing.plan === "network"}>
+                    <button onClick={() => handleSubscribe("network")} className={`w-full rounded-full py-3 text-sm font-semibold transition-all focus:outline-none focus:ring-2 ${billing.plan === "network" ? "opacity-50 cursor-not-allowed bg-slate-100 text-text-muted dark:bg-zinc-800/50 dark:text-zinc-500 border border-transparent" : "bg-transparent border border-border-subtle text-text-main hover:bg-slate-100 dark:hover:bg-zinc-800 active:scale-[0.96] focus:ring-slate-300 dark:focus:ring-zinc-600"}`} disabled={billing.plan === "network"}>
                       {billing.plan === "network" ? "Активен" : "Связаться с нами"}
                     </button>
                   </div>
@@ -1236,18 +1236,18 @@ export function DashboardPage({
 
                 <CardShell className="mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border-t-4 border-t-[var(--brand)]">
                   <div className="space-y-2">
-                    <h4 className="font-bold text-slate-900 dark:text-white">Статус рассылок</h4>
-                    <div className="text-sm text-slate-600 dark:text-slate-400">
+                    <h4 className="font-bold text-text-main">Статус рассылок</h4>
+                    <div className="text-sm text-slate-600 dark:text-text-muted">
                       {billing.is_manually_paused ? (
                         <span className="text-orange-600 font-medium">Приостановлены (Пауза). Новые визиты сохраняются, но сообщения не отправляются.</span>
                       ) : billing.status === "churned" && !billing.is_lifetime_access ? (
-                        <span className="text-red-500 font-medium">Приостановлены (Неоплата). Оплатите подписку для возобновления.</span>
+                        <span className="text-error font-medium">Приостановлены (Неоплата). Оплатите подписку для возобновления.</span>
                       ) : (
                         <span className="text-green-600 font-medium">Активны. Сообщения отправляются клиентам в штатном режиме.</span>
                       )}
                     </div>
                     {!billing.is_lifetime_access && billing.subscription_ends_at && (
-                      <div className="text-xs text-slate-500">
+                      <div className="text-xs text-text-muted">
                         Оплачено до: <span className="font-semibold text-slate-700 dark:text-slate-300">{new Date(billing.subscription_ends_at).toLocaleDateString("ru-RU")}</span>
                       </div>
                     )}
@@ -1275,8 +1275,8 @@ export function DashboardPage({
       {locToDelete && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4 transition-all animate-fade-in">
           <div className="w-full max-w-sm rounded-3xl bg-[var(--surface)] p-8 shadow-2xl border border-[var(--border-subtle)] text-center transform transition-all scale-100">
-            <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Удаление локации</h2>
-            <p className="mt-4 text-sm text-slate-500 dark:text-slate-400">
+            <h2 className="text-xl font-semibold text-text-main">Удаление локации</h2>
+            <p className="mt-4 text-sm text-text-muted">
               Вы уверены, что хотите безвозвратно удалить эту локацию? Это действие нельзя отменить.
             </p>
             <div className="mt-8 flex gap-3">
