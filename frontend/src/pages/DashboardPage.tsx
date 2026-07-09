@@ -1,11 +1,10 @@
 import { useState, useEffect } from "react";
 import { DashboardLayout } from "../components/layout/DashboardLayout";
 import {
-  IconArrowRight,
   CardShell,
   Avatar,
 } from "../components/ui/icons";
-import { RiStarFill, RiMagicFill, RiChatSmile3Fill, RiFileCopyLine, RiCheckLine, RiEditLine, RiDeleteBinLine } from "@remixicon/react";
+import { RiStarFill, RiFileCopyLine, RiCheckLine, RiEditLine, RiDeleteBinLine } from "@remixicon/react";
 
 const API_BASE = `${import.meta.env.VITE_API_BASE_URL || "https://167-233-118-175.sslip.io"}/api/dashboard`;
 const REDIRECT_BASE = `${import.meta.env.VITE_API_BASE_URL || "https://167-233-118-175.sslip.io"}/api/redirect`;
