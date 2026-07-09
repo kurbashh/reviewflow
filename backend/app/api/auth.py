@@ -10,6 +10,8 @@ from __future__ import annotations
 
 import logging
 import uuid
+import hashlib
+import httpx
 
 import bcrypt
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -32,7 +34,7 @@ router = APIRouter(prefix="/api/auth", tags=["auth"])
 
 class RegisterRequest(BaseModel):
     email: EmailStr
-    password: str = Field(..., min_length=6, max_length=128)
+    password: str = Field(..., min_length=12, max_length=128)
     full_name: str = Field(..., min_length=1, max_length=255)
 
 
@@ -79,6 +81,28 @@ def _verify_password(password: str, hashed: str) -> bool:
     return bcrypt.checkpw(password.encode("utf-8"), hashed.encode("utf-8"))
 
 
+async def check_pwned_password(password: str) -> bool:
+    """Проверяет пароль через API Have I Been Pwned."""
+    sha1_hash = hashlib.sha1(password.encode("utf-8")).hexdigest().upper()
+    prefix, suffix = sha1_hash[:5], sha1_hash[5:]
+    
+    url = f"https://api.pwnedpasswords.com/range/{prefix}"
+    try:
+        async with httpx.AsyncClient(timeout=3.0) as client:
+            response = await client.get(url)
+            if response.status_code == 200:
+                hashes = (line.split(":") for line in response.text.splitlines())
+                for h, count in hashes:
+                    if h == suffix:
+                        return True
+    except httpx.RequestError as e:
+        logger.warning(f"HIBP API error: {e}")
+        # Если API недоступно, пропускаем проверку, чтобы не блокировать регистрацию
+        pass
+    
+    return False
+
+
 # --------------------------------------------------------------------------
 # Endpoints
 # --------------------------------------------------------------------------
@@ -95,6 +119,14 @@ async def register(payload: RegisterRequest, session: AsyncSession = Depends(get
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail="Пользователь с таким email уже существует",
+        )
+
+    # Проверка пароля по базе утечек
+    is_pwned = await check_pwned_password(payload.password)
+    if is_pwned:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Этот пароль слишком предсказуем или найден в базах утечек, пожалуйста, выберите другой.",
         )
 
     user = User(

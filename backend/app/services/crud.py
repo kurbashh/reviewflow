@@ -200,6 +200,7 @@ async def update_review_request(
     if rating is not None:
         request.rating = rating
         request.responded_at = datetime.now(timezone.utc)
+    await session.commit()
 
 
 # --------------------------------------------------------------------------

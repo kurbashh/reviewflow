@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { RiMailLine, RiLockPasswordLine, RiUserLine, RiEyeLine, RiEyeOffLine } from "@remixicon/react";
+import { RiMailLine, RiLockPasswordLine, RiUserLine, RiEyeLine, RiEyeOffLine, RiCheckLine } from "@remixicon/react";
 
 interface LoginPageProps {
   onLogin: (email: string, password: string) => Promise<void>;
@@ -168,10 +168,10 @@ export function LoginPage({ onLogin, onRegister }: LoginPageProps) {
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder={isLogin ? "••••••••" : "Минимум 6 символов"}
+                  placeholder={isLogin ? "••••••••" : "Парольная фраза (мин. 12 символов)"}
                   className="w-full rounded-xl border border-[var(--border-subtle)] bg-[var(--dashboard-bg)] py-3 pl-11 pr-11 text-sm text-[var(--text-main)] placeholder-[var(--text-muted)] outline-none transition-all focus:border-[var(--brand)] focus:ring-2 focus:ring-[var(--brand)]/20"
                   required
-                  minLength={isLogin ? 1 : 6}
+                  minLength={isLogin ? 1 : 12}
                   autoComplete={isLogin ? "current-password" : "new-password"}
                 />
                 <button
@@ -183,6 +183,16 @@ export function LoginPage({ onLogin, onRegister }: LoginPageProps) {
                   {showPassword ? <RiEyeOffLine className="h-5 w-5" /> : <RiEyeLine className="h-5 w-5" />}
                 </button>
               </div>
+              {!isLogin && (
+                <div className="mt-2 flex items-center gap-2 text-xs">
+                  <div className={`flex h-4 w-4 items-center justify-center rounded-full transition-colors ${password.length >= 12 ? 'bg-emerald-500 text-white' : 'bg-slate-200 dark:bg-zinc-700 text-transparent'}`}>
+                    <RiCheckLine className="h-3 w-3" />
+                  </div>
+                  <span className={`transition-colors ${password.length >= 12 ? 'text-emerald-600 dark:text-emerald-400 font-medium' : 'text-slate-500 dark:text-slate-400'}`}>
+                    Минимум 12 символов (можно фразы и пробелы)
+                  </span>
+                </div>
+              )}
             </div>
 
             {/* Submit button */}
