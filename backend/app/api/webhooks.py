@@ -107,7 +107,7 @@ async def webhook_intake(request: Request, payload: WebhookIntakePayload, sessio
     # request.id уже присвоен (flush в create_review_request), но commit ещё не
     # произошёл — он случится в get_session после успешного возврата из роута.
 
-    is_active = business.is_lifetime_access or (business.status != BusinessStatus.CHURNED and not business.is_manually_paused)
+    is_active = not business.is_manually_paused and (business.is_lifetime_access or business.status != BusinessStatus.CHURNED)
     
     if is_active:
         send_review_request_task.apply_async(
