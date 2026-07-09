@@ -953,8 +953,7 @@ export function DashboardPage({
                     )}
                   </section>
                 )}
-              </div>
-
+                
                 {/* Recent Reviews Summary */}
                 <section className="grid gap-6 lg:grid-cols-[1.6fr_1fr]">
                   
@@ -1015,7 +1014,7 @@ export function DashboardPage({
 
 
                 </section>
-
+              </div>
             )}
 
             {/* REVIEWS HISTORY TAB */}
