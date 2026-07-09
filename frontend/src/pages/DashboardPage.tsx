@@ -1262,56 +1262,65 @@ export function DashboardPage({
 
                 <div className="grid gap-[var(--spacing-fluid-md)] grid-cols-[repeat(auto-fit,minmax(280px,1fr))]">
                   {/* START Plan */}
-                  <div className={`relative rounded-3xl p-6 border ${billing.plan === "light" ? "border-brand bg-brand/5 shadow-md" : "border-border-subtle bg-surface"} transition-all`}>
-                    {billing.plan === "light" && <div className="absolute top-0 right-0 rounded-bl-xl rounded-tr-3xl bg-brand px-3 py-1 text-[10px] font-bold text-white uppercase tracking-wider">Текущий</div>}
-                    <h4 className="text-lg font-bold text-text-main">Start</h4>
-                    <p className="mt-1 text-xs text-text-muted min-h-[40px]">Базовые возможности для начала</p>
-                    <div className="my-4 text-2xl font-extrabold text-text-main">10 000 ₸<span className="text-sm font-normal text-text-muted">/мес</span></div>
-                    <ul className="space-y-3 text-sm text-slate-600 dark:text-text-muted mb-6">
+                  <div className={`relative rounded-3xl p-6 border border-border-subtle bg-surface transition-all`}>
+                    {billing.plan === "light" && <div className="absolute top-0 right-0 rounded-bl-xl rounded-tr-3xl bg-slate-100 dark:bg-zinc-800 px-3 py-1 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Текущий</div>}
+                    <div className="min-h-[130px]">
+                      <h4 className="text-lg font-bold text-text-main">Start</h4>
+                      <p className="mt-1 text-xs text-text-muted min-h-[40px]">Базовые возможности для начала</p>
+                      <div className="my-4 flex items-end h-[32px] text-2xl font-extrabold text-text-main">10 000 ₸<span className="text-sm font-normal text-text-muted mb-1 ml-1">/мес</span></div>
+                    </div>
+                    <ul className="space-y-3 text-sm text-slate-800 dark:text-slate-200 mb-6">
                       <li className="flex gap-2"><RiCheckLine className="h-5 w-5 text-green-500 shrink-0"/> Обычная рассылка сообщений</li>
                       <li className="flex gap-2"><RiCheckLine className="h-5 w-5 text-green-500 shrink-0"/> Перехват негатива в Telegram</li>
                       <li className="flex gap-2"><RiCheckLine className="h-5 w-5 text-green-500 shrink-0"/> Маршрутизация на 2GIS/Yandex</li>
                     </ul>
-                    <button onClick={() => handleSubscribe("light")} className={`w-full rounded-full py-3 text-sm font-semibold transition-all focus:outline-none focus:ring-2 ${billing.plan === "light" ? "opacity-50 cursor-not-allowed bg-slate-100 text-text-muted dark:bg-zinc-800/50 dark:text-zinc-500 border border-transparent" : "bg-transparent border border-border-subtle text-text-main hover:bg-slate-100 dark:hover:bg-zinc-800 active:scale-[0.96] focus:ring-slate-300 dark:focus:ring-zinc-600"}`} disabled={billing.plan === "light"}>
+                    <button onClick={() => handleSubscribe("light")} className={`w-full rounded-full py-3 text-sm font-semibold transition-all focus:outline-none focus:ring-2 ${billing.plan === "light" ? "cursor-default bg-slate-100 text-slate-500 dark:bg-zinc-800 dark:text-zinc-400 border border-transparent" : "bg-transparent border border-border-subtle text-text-main hover:bg-slate-100 dark:hover:bg-zinc-800 active:scale-[0.96] focus:ring-slate-300 dark:focus:ring-zinc-600"}`} disabled={billing.plan === "light"}>
                       {billing.plan === "light" ? "Активен" : "Выбрать Start"}
                     </button>
                   </div>
 
                   {/* PRO Plan */}
-                  <div className={`relative rounded-3xl p-6 border ${billing.plan === "standard" ? "border-brand bg-brand/5 shadow-md transform scale-105" : "border-border-subtle bg-surface"} transition-all`}>
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-orange-400 to-pink-500 px-3 py-0.5 text-[10px] font-bold text-white uppercase tracking-wider shadow-sm">Популярный</div>
-                    {billing.plan === "standard" && <div className="absolute top-0 right-0 rounded-bl-xl rounded-tr-3xl bg-brand px-3 py-1 text-[10px] font-bold text-white uppercase tracking-wider">Текущий</div>}
-                    <h4 className="text-lg font-bold text-text-main">Pro</h4>
-                    <p className="mt-1 text-xs text-text-muted min-h-[40px]">Максимум отзывов с искусственным интеллектом</p>
-                    <div className="my-4 text-2xl font-extrabold text-text-main">15 000 ₸<span className="text-sm font-normal text-text-muted">/мес</span></div>
-                    <ul className="space-y-3 text-sm text-slate-600 dark:text-text-muted mb-6">
+                  <div className={`relative rounded-3xl p-6 border-2 border-brand bg-brand/5 shadow-lg transform scale-105 z-10 transition-all`}>
+                    {billing.plan === "standard" ? (
+                      <div className="absolute top-0 right-0 rounded-bl-xl rounded-tr-3xl bg-brand px-3 py-1 text-[10px] font-bold text-white uppercase tracking-wider shadow-sm">Текущий (Популярный)</div>
+                    ) : (
+                      <div className="absolute top-0 right-0 rounded-bl-xl rounded-tr-3xl bg-gradient-to-r from-orange-400 to-pink-500 px-3 py-1 text-[10px] font-bold text-white uppercase tracking-wider shadow-sm">Популярный</div>
+                    )}
+                    <div className="min-h-[130px]">
+                      <h4 className="text-lg font-bold text-text-main">Pro</h4>
+                      <p className="mt-1 text-xs text-text-muted min-h-[40px]">Максимум отзывов с искусственным интеллектом</p>
+                      <div className="my-4 flex items-end h-[32px] text-2xl font-extrabold text-text-main">15 000 ₸<span className="text-sm font-normal text-text-muted mb-1 ml-1">/мес</span></div>
+                    </div>
+                    <ul className="space-y-3 text-sm text-slate-800 dark:text-slate-200 mb-6">
                       <li className="flex gap-2"><RiCheckLine className="h-5 w-5 text-green-500 shrink-0"/> Всё из тарифа Start</li>
-                      <li className="flex gap-2 font-medium text-text-main dark:text-slate-200"><RiCheckLine className="h-5 w-5 text-orange-500 shrink-0"/> ИИ-генерация отзывов</li>
-                      <li className="flex gap-2 font-medium text-text-main dark:text-slate-200"><RiCheckLine className="h-5 w-5 text-orange-500 shrink-0"/> Умный тайминг отправки</li>
+                      <li className="flex gap-2 font-medium text-text-main dark:text-slate-200 items-start"><RiCheckLine className="h-5 w-5 text-green-500 shrink-0"/> <span>ИИ-генерация отзывов <span className="ml-1 rounded bg-brand/10 px-1.5 py-0.5 text-[10px] font-bold text-brand uppercase inline-block">Новое</span></span></li>
+                      <li className="flex gap-2 font-medium text-text-main dark:text-slate-200 items-start"><RiCheckLine className="h-5 w-5 text-green-500 shrink-0"/> <span>Умный тайминг отправки <span className="ml-1 rounded bg-brand/10 px-1.5 py-0.5 text-[10px] font-bold text-brand uppercase inline-block">Новое</span></span></li>
                     </ul>
-                    <button onClick={() => handleSubscribe("standard")} className={`w-full rounded-full py-3 text-sm font-semibold transition-all focus:outline-none focus:ring-2 ${billing.plan === "standard" ? "opacity-50 cursor-not-allowed bg-slate-100 text-text-muted dark:bg-zinc-800/50 dark:text-zinc-500 border border-transparent" : "bg-brand text-white hover:bg-brand-hover active:scale-[0.96] shadow-md hover:shadow-lg focus:ring-[var(--brand)]/30"}`} disabled={billing.plan === "standard"}>
+                    <button onClick={() => handleSubscribe("standard")} className={`w-full rounded-full py-3 text-sm font-semibold transition-all focus:outline-none focus:ring-2 ${billing.plan === "standard" ? "cursor-default bg-brand/80 text-white border border-transparent shadow-sm" : "bg-brand text-white hover:bg-brand-hover active:scale-[0.96] shadow-md hover:shadow-lg focus:ring-[var(--brand)]/30"}`} disabled={billing.plan === "standard"}>
                       {billing.plan === "standard" ? "Активен" : "Выбрать Pro"}
                     </button>
                   </div>
 
                   {/* ENTERPRISE Plan */}
-                  <div className={`relative rounded-3xl p-6 border ${billing.plan === "network" ? "border-brand bg-brand/5 shadow-md" : "border-border-subtle bg-surface"} transition-all`}>
-                    {billing.plan === "network" && <div className="absolute top-0 right-0 rounded-bl-xl rounded-tr-3xl bg-brand px-3 py-1 text-[10px] font-bold text-white uppercase tracking-wider">Текущий</div>}
-                    <h4 className="text-lg font-bold text-text-main">Enterprise</h4>
-                    <p className="mt-1 text-xs text-text-muted min-h-[40px]">Для сетей и крупных проектов</p>
-                    <div className="my-4 text-2xl font-extrabold text-text-main">Индивидуально</div>
-                    <ul className="space-y-3 text-sm text-slate-600 dark:text-text-muted mb-6">
+                  <div className={`relative rounded-3xl p-6 border border-border-subtle bg-surface transition-all`}>
+                    {billing.plan === "network" && <div className="absolute top-0 right-0 rounded-bl-xl rounded-tr-3xl bg-slate-100 dark:bg-zinc-800 px-3 py-1 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Текущий</div>}
+                    <div className="min-h-[130px]">
+                      <h4 className="text-lg font-bold text-text-main">Enterprise</h4>
+                      <p className="mt-1 text-xs text-text-muted min-h-[40px]">Для сетей и крупных проектов</p>
+                      <div className="my-4 flex items-end h-[32px] text-2xl font-extrabold text-text-main">Индивидуально</div>
+                    </div>
+                    <ul className="space-y-3 text-sm text-slate-800 dark:text-slate-200 mb-6">
                       <li className="flex gap-2"><RiCheckLine className="h-5 w-5 text-green-500 shrink-0"/> Всё из тарифа Pro</li>
                       <li className="flex gap-2"><RiCheckLine className="h-5 w-5 text-green-500 shrink-0"/> Несколько локаций/филиалов</li>
                       <li className="flex gap-2"><RiCheckLine className="h-5 w-5 text-green-500 shrink-0"/> Приоритетная поддержка</li>
                     </ul>
-                    <button onClick={() => handleSubscribe("network")} className={`w-full rounded-full py-3 text-sm font-semibold transition-all focus:outline-none focus:ring-2 ${billing.plan === "network" ? "opacity-50 cursor-not-allowed bg-slate-100 text-text-muted dark:bg-zinc-800/50 dark:text-zinc-500 border border-transparent" : "bg-transparent border border-border-subtle text-text-main hover:bg-slate-100 dark:hover:bg-zinc-800 active:scale-[0.96] focus:ring-slate-300 dark:focus:ring-zinc-600"}`} disabled={billing.plan === "network"}>
+                    <button onClick={() => handleSubscribe("network")} className={`w-full rounded-full py-3 text-sm font-semibold transition-all focus:outline-none focus:ring-2 ${billing.plan === "network" ? "cursor-default bg-slate-100 text-slate-500 dark:bg-zinc-800 dark:text-zinc-400 border border-transparent" : "bg-transparent border border-border-subtle text-text-main hover:bg-slate-100 dark:hover:bg-zinc-800 active:scale-[0.96] focus:ring-slate-300 dark:focus:ring-zinc-600"}`} disabled={billing.plan === "network"}>
                       {billing.plan === "network" ? "Активен" : "Связаться с нами"}
                     </button>
                   </div>
                 </div>
 
-                <CardShell className="mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border-t-4 border-t-[var(--brand)]">
+                <CardShell className="mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border border-border-subtle shadow-sm bg-surface">
                   <div className="space-y-2">
                     <h4 className="font-bold text-text-main">Статус рассылок</h4>
                     <div className="text-sm text-slate-600 dark:text-text-muted">
@@ -1332,10 +1341,10 @@ export function DashboardPage({
                   
                   <button
                     onClick={handleTogglePause}
-                    className={`shrink-0 rounded-full px-5 py-2 text-sm font-semibold transition-colors ${
+                    className={`shrink-0 rounded-full px-5 py-2.5 text-sm font-semibold transition-colors border ${
                       billing.is_manually_paused 
-                        ? "bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-400 dark:hover:bg-green-900/50" 
-                        : "bg-orange-100 text-orange-700 hover:bg-orange-200 dark:bg-orange-900/30 dark:text-orange-400 dark:hover:bg-orange-900/50"
+                        ? "bg-green-50 border-green-200 text-green-700 hover:bg-green-100 dark:bg-green-900/30 dark:border-green-800 dark:text-green-400 dark:hover:bg-green-900/50" 
+                        : "bg-transparent border-red-200 text-red-600 hover:bg-red-50 dark:border-red-800/30 dark:text-red-500 dark:hover:bg-red-900/20"
                     }`}
                   >
                     {billing.is_manually_paused ? "Возобновить рассылки" : "Приостановить рассылки"}
