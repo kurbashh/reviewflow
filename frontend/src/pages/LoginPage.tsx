@@ -200,17 +200,6 @@ export function LoginPage({ onLogin, onRegister }: LoginPageProps) {
           </form>
         </div>
 
-        {/* Footer */}
-        <p className="mt-6 text-center text-xs text-[var(--text-muted)]">
-          {isLogin ? "Нет аккаунта?" : "Уже есть аккаунт?"}{" "}
-          <button
-            type="button"
-            onClick={switchMode}
-            className="font-semibold text-[var(--brand)] hover:underline"
-          >
-            {isLogin ? "Зарегистрироваться" : "Войти"}
-          </button>
-        </p>
       </div>
     </div>
   );
