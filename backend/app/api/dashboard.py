@@ -11,6 +11,9 @@ from app.db.session import get_session
 from app.services import crud
 from app.db.models import BusinessPlan, BusinessStatus, CrmType, User, Business
 from app.core.jwt import get_current_user
+from app.core.redis import get_redis
+from app.services.green_api import send_whatsapp_message, GreenApiError
+import random
 
 router = APIRouter()
 
@@ -61,9 +64,13 @@ class LocationCreate(BaseModel):
     gis_2gis_url: str | None = Field(None, max_length=512)
     yandex_maps_url: str | None = Field(None, max_length=512)
 
+class SendCodeRequest(BaseModel):
+    phone: str = Field(..., max_length=32)
+
 class OnboardingRequest(BaseModel):
     name: str = Field(..., min_length=1, max_length=255)
     phone: str = Field(..., max_length=32)
+    code: str = Field(..., min_length=4, max_length=6)
 
 class OnboardingResponse(BaseModel):
     business_id: uuid.UUID
@@ -115,6 +122,38 @@ class BillingLifetimeRequest(BaseModel):
 # Endpoints
 # --------------------------------------------------------------------------
 
+@router.post("/onboarding/send-code", status_code=status.HTTP_200_OK)
+async def send_onboarding_code(
+    payload: SendCodeRequest,
+    current_user: User = Depends(get_current_user)
+):
+    """Генерация и отправка SMS/WhatsApp кода для верификации номера."""
+    # Генерируем 4-значный код
+    code = f"{random.randint(1000, 9999)}"
+    redis = get_redis()
+    
+    # Сохраняем в Redis с TTL 300 сек (5 минут)
+    await redis.setex(f"otp:{payload.phone}", 300, code)
+    
+    # Отправляем через Green API
+    try:
+        # Поскольку send_whatsapp_message синхронный, 
+        # для FastAPI в идеале нужно завернуть его в run_in_threadpool.
+        # Но ради простоты мы вызываем его как есть (I/O блокировка будет минимальной).
+        send_whatsapp_message(
+            phone=payload.phone,
+            text=f"Ваш код подтверждения ReviewFlow: {code}"
+        )
+    except GreenApiError as e:
+        # Если Green API недоступен, мы всё равно возвращаем успешный ответ? 
+        # Нет, лучше вернуть ошибку, чтобы фронт показал пользователю "Сбой отправки".
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Не удалось отправить сообщение. Попробуйте еще раз."
+        )
+
+    return {"status": "success", "message": "Код отправлен"}
+
 @router.post("/onboarding", response_model=OnboardingResponse, status_code=status.HTTP_201_CREATED)
 async def complete_onboarding(
     payload: OnboardingRequest,
@@ -122,6 +161,18 @@ async def complete_onboarding(
     current_user: User = Depends(get_current_user)
 ):
     """Создание первого бизнеса пользователя (онбординг)."""
+    redis = get_redis()
+    stored_code = await redis.get(f"otp:{payload.phone}")
+
+    if not stored_code or stored_code != payload.code:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Неверный или истекший код подтверждения"
+        )
+        
+    # Удаляем код после успешной проверки
+    await redis.delete(f"otp:{payload.phone}")
+
     business = Business(
         owner_id=current_user.id,
         name=payload.name,

@@ -12,6 +12,8 @@ export function OnboardingPage({ onComplete }: OnboardingProps) {
   const [step, setStep] = useState(1);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [otpCode, setOtpCode] = useState("");
+  const [countdown, setCountdown] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -23,15 +25,50 @@ export function OnboardingPage({ onComplete }: OnboardingProps) {
     }
   }, [step]);
 
+  // Countdown timer
+  useEffect(() => {
+    let timer: number;
+    if (countdown > 0) {
+      timer = window.setTimeout(() => setCountdown(c => c - 1), 1000);
+    }
+    return () => clearTimeout(timer);
+  }, [countdown]);
+
+  const handleSendCode = async () => {
+    if (!phone.trim()) {
+      setError("Пожалуйста, введите номер телефона");
+      return;
+    }
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await apiFetch(`${API_BASE}/api/dashboard/onboarding/send-code`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone }),
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.detail || "Не удалось отправить код");
+      }
+      setCountdown(60);
+      setStep(4);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleSubmit = async () => {
-    if (!name.trim() || !phone.trim()) {
-      setError("Пожалуйста, заполните все поля");
+    if (!otpCode.trim() || otpCode.length < 4) {
+      setError("Введите корректный код (минимум 4 цифры)");
       return;
     }
     
     setLoading(true);
     setError(null);
-    setStep(4); // "Setting up" effect
+    setStep(5); // "Setting up" effect
 
     try {
       const res = await apiFetch(`${API_BASE}/api/dashboard/onboarding`, {
@@ -39,12 +76,12 @@ export function OnboardingPage({ onComplete }: OnboardingProps) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ name, phone })
+        body: JSON.stringify({ name, phone, code: otpCode })
       });
 
       if (!res.ok) {
         const err = await res.json();
-        throw new Error(err.detail || "Ошибка при создании профиля");
+        throw new Error(err.detail || "Неверный код");
       }
 
       // Simulate a small delay for the Windows-like setup effect
@@ -54,7 +91,7 @@ export function OnboardingPage({ onComplete }: OnboardingProps) {
 
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Неизвестная ошибка");
-      setStep(3); // Возврат к форме
+      setStep(4); // Возврат к вводу кода
       setLoading(false);
     }
   };
@@ -76,13 +113,13 @@ export function OnboardingPage({ onComplete }: OnboardingProps) {
           <p className="text-xl text-[var(--text-muted)] animate-pulse">Подготавливаем всё для вас...</p>
         </div>
 
-        {/* Steps 2 & 3: Business Details */}
-        <div className={`transition-all duration-1000 ${step === 2 || step === 3 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8 pointer-events-none absolute w-full'}`}>
+        {/* Steps 2, 3 & 4: Business Details & Verification */}
+        <div className={`transition-all duration-1000 ${step === 2 || step === 3 || step === 4 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8 pointer-events-none absolute w-full'}`}>
           <div className="rounded-3xl border border-white/10 bg-white/5 p-8 sm:p-10 shadow-2xl backdrop-blur-2xl dark:border-white/5 dark:bg-black/20">
             <div className="mb-8 text-center">
               <h2 className="text-2xl sm:text-3xl font-semibold text-[var(--text-main)]">Давайте настроим ваш профиль</h2>
               <p className="mt-3 text-[var(--text-muted)]">
-                {step === 2 ? "Как называется ваша компания или заведение?" : "По какому номеру клиенты могут связаться с вами?"}
+                {step === 2 ? "Как называется ваша компания или заведение?" : step === 3 ? "По какому номеру клиенты могут связаться с вами?" : "Мы отправили код подтверждения на ваш WhatsApp"}
               </p>
             </div>
 
@@ -124,7 +161,7 @@ export function OnboardingPage({ onComplete }: OnboardingProps) {
                     type="tel"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && phone.trim() && handleSubmit()}
+                    onKeyDown={(e) => e.key === 'Enter' && phone.trim() && handleSendCode()}
                     placeholder="+7 (777) 123-45-67"
                     className="w-full rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface)]/50 py-5 pl-14 pr-5 text-lg text-[var(--text-main)] placeholder-[var(--text-muted)] outline-none backdrop-blur-sm transition-all focus:border-[var(--brand)] focus:ring-4 focus:ring-[var(--brand)]/20"
                     autoFocus={step === 3}
@@ -138,20 +175,66 @@ export function OnboardingPage({ onComplete }: OnboardingProps) {
                     Назад
                   </button>
                   <button
-                    onClick={handleSubmit}
+                    onClick={handleSendCode}
                     disabled={!phone.trim() || loading}
+                    className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-[var(--brand)] py-4 text-lg font-semibold text-white shadow-lg shadow-[var(--brand)]/25 transition-all hover:bg-[var(--brand)]/90 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Получить код <RiArrowRightLine className="h-5 w-5" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Step 4 Input */}
+              <div className={`transition-transform duration-500 ${step === 4 ? 'translate-x-0' : 'translate-x-[150%] absolute w-full top-0'}`}>
+                <div className="group relative">
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    maxLength={6}
+                    value={otpCode}
+                    onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
+                    onKeyDown={(e) => e.key === 'Enter' && otpCode.trim() && handleSubmit()}
+                    placeholder="Введите код (например: 1234)"
+                    className="w-full rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface)]/50 py-5 px-5 text-center tracking-[0.5em] text-2xl font-bold text-[var(--text-main)] placeholder-[var(--text-muted)] outline-none backdrop-blur-sm transition-all focus:border-[var(--brand)] focus:ring-4 focus:ring-[var(--brand)]/20"
+                    autoFocus={step === 4}
+                  />
+                </div>
+                <div className="mt-6 flex flex-col sm:flex-row gap-3">
+                  <button
+                    onClick={() => setStep(3)}
+                    className="flex items-center justify-center rounded-2xl border border-[var(--border-subtle)] bg-transparent px-6 py-4 font-semibold text-[var(--text-main)] transition-all hover:bg-[var(--surface)]"
+                  >
+                    Назад
+                  </button>
+                  <button
+                    onClick={handleSubmit}
+                    disabled={!otpCode.trim() || loading}
                     className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-[var(--brand)] py-4 text-lg font-semibold text-white shadow-lg shadow-[var(--brand)]/25 transition-all hover:bg-[var(--brand)]/90 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Завершить <RiCheckLine className="h-5 w-5" />
                   </button>
+                </div>
+                
+                <div className="mt-4 text-center">
+                  {countdown > 0 ? (
+                    <p className="text-sm text-[var(--text-muted)]">Отправить код повторно через {countdown} сек</p>
+                  ) : (
+                    <button
+                      onClick={handleSendCode}
+                      disabled={loading}
+                      className="text-sm font-semibold text-[var(--brand)] hover:underline"
+                    >
+                      Отправить код еще раз
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Step 4: Loading / Setup effect */}
-        <div className={`transition-all duration-1000 absolute top-1/2 left-1/2 w-full -translate-x-1/2 -translate-y-1/2 text-center ${step === 4 ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}`}>
+        {/* Step 5: Loading / Setup effect */}
+        <div className={`transition-all duration-1000 absolute top-1/2 left-1/2 w-full -translate-x-1/2 -translate-y-1/2 text-center ${step === 5 ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}`}>
           <div className="mx-auto mb-8 h-14 w-14 animate-spin rounded-full border-4 border-[var(--border-subtle)] border-t-[var(--brand)]" />
           <h1 className="text-3xl font-light tracking-tight text-[var(--text-main)] mb-3">Это займёт всего пару секунд</h1>
           <p className="text-lg text-[var(--text-muted)]">Применяем настройки...</p>

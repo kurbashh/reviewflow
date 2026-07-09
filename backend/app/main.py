@@ -17,6 +17,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
 from app.db.session import async_engine
+from app.core.redis import init_redis, close_redis
 
 logging.basicConfig(
     level=logging.INFO if not settings.debug else logging.DEBUG,
@@ -37,9 +38,11 @@ async def lifespan(app: FastAPI):
     Supabase pooler повисают до таймаута.
     """
     logger.info("ReviewFlow API starting up (env=%s)", settings.app_env)
+    await init_redis()
     yield
     logger.info("ReviewFlow API shutting down, disposing DB engine pool")
     await async_engine.dispose()
+    await close_redis()
 
 
 app = FastAPI(
