@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "https://167-233-118-175.sslip.io";
+import { apiFetch, onSessionExpired } from "../lib/apiClient";
 
 interface Business {
   id: string;
@@ -47,9 +48,7 @@ export function useAuth() {
     }
 
     let cancelled = false;
-    fetch(`${API_BASE}/api/auth/me`, {
-      headers: { Authorization: `Bearer ${state.token}` },
-    })
+    apiFetch(`${API_BASE}/api/auth/me`)
       .then((res) => {
         if (!res.ok) throw new Error("unauthorized");
         return res.json();
@@ -72,9 +71,7 @@ export function useAuth() {
   const refreshUser = useCallback(async () => {
     if (!state.token) return;
     try {
-      const res = await fetch(`${API_BASE}/api/auth/me`, {
-        headers: { Authorization: `Bearer ${state.token}` },
-      });
+      const res = await apiFetch(`${API_BASE}/api/auth/me`);
       if (res.ok) {
         const user = await res.json();
         setState(prev => ({ ...prev, user }));
@@ -126,6 +123,13 @@ export function useAuth() {
     setToken(null);
     setState({ user: null, token: null, loading: false });
   }, [setToken]);
+
+  useEffect(() => {
+    return onSessionExpired(() => {
+      sessionStorage.setItem("rf_session_expired", "1");
+      logout();
+    });
+  }, [logout]);
 
   return {
     user: state.user,

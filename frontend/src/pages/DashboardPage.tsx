@@ -10,16 +10,7 @@ import { RiStarFill, RiMagicFill, RiChatSmile3Fill, RiFileCopyLine, RiCheckLine 
 const API_BASE = `${import.meta.env.VITE_API_BASE_URL || "https://167-233-118-175.sslip.io"}/api/dashboard`;
 const REDIRECT_BASE = `${import.meta.env.VITE_API_BASE_URL || "https://167-233-118-175.sslip.io"}/api/redirect`;
 
-const authFetch = async (url: string, options: RequestInit = {}) => {
-  const token = localStorage.getItem("rf_token");
-  const headers: Record<string, string> = {
-    ...(options.headers as Record<string, string> || {}),
-  };
-  if (token) {
-    headers["Authorization"] = `Bearer ${token}`;
-  }
-  return fetch(url, { ...options, headers });
-};
+import { apiFetch } from "../lib/apiClient";
 
 interface Location {
   id: string;
@@ -145,7 +136,7 @@ export function DashboardPage({
       if (isNegative) {
         url += "&rating_lte=3";
       }
-      const res = await authFetch(url);
+      const res = await apiFetch(url);
       if (!res.ok) throw new Error("Не удалось загрузить отзывы");
       const data = await res.json();
       setReviewsData(data);
@@ -156,7 +147,7 @@ export function DashboardPage({
 
   const fetchSettings = async () => {
     try {
-      const res = await authFetch(`${API_BASE}/${businessId}/settings`);
+      const res = await apiFetch(`${API_BASE}/${businessId}/settings`);
       if (!res.ok) throw new Error("Не удалось загрузить настройки");
       const data = await res.json();
       setSettings(data);
@@ -176,7 +167,7 @@ export function DashboardPage({
 
   const fetchBilling = async () => {
     try {
-      const res = await authFetch(`${API_BASE}/${businessId}/billing`);
+      const res = await apiFetch(`${API_BASE}/${businessId}/billing`);
       if (!res.ok) throw new Error("Не удалось загрузить биллинг");
       const data = await res.json();
       setBilling(data);
@@ -229,7 +220,7 @@ export function DashboardPage({
     try {
       if (editingLocId) {
         // Update
-        const res = await authFetch(`${API_BASE}/${businessId}/locations/${editingLocId}`, {
+        const res = await apiFetch(`${API_BASE}/${businessId}/locations/${editingLocId}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -241,7 +232,7 @@ export function DashboardPage({
         if (!res.ok) throw new Error("Не удалось обновить локацию");
       } else {
         // Create
-        const res = await authFetch(`${API_BASE}/${businessId}/locations`, {
+        const res = await apiFetch(`${API_BASE}/${businessId}/locations`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -272,7 +263,7 @@ export function DashboardPage({
   const handleDeleteLocation = async (locId: string) => {
     if (!confirm("Вы уверены, что хотите удалить эту локацию?")) return;
     try {
-      const res = await authFetch(`${API_BASE}/${businessId}/locations/${locId}`, {
+      const res = await apiFetch(`${API_BASE}/${businessId}/locations/${locId}`, {
         method: "DELETE",
       });
       if (!res.ok) throw new Error("Не удалось удалить локацию");
@@ -305,7 +296,7 @@ export function DashboardPage({
     e.preventDefault();
     setSettingsMsg(null);
     try {
-      const res = await authFetch(`${API_BASE}/${businessId}/settings`, {
+      const res = await apiFetch(`${API_BASE}/${businessId}/settings`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -340,14 +331,14 @@ export function DashboardPage({
     if (!businessId) return;
     if (confirm(`Вы будете перенаправлены на Kaspi Pay для оплаты тарифа ${planName.toUpperCase()}. Продолжить?`)) {
       try {
-        const res = await authFetch(`${API_BASE}/${businessId}/billing/subscribe`, {
+        const res = await apiFetch(`${API_BASE}/${businessId}/billing/subscribe`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ plan: planName }),
         });
         if (res.ok) {
           alert("Оплата успешно завершена (Mock Kaspi). Тариф активирован!");
-          const bRes = await authFetch(`${API_BASE}/${businessId}/billing`);
+          const bRes = await apiFetch(`${API_BASE}/${businessId}/billing`);
           if (bRes.ok) setBilling(await bRes.json());
         }
       } catch (e) {
@@ -362,13 +353,13 @@ export function DashboardPage({
     const actionText = newPauseState ? "приостановить" : "возобновить";
     if (confirm(`Вы уверены, что хотите ${actionText} рассылки?`)) {
       try {
-        const res = await authFetch(`${API_BASE}/${businessId}/billing/pause`, {
+        const res = await apiFetch(`${API_BASE}/${businessId}/billing/pause`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ is_paused: newPauseState }),
         });
         if (res.ok) {
-          const bRes = await authFetch(`${API_BASE}/${businessId}/billing`);
+          const bRes = await apiFetch(`${API_BASE}/${businessId}/billing`);
           if (bRes.ok) setBilling(await bRes.json());
         }
       } catch (e) {

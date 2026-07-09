@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { RiStore2Line, RiPhoneLine, RiArrowRightLine, RiCheckLine } from "@remixicon/react";
+import { apiFetch } from "../lib/apiClient";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "https://167-233-118-175.sslip.io";
 
@@ -34,11 +35,10 @@ export function OnboardingPage({ token, onComplete }: OnboardingProps) {
     setStep(4); // "Setting up" effect
 
     try {
-      const res = await fetch(`${API_BASE}/api/dashboard/onboarding`, {
+      const res = await apiFetch(`${API_BASE}/api/dashboard/onboarding`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
         },
         body: JSON.stringify({ name, phone })
       });
