@@ -480,65 +480,62 @@ export function DashboardPage({
         {!loading && !error && (
           <>
             {/* OVERVIEW TAB */}
-            {activeTab === "overview" && stats && (
-              <div className="space-y-8">
-                
                 {/* Overview & Metrics Layout */}
                 <div className="grid gap-[var(--spacing-fluid-lg)] lg:grid-cols-[1fr_300px]">
                   {/* Left Column: Welcome & Volume */}
                   <div className="space-y-[var(--spacing-fluid-md)]">
-                    <section className="rounded-card bg-[var(--surface)] border border-[var(--border-subtle)] p-6 sm:p-8 shadow-sm">
-                      <h2 className="text-2xl sm:text-3xl font-bold text-text-main">
-                        Сбор отзывов активен
-                      </h2>
-                      <p className="mt-3 max-w-2xl text-sm leading-relaxed text-text-muted">
-                        Мы автоматически запрашиваем отзывы у ваших клиентов после визита. Довольные клиенты перенаправляются на карты, а негатив отправляется вам.
-                      </p>
-                      <div className="mt-6 flex flex-wrap gap-3">
-                        <button
-                          onClick={() => setActiveTab("settings")}
-                          className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full bg-brand px-6 py-2 text-sm font-semibold text-white transition-all hover:bg-brand-hover active:scale-[0.96] focus:outline-none focus:ring-2 focus:ring-[var(--brand)]/30"
-                        >
-                          Настроить интеграцию
-                        </button>
+                    <section className="rounded-card bg-[var(--surface)] shadow-sm p-6 sm:p-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                      <div className="flex items-center gap-4">
+                        <div className="relative flex h-3 w-3 shrink-0">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--success)] opacity-75"></span>
+                          <span className="relative inline-flex rounded-full h-3 w-3 bg-[var(--success)]"></span>
+                        </div>
+                        <h2 className="text-2xl font-bold text-text-main leading-tight">
+                          Сбор отзывов активен
+                        </h2>
                       </div>
+                      <button
+                        onClick={() => setActiveTab("settings")}
+                        className="inline-flex min-h-[44px] items-center justify-center rounded-full border border-[var(--border-subtle)] bg-[var(--surface)] px-6 py-2 text-sm font-semibold text-text-main transition-all hover:bg-slate-50 dark:hover:bg-zinc-800/50 active:scale-[0.96] focus:outline-none focus:ring-2 focus:ring-[var(--brand)]/30"
+                      >
+                        Настроить интеграцию
+                      </button>
                     </section>
 
-                    <div className="grid gap-[var(--spacing-fluid-md)] sm:grid-cols-2">
-                      <div className="rounded-card bg-[var(--surface)] border border-[var(--border-subtle)] p-6 flex flex-col justify-between">
-                        <p className="text-sm font-semibold text-text-muted">Отправлено запросов</p>
-                        <div className="mt-4 flex items-end justify-between">
-                          <p className="text-4xl font-extrabold text-text-main">{stats.sent}</p>
-                          <span className="text-xs font-medium text-success bg-[var(--success)]/10 px-2 py-1 rounded-md">WhatsApp</span>
-                        </div>
+                    <div className="rounded-card bg-[var(--surface)] shadow-sm flex flex-col sm:flex-row overflow-hidden">
+                      <div className="flex-1 p-6 sm:p-8 border-b sm:border-b-0 sm:border-r border-[var(--border-subtle)]">
+                        <p className="text-sm font-semibold text-text-muted">Отправлено запросов • WhatsApp</p>
+                        <p className="mt-4 text-4xl sm:text-5xl font-black text-text-main">{stats.sent}</p>
                       </div>
-                      <div className="rounded-card bg-[var(--surface)] border border-[var(--border-subtle)] p-6 flex flex-col justify-between">
+                      <div className="flex-1 p-6 sm:p-8">
                         <p className="text-sm font-semibold text-text-muted">Ожидают ответа</p>
-                        <div className="mt-4 flex items-end justify-between">
-                          <p className="text-4xl font-extrabold text-text-main">{stats.pending_replies}</p>
-                          <span className="text-xs font-medium text-text-muted bg-dashboard-bg px-2 py-1 rounded-md">В процессе</span>
-                        </div>
+                        <p className="mt-4 text-4xl sm:text-5xl font-black text-text-main">{stats.pending_replies}</p>
                       </div>
                     </div>
                   </div>
 
                   {/* Right Column: Rating Highlight */}
                   <div className="space-y-[var(--spacing-fluid-md)]">
-                    <div className="rounded-card bg-[var(--surface)] border border-[var(--border-subtle)] p-8 flex flex-col items-center justify-center text-center h-full min-h-[280px] shadow-sm">
-                      <div className="rounded-full bg-brand/10 p-4 mb-4 text-brand">
-                        <RiStarFill className="h-8 w-8" />
-                      </div>
-                      <p className="text-sm font-semibold text-text-muted">Средняя оценка</p>
-                      <p className="mt-2 text-5xl font-black text-text-main">{stats.avg_rating}</p>
-                      <p className="mt-3 text-xs text-text-muted">На основе {stats.rated} ответов</p>
+                    <div className="rounded-card bg-[var(--surface)] p-6 sm:p-8 shadow-sm h-full flex flex-col justify-center">
+                      <p className="text-sm font-semibold text-text-muted mb-6 text-center sm:text-left uppercase tracking-wider">Средняя оценка</p>
                       
-                      <div className="mt-6 w-full pt-6 border-t border-[var(--border-subtle)]">
-                        <div className="flex justify-between items-center text-sm">
-                          <span className="text-text-muted">Конверсия</span>
-                          <span className="font-bold text-brand">{stats.response_rate}%</span>
+                      <div className="flex items-center justify-center sm:justify-start gap-4">
+                        <div className="text-[var(--brand)]">
+                          <RiStarFill className="h-10 w-10 sm:h-12 sm:w-12" />
                         </div>
-                        <div className="mt-2 h-2 w-full bg-[var(--border-subtle)] rounded-full overflow-hidden">
-                          <div className="h-full bg-brand rounded-full transition-all duration-1000" style={{ width: `${stats.response_rate}%` }} />
+                        <div>
+                          <p className="text-5xl font-black text-text-main leading-none">{stats.avg_rating}</p>
+                          <p className="text-xs text-text-muted mt-2">На основе {stats.rated} ответов</p>
+                        </div>
+                      </div>
+                      
+                      <div className="mt-8 pt-8 border-t border-[var(--border-subtle)]">
+                        <div className="flex justify-between items-center text-sm mb-3">
+                          <span className="text-text-muted font-medium">Конверсия</span>
+                          <span className="font-bold text-text-main">{stats.response_rate}%</span>
+                        </div>
+                        <div className="h-3 w-full bg-[var(--dashboard-bg)] rounded-full overflow-hidden">
+                          <div className="h-full bg-[var(--brand)] rounded-full transition-all duration-1000" style={{ width: `${stats.response_rate}%` }} />
                         </div>
                       </div>
                     </div>
@@ -546,40 +543,52 @@ export function DashboardPage({
                 </div>
 
                 {/* Charts & Locations */}
-                <section className="grid gap-6 xl:grid-cols-[1.6fr_1fr]">
+                <section className="grid gap-[var(--spacing-fluid-md)] xl:grid-cols-[1.6fr_1fr]">
                   
                   {/* Dynamic Line Chart */}
-                  <CardShell>
+                  <div className="rounded-card bg-[var(--surface)] shadow-sm p-6 sm:p-8">
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                       <div>
-                        <h3 className="text-lg font-semibold text-text-main">Динамика отправки и ответов</h3>
-                        <p className="mt-1 text-sm text-text-muted">Новые запросы и полученные оценки за 7 дней</p>
+                        <h3 className="text-lg font-bold text-text-main">Динамика отправки</h3>
+                        <p className="mt-1 text-sm text-text-muted">Запросы и оценки за 7 дней</p>
                       </div>
                       <div className="flex items-center gap-4 text-xs">
-                        <span className="flex items-center gap-1.5 text-slate-600 dark:text-slate-300 font-medium">
-                          <span className="h-2 w-2 rounded-full bg-brand" />
+                        <span className="flex items-center gap-1.5 text-text-main font-medium">
+                          <span className="h-2.5 w-2.5 rounded-full bg-[var(--brand)]" />
                           Отправлено
                         </span>
-                        <span className="flex items-center gap-1.5 text-slate-600 dark:text-slate-300 font-medium">
-                          <span className="h-2 w-2 rounded-full bg-blue-500" />
+                        <span className="flex items-center gap-1.5 text-text-main font-medium">
+                          <span className="h-2.5 w-2.5 rounded-full bg-blue-500" />
                           С оценкой
                         </span>
                       </div>
                     </div>
 
-                    {/* SVG Line Chart Plotter */}
-                    <div className="mt-8 overflow-hidden rounded-2xl bg-slate-50 p-4">
+                    <div className="mt-8 overflow-hidden rounded-2xl bg-[var(--dashboard-bg)] p-6">
                       {(() => {
+                        const maxData = Math.max(...stats.daily_stats.map(d => Math.max(d.sent, d.rated)));
+                        const isChartEmpty = maxData === 0;
+
+                        if (isChartEmpty) {
+                          return (
+                            <div className="flex flex-col items-center justify-center h-48 text-center">
+                              <div className="rounded-full bg-[var(--surface)] p-4 text-text-muted mb-3">
+                                <svg className="w-6 h-6 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
+                                </svg>
+                              </div>
+                              <p className="text-sm font-medium text-text-muted">Нет данных за выбранный период</p>
+                            </div>
+                          );
+                        }
+
                         const width = 600;
                         const height = 200;
                         const padding = 25;
                         const chartWidth = width - padding * 2;
                         const chartHeight = height - padding * 2;
 
-                        const maxVal = Math.max(
-                          ...stats.daily_stats.map((d) => Math.max(d.sent, d.rated, 5)),
-                          5
-                        );
+                        const maxVal = Math.max(4, Math.ceil(maxData / 4) * 4);
 
                         const pointsSent = stats.daily_stats.map((d, i) => {
                           const x = padding + (i * chartWidth) / (stats.daily_stats.length - 1);
@@ -601,15 +610,15 @@ export function DashboardPage({
                               const val = Math.round(maxVal * (1 - r));
                               return (
                                 <g key={idx}>
-                                  <line x1={padding} y1={y} x2={width - padding} y2={y} stroke="#e2e8f0" strokeWidth="1" />
-                                  <text x={padding - 5} y={y + 4} fill="#94a3b8" fontSize="10" textAnchor="end">{val}</text>
+                                  <line x1={padding} y1={y} x2={width - padding} y2={y} stroke="var(--border-subtle)" strokeWidth="1" strokeDasharray="4 4" />
+                                  <text x={padding - 5} y={y + 4} fill="var(--text-muted)" fontSize="10" textAnchor="end">{val}</text>
                                 </g>
                               );
                             })}
                             
                             {/* Lines */}
-                            <polyline fill="none" stroke="#cbd5e1" strokeWidth="2" strokeDasharray="4 4" points={pointsSent} />
-                            <polyline fill="none" stroke="#ff6b35" strokeWidth="3" strokeLinecap="round" points={pointsRated} />
+                            <polyline fill="none" stroke="var(--brand)" strokeWidth="2.5" strokeDasharray="5 5" points={pointsSent} />
+                            <polyline fill="none" stroke="#3b82f6" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" points={pointsRated} />
 
                             {/* Axis Labels */}
                             {stats.daily_stats.map((d, i) => {
@@ -617,7 +626,7 @@ export function DashboardPage({
                               const dateParts = d.date.split("-");
                               const label = `${dateParts[2]}/${dateParts[1]}`;
                               return (
-                                <text key={i} x={x} y={height - 5} fill="#64748b" fontSize="10" textAnchor="middle">
+                                <text key={i} x={x} y={height - 5} fill="var(--text-muted)" fontSize="10" textAnchor="middle">
                                   {label}
                                 </text>
                               );
@@ -626,36 +635,50 @@ export function DashboardPage({
                         );
                       })()}
                     </div>
-                  </CardShell>
+                  </div>
 
                   {/* Location Stats */}
-                  <CardShell>
+                  <div className="rounded-card bg-[var(--surface)] shadow-sm p-6 sm:p-8">
                     <div>
-                      <h3 className="text-lg font-semibold text-text-main">Показатели по точкам</h3>
-                      <p className="mt-1 text-sm text-text-muted">Активность сбора отзывов по филиалам</p>
+                      <h3 className="text-lg font-bold text-text-main">Показатели по точкам</h3>
+                      <p className="mt-1 text-sm text-text-muted">Активность по филиалам</p>
                     </div>
 
                     <div className="mt-6 space-y-4">
                       {stats.location_stats.length === 0 ? (
-                        <p className="text-center text-xs text-text-muted py-8">Локации пока не настроены.</p>
+                        <div className="flex flex-col items-center justify-center py-10 text-center bg-[var(--dashboard-bg)] rounded-2xl border border-[var(--border-subtle)]">
+                          <div className="rounded-full bg-[var(--surface)] p-4 text-text-muted mb-4 shadow-sm">
+                            <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                            </svg>
+                          </div>
+                          <p className="text-sm font-bold text-text-main">Локации пока не настроены</p>
+                          <p className="mt-1 text-xs text-text-muted max-w-[200px] mx-auto leading-relaxed">Для начала сбора отзывов добавьте ваш первый филиал.</p>
+                          <button
+                            onClick={() => setActiveTab("settings")}
+                            className="mt-5 inline-flex min-h-[44px] items-center justify-center rounded-full bg-[var(--text-main)] px-5 py-2 text-sm font-semibold text-[var(--surface)] transition-all hover:opacity-90 active:scale-[0.96] focus:outline-none focus:ring-2 focus:ring-[var(--brand)]/30"
+                          >
+                            Добавить филиал
+                          </button>
+                        </div>
                       ) : (
                         stats.location_stats.map((loc) => (
-                          <div key={loc.name} className="rounded-2xl border border-[var(--border-subtle)] p-4">
+                          <div key={loc.name} className="rounded-2xl border border-[var(--border-subtle)] p-4 hover:bg-[var(--dashboard-bg)] transition-colors">
                             <div className="flex items-center justify-between">
-                              <p className="text-sm font-bold text-slate-800 dark:text-slate-200">{loc.name}</p>
-                              <span className="rounded-full bg-blue-50 dark:bg-blue-950/20 px-2.5 py-1 text-xs font-semibold text-blue-600 dark:text-blue-300">
+                              <p className="text-sm font-bold text-text-main">{loc.name}</p>
+                              <span className="rounded-full bg-blue-50 dark:bg-blue-900/20 px-2.5 py-1 text-xs font-semibold text-blue-700 dark:text-blue-300">
                                 ★ {loc.avg_rating}
                               </span>
                             </div>
                             <div className="mt-3 flex items-center justify-between text-xs text-text-muted">
-                              <span>Отправлено: <b>{loc.sent}</b></span>
-                              <span>С ответом: <b>{loc.rated}</b></span>
+                              <span>Отправлено: <b className="text-text-main">{loc.sent}</b></span>
+                              <span>С ответом: <b className="text-text-main">{loc.rated}</b></span>
                             </div>
                           </div>
                         ))
                       )}
                     </div>
-                  </CardShell>
+                  </div>
                 </section>
 
                 {/* Recent Reviews Summary */}
