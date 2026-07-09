@@ -26,6 +26,12 @@ export function LoginPage({ onLogin, onRegister }: LoginPageProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+
+    if (!isLogin && password.length < 12) {
+      setError("Парольная фраза должна содержать не менее 12 символов");
+      return;
+    }
+
     setLoading(true);
 
     try {
