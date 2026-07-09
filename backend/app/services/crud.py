@@ -19,7 +19,7 @@ from __future__ import annotations
 import uuid
 from datetime import datetime, timezone, timedelta
 
-from sqlalchemy import select, func, desc, nulls_last, case, cast, Integer
+from sqlalchemy import select, func, desc, nulls_last, case, cast, Integer, Date
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Session, selectinload
 
