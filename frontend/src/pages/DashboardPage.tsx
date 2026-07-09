@@ -4,7 +4,7 @@ import {
   CardShell,
   Avatar,
 } from "../components/ui/icons";
-import { RiStarFill, RiFileCopyLine, RiCheckLine, RiEditLine, RiDeleteBinLine, RiErrorWarningFill } from "@remixicon/react";
+import { RiStarFill, RiFileCopyLine, RiCheckLine, RiEditLine, RiDeleteBinLine, RiErrorWarningFill, RiEyeLine, RiEyeOffLine } from "@remixicon/react";
 
 const API_BASE = `${import.meta.env.VITE_API_BASE_URL || "https://167-233-118-175.sslip.io"}/api/dashboard`;
 const REDIRECT_BASE = `${import.meta.env.VITE_API_BASE_URL || "https://167-233-118-175.sslip.io"}/api/redirect`;
@@ -146,6 +146,8 @@ export function DashboardPage({
     telegram_chat_id: "",
   });
   const [settingsMsg, setSettingsMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [showWebhookSecret, setShowWebhookSecret] = useState(false);
+  const [copiedWebhookSecret, setCopiedWebhookSecret] = useState(false);
 
   const [settingsFieldErrors, setSettingsFieldErrors] = useState<{ name?: string; category?: string; phone?: string }>({});
   const [settingsTouched, setSettingsTouched] = useState<{ name?: boolean; category?: boolean; phone?: boolean }>({});
@@ -1086,23 +1088,23 @@ export function DashboardPage({
 
                   {/* Section 1: Business Profile */}
                   <div className="space-y-4">
-                    <h4 className="text-xs font-bold text-brand uppercase tracking-wider">Профиль бизнеса</h4>
+                    <h4 className="text-lg font-semibold text-slate-900 dark:text-white">Профиль бизнеса</h4>
                     
                     <div className="grid gap-[var(--spacing-fluid-md)] grid-cols-[repeat(auto-fit,minmax(280px,1fr))]">
-                      <div className="space-y-1">
-                        <label className="text-xs font-bold text-text-muted uppercase">Название бизнеса *</label>
+                      <div className="space-y-1.5">
+                        <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Название бизнеса *</label>
                         <input
                           type="text"
                           required
                           value={settingsForm.name}
                           onChange={(e) => handleSettingsChange("name", e.target.value)}
                           onBlur={() => handleSettingsBlur("name")}
-                          className={`w-full rounded-2xl border bg-surface px-4 py-3 text-sm text-text-main dark:text-slate-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:outline-none transition-colors ${settingsFieldErrors.name ? 'border-red-500 focus:border-red-500 ring-2 ring-red-500/20' : 'border-border-subtle focus:border-brand focus:ring-2 focus:ring-brand/20'}`}
+                          className={`w-full rounded-lg border bg-surface px-4 py-3 text-sm text-text-main dark:text-slate-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:outline-none transition-colors ${settingsFieldErrors.name ? 'border-red-500 focus:border-red-500 ring-2 ring-red-500/20' : 'border-border-subtle focus:border-brand focus:ring-2 focus:ring-brand/20'}`}
                         />
                         {settingsFieldErrors.name && <p className="mt-1 text-xs text-error animate-fade-in">{settingsFieldErrors.name}</p>}
                       </div>
-                      <div className="space-y-1">
-                        <label className="text-xs font-bold text-text-muted uppercase">Категория / Сфера *</label>
+                      <div className="space-y-1.5">
+                        <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Категория / Сфера *</label>
                         <input
                           type="text"
                           required
@@ -1110,37 +1112,37 @@ export function DashboardPage({
                           onChange={(e) => handleSettingsChange("category", e.target.value)}
                           onBlur={() => handleSettingsBlur("category")}
                           placeholder="Например, Салон красоты"
-                          className={`w-full rounded-2xl border bg-surface px-4 py-3 text-sm text-text-main dark:text-slate-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:outline-none transition-colors ${settingsFieldErrors.category ? 'border-red-500 focus:border-red-500 ring-2 ring-red-500/20' : 'border-border-subtle focus:border-brand focus:ring-2 focus:ring-brand/20'}`}
+                          className={`w-full rounded-lg border bg-surface px-4 py-3 text-sm text-text-main dark:text-slate-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:outline-none transition-colors ${settingsFieldErrors.category ? 'border-red-500 focus:border-red-500 ring-2 ring-red-500/20' : 'border-border-subtle focus:border-brand focus:ring-2 focus:ring-brand/20'}`}
                         />
                         {settingsFieldErrors.category && <p className="mt-1 text-xs text-error animate-fade-in">{settingsFieldErrors.category}</p>}
                       </div>
                     </div>
 
-                    <div className="space-y-1">
-                      <label className="text-xs font-bold text-text-muted uppercase">Контактный телефон *</label>
+                    <div className="space-y-1.5 max-w-sm">
+                      <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Контактный телефон *</label>
                       <input
                         type="tel"
                         required
                         value={settingsForm.phone}
                         onChange={(e) => handleSettingsChange("phone", e.target.value)}
                         onBlur={() => handleSettingsBlur("phone")}
-                        className={`w-full rounded-2xl border bg-surface px-4 py-3 text-sm text-text-main dark:text-slate-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:outline-none transition-colors ${settingsFieldErrors.phone ? 'border-red-500 focus:border-red-500 ring-2 ring-red-500/20' : 'border-border-subtle focus:border-brand focus:ring-2 focus:ring-brand/20'}`}
+                        className={`w-full rounded-lg border bg-surface px-4 py-3 text-sm text-text-main dark:text-slate-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:outline-none transition-colors ${settingsFieldErrors.phone ? 'border-red-500 focus:border-red-500 ring-2 ring-red-500/20' : 'border-border-subtle focus:border-brand focus:ring-2 focus:ring-brand/20'}`}
                       />
                       {settingsFieldErrors.phone && <p className="mt-1 text-xs text-error animate-fade-in">{settingsFieldErrors.phone}</p>}
                     </div>
                   </div>
 
                   {/* Section 2: CRM & Webhooks */}
-                  <div className="space-y-4 pt-4 border-t border-slate-100">
-                    <h4 className="text-xs font-bold text-brand uppercase tracking-wider">Интеграция CRM</h4>
+                  <div className="space-y-4 pt-6 border-t border-slate-100 dark:border-zinc-800">
+                    <h4 className="text-lg font-semibold text-slate-900 dark:text-white">Интеграция CRM</h4>
                     
                     <div className="grid gap-[var(--spacing-fluid-md)] grid-cols-[repeat(auto-fit,minmax(280px,1fr))]">
-                      <div className="space-y-1">
-                        <label className="text-xs font-bold text-text-muted uppercase">Тип CRM</label>
+                      <div className="space-y-1.5 max-w-sm">
+                        <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Тип CRM</label>
                         <select
                           value={settingsForm.crm_type}
                           onChange={(e) => setSettingsForm({ ...settingsForm, crm_type: e.target.value })}
-                          className="w-full rounded-2xl border border-border-subtle bg-surface px-4 py-3 text-sm text-text-main dark:text-slate-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:border-brand focus:outline-none transition-colors"
+                          className="w-full rounded-lg border border-border-subtle bg-surface px-4 py-3 text-sm text-text-main dark:text-slate-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:border-brand focus:outline-none transition-colors"
                         >
                           <option value="">Без интеграции (вручную)</option>
                           <option value="yclients">YClients</option>
@@ -1149,62 +1151,86 @@ export function DashboardPage({
                         </select>
                       </div>
                       
-                      <div className="space-y-1">
-                        <label className="text-xs font-bold text-text-muted uppercase">Секрет Вебхука (только чтение)</label>
-                        <input
-                          type="text"
-                          readOnly
-                          value={settings.crm_webhook_secret}
-                          className="w-full rounded-2xl border border-border-subtle bg-dashboard-bg px-4 py-3 text-sm font-mono text-text-muted focus:outline-none"
-                        />
-                        <p className="text-[10px] text-text-muted">Используйте этот секрет для проверки входящих событий</p>
+                      <div className="space-y-1.5">
+                        <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Секрет вебхука (только чтение)</label>
+                        <div className="relative flex max-w-sm">
+                          <input
+                            type={showWebhookSecret ? "text" : "password"}
+                            readOnly
+                            value={settings.crm_webhook_secret}
+                            className="w-full rounded-lg border border-border-subtle bg-slate-50 dark:bg-zinc-900/50 px-4 py-3 pr-20 text-sm font-mono text-slate-700 dark:text-slate-300 focus:outline-none"
+                          />
+                          <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1">
+                            <button
+                              type="button"
+                              onClick={() => setShowWebhookSecret(!showWebhookSecret)}
+                              className="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors rounded-md hover:bg-slate-200 dark:hover:bg-zinc-800"
+                              title={showWebhookSecret ? "Скрыть" : "Показать"}
+                            >
+                              {showWebhookSecret ? <RiEyeOffLine className="h-4 w-4" /> : <RiEyeLine className="h-4 w-4" />}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                navigator.clipboard.writeText(settings.crm_webhook_secret);
+                                setCopiedWebhookSecret(true);
+                                setTimeout(() => setCopiedWebhookSecret(false), 2000);
+                              }}
+                              className="p-1.5 text-slate-400 hover:text-brand transition-colors rounded-md hover:bg-slate-200 dark:hover:bg-zinc-800"
+                              title="Копировать"
+                            >
+                              {copiedWebhookSecret ? <RiCheckLine className="h-4 w-4 text-green-500" /> : <RiFileCopyLine className="h-4 w-4" />}
+                            </button>
+                          </div>
+                        </div>
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400 pt-0.5">Используйте этот секрет для проверки входящих событий</p>
                       </div>
                     </div>
                   </div>
 
                   {/* Section 3: Default Map URLs & Alerts */}
-                  <div className="space-y-4 pt-4 border-t border-slate-100">
-                    <h4 className="text-xs font-bold text-brand uppercase tracking-wider">Глобальные ссылки и оповещения</h4>
+                  <div className="space-y-4 pt-6 border-t border-slate-100 dark:border-zinc-800">
+                    <h4 className="text-lg font-semibold text-slate-900 dark:text-white">Глобальные ссылки и оповещения</h4>
                     
-                    <div className="space-y-1">
-                      <label className="text-xs font-bold text-text-muted uppercase">Дефолтная ссылка 2ГИС</label>
+                    <div className="space-y-1.5">
+                      <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Дефолтная ссылка 2ГИС</label>
                       <input
                         type="url"
                         value={settingsForm.gis_2gis_url}
                         onChange={(e) => setSettingsForm({ ...settingsForm, gis_2gis_url: e.target.value })}
                         placeholder="Будет использоваться, если у филиала нет индивидуальной ссылки"
-                        className="w-full rounded-2xl border border-border-subtle bg-surface px-4 py-3 text-sm text-text-main dark:text-slate-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:border-brand focus:outline-none transition-colors"
+                        className="w-full rounded-lg border border-border-subtle bg-surface px-4 py-3 text-sm text-text-main dark:text-slate-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:border-brand focus:outline-none transition-colors"
                       />
                     </div>
 
-                    <div className="space-y-1">
-                      <label className="text-xs font-bold text-text-muted uppercase">Дефолтная ссылка Яндекс.Карты</label>
+                    <div className="space-y-1.5">
+                      <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Дефолтная ссылка Яндекс.Карты</label>
                       <input
                         type="url"
                         value={settingsForm.yandex_maps_url}
                         onChange={(e) => setSettingsForm({ ...settingsForm, yandex_maps_url: e.target.value })}
                         placeholder="Будет использоваться, если у филиала нет индивидуальной ссылки"
-                        className="w-full rounded-2xl border border-border-subtle bg-surface px-4 py-3 text-sm text-text-main dark:text-slate-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:border-brand focus:outline-none transition-colors"
+                        className="w-full rounded-lg border border-border-subtle bg-surface px-4 py-3 text-sm text-text-main dark:text-slate-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:border-brand focus:outline-none transition-colors"
                       />
                     </div>
 
-                    <div className="space-y-1">
-                      <label className="text-xs font-bold text-text-muted uppercase">Telegram Chat ID (Оповещения о негативе)</label>
+                    <div className="space-y-1.5 max-w-sm pt-2">
+                      <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Telegram Chat ID (Оповещения)</label>
                       <input
                         type="text"
                         value={settingsForm.telegram_chat_id}
                         onChange={(e) => setSettingsForm({ ...settingsForm, telegram_chat_id: e.target.value.trim() })}
-                        placeholder="Chat ID вашего Telegram бота для алертов об оценках 1-3"
-                        className="w-full rounded-2xl border border-border-subtle bg-surface px-4 py-3 text-sm text-text-main dark:text-slate-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:border-brand focus:outline-none transition-colors"
+                        placeholder="Например, 123456789"
+                        className="w-full rounded-lg border border-border-subtle bg-surface px-4 py-3 text-sm text-text-main dark:text-slate-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:border-brand focus:outline-none transition-colors"
                       />
-                      <p className="text-[10px] text-text-muted">На этот чат будут приходить уведомления о перехваченном негативе</p>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 pt-0.5">На этот чат будут приходить уведомления о негативе</p>
                     </div>
                   </div>
 
-                  <div className="pt-4">
+                  <div className="pt-6 flex justify-end">
                     <button
                       type="submit"
-                      className="w-full rounded-full bg-brand hover:bg-brand-hover py-3.5 text-sm font-semibold text-white transition-all shadow-md hover:shadow-lg active:scale-[0.98] focus:ring-2 focus:ring-[var(--brand)] focus:outline-none focus:ring-offset-2 dark:focus:ring-offset-zinc-900 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-auto px-8 rounded-lg bg-brand hover:bg-brand-hover py-3 text-sm font-medium text-white transition-all shadow-sm hover:shadow active:scale-[0.98] focus:ring-2 focus:ring-[var(--brand)] focus:outline-none focus:ring-offset-2 dark:focus:ring-offset-zinc-900 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       Сохранить настройки
                     </button>
