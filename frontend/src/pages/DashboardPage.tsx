@@ -105,6 +105,7 @@ export function DashboardPage({
   const [locError, setLocError] = useState<string | null>(null);
   const [editingLocId, setEditingLocId] = useState<string | null>(null);
   const [locToDelete, setLocToDelete] = useState<string | null>(null);
+  const [isLocModalOpen, setIsLocModalOpen] = useState(false);
 
   const [locFieldErrors, setLocFieldErrors] = useState<{ name?: string; slug?: string }>({});
   const [locTouched, setLocTouched] = useState<{ name?: boolean; slug?: boolean }>({});
@@ -294,11 +295,10 @@ export function DashboardPage({
         }
       }
       // Reset & refresh
-      setNewLocName("");
-      setNewLocSlug("");
       setNewLocGis("");
       setNewLocYandex("");
       setEditingLocId(null);
+      setIsLocModalOpen(false);
       await fetchSettings();
     } catch (err: any) {
       setLocError(err.message);
@@ -332,6 +332,7 @@ export function DashboardPage({
     setNewLocSlug(loc.redirect_slug);
     setNewLocGis(loc.gis_2gis_url || "");
     setNewLocYandex(loc.yandex_maps_url || "");
+    setIsLocModalOpen(true);
   };
 
   // Cancel Editing Location
@@ -341,6 +342,7 @@ export function DashboardPage({
     setNewLocSlug("");
     setNewLocGis("");
     setNewLocYandex("");
+    setIsLocModalOpen(false);
   };
 
   // Save Settings Form
@@ -434,8 +436,7 @@ export function DashboardPage({
             </h1>
           </div>
 
-          <div className="flex items-center gap-3">
-            <span className="text-xs font-medium text-text-muted">ID бизнеса:</span>
+          <div className="flex items-center">
             <button
               onClick={() => {
                 navigator.clipboard.writeText(businessId);
@@ -443,13 +444,13 @@ export function DashboardPage({
                 setTimeout(() => setCopiedId(false), 2000);
               }}
               title="Копировать ID бизнеса"
-              className="group flex items-center gap-2 rounded-full border border-border-subtle bg-white/50 dark:bg-zinc-800/50 px-4 py-2 text-xs font-mono text-slate-700 dark:text-slate-300 transition-all hover:bg-slate-100 hover:dark:bg-zinc-700"
+              className="group flex items-center gap-1.5 rounded-full bg-slate-100 dark:bg-zinc-800/60 px-3 py-1.5 text-[11px] font-mono text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors focus:outline-none"
             >
-              <span className="truncate max-w-[120px] sm:max-w-[160px]">{businessId}</span>
+              ID: <span className="truncate max-w-[100px] sm:max-w-[140px] font-semibold">{businessId}</span>
               {copiedId ? (
-                <RiCheckLine className="h-4 w-4 text-green-500" />
+                <RiCheckLine className="h-3.5 w-3.5 text-green-500" />
               ) : (
-                <RiFileCopyLine className="h-4 w-4 text-text-muted group-hover:text-[var(--brand)] transition-colors" />
+                <RiFileCopyLine className="h-3.5 w-3.5 opacity-50 group-hover:opacity-100 transition-opacity" />
               )}
             </button>
           </div>
@@ -899,33 +900,52 @@ export function DashboardPage({
 
             {/* LOCATIONS TAB */}
             {activeTab === "locations" && settings && (
-              <div className="grid gap-6 lg:grid-cols-[1.5fr_1fr]">
-                
+              <div className="space-y-6">
                 {/* Locations list */}
                 <CardShell>
-                  <div>
-                    <h3 className="text-lg font-semibold text-text-main">Управление филиалами</h3>
-                    <p className="mt-1 text-sm text-text-muted">Настройка ссылок на карты и слагов перенаправления для каждой точки</p>
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <h3 className="text-lg font-semibold text-text-main">Управление филиалами</h3>
+                      <p className="mt-1 text-sm text-text-muted">Настройка ссылок на карты и слагов перенаправления для каждой точки</p>
+                    </div>
+                    <button
+                      onClick={() => setIsLocModalOpen(true)}
+                      className="rounded-full bg-brand hover:bg-brand-hover px-5 py-2.5 text-sm font-semibold text-white transition-colors shadow-sm active:scale-95 focus:ring-2 focus:ring-brand focus:outline-none focus:ring-offset-2 shrink-0"
+                    >
+                      + Добавить филиал
+                    </button>
                   </div>
 
                   <div className="mt-6 space-y-4">
                     {settings.locations.length === 0 ? (
-                      <p className="text-center text-xs text-text-muted py-12">Точки еще не добавлены. Добавьте филиал справа.</p>
+                      <p className="text-center text-xs text-text-muted py-12">Точки еще не добавлены. Нажмите «+ Добавить филиал».</p>
                     ) : (
                       settings.locations.map((loc) => (
-                        <div key={loc.id} className="rounded-2xl border border-[var(--border-subtle)] p-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between hover:bg-slate-100 dark:hover:bg-zinc-800/50 transition-colors cursor-pointer">
-                          <div className="space-y-1">
+                        <div key={loc.id} className="rounded-2xl border border-[var(--border-subtle)] p-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between hover:border-slate-300 dark:hover:border-zinc-700 hover:shadow-sm transition-all bg-white dark:bg-zinc-900/30">
+                          <div className="space-y-2">
                             <h4 className="font-bold text-slate-800 dark:text-slate-200 text-base">{loc.name}</h4>
-                            <p className="text-xs text-text-muted font-mono">
-                              Редирект: <a href={`${REDIRECT_BASE}/${loc.redirect_slug}`} target="_blank" rel="noopener noreferrer" className="text-brand hover:underline">/go/{loc.redirect_slug}</a>
+                            <p className="text-xs text-slate-500 dark:text-zinc-400 font-medium">
+                              Редирект: <a href={`${REDIRECT_BASE}/${loc.redirect_slug}`} target="_blank" rel="noopener noreferrer" className="text-brand hover:underline font-mono">reviewflow.kz/go/{loc.redirect_slug}</a>
                             </p>
-                            <div className="flex flex-wrap gap-x-4 gap-y-1 pt-1 text-[11px]">
-                              <span className={loc.gis_2gis_url ? "text-emerald-600 dark:text-emerald-500" : "text-slate-300 dark:text-zinc-600"}>
-                                2ГИС: {loc.gis_2gis_url ? "Подключен ✓" : "Нет"}
-                              </span>
-                              <span className={loc.yandex_maps_url ? "text-emerald-600 dark:text-emerald-500" : "text-slate-300 dark:text-zinc-600"}>
-                                Яндекс: {loc.yandex_maps_url ? "Подключен ✓" : "Нет"}
-                              </span>
+                            <div className="flex flex-wrap gap-2 pt-1 text-[11px]">
+                              {loc.gis_2gis_url ? (
+                                <a href={loc.gis_2gis_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 rounded-full bg-emerald-50 text-emerald-700 px-2 py-0.5 font-medium hover:bg-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-400">
+                                  ✓ 2ГИС
+                                </a>
+                              ) : (
+                                <button onClick={() => handleStartEditLocation(loc)} className="inline-flex items-center gap-1 rounded-full bg-slate-100 text-slate-600 px-2 py-0.5 font-medium hover:bg-slate-200 dark:bg-zinc-800 dark:text-slate-400 dark:hover:bg-zinc-700 transition-colors">
+                                  + Добавить 2ГИС
+                                </button>
+                              )}
+                              {loc.yandex_maps_url ? (
+                                <a href={loc.yandex_maps_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 rounded-full bg-emerald-50 text-emerald-700 px-2 py-0.5 font-medium hover:bg-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-400">
+                                  ✓ Яндекс
+                                </a>
+                              ) : (
+                                <button onClick={() => handleStartEditLocation(loc)} className="inline-flex items-center gap-1 rounded-full bg-slate-100 text-slate-600 px-2 py-0.5 font-medium hover:bg-slate-200 dark:bg-zinc-800 dark:text-slate-400 dark:hover:bg-zinc-700 transition-colors">
+                                  + Добавить Яндекс
+                                </button>
+                              )}
                             </div>
                           </div>
 
@@ -953,95 +973,97 @@ export function DashboardPage({
                   </div>
                 </CardShell>
 
-                {/* Add/Edit Location form */}
-                <CardShell>
-                  <div>
-                    <h3 className="text-lg font-semibold text-text-main">
-                      {editingLocId ? "Редактировать локацию" : "Добавить новый филиал"}
-                    </h3>
-                    <p className="mt-1 text-sm text-text-muted">
-                      {editingLocId ? "Изменение ссылок для выбранной точки" : "Создание новой точки с уникальным слагом редиректа"}
-                    </p>
+                {/* Add/Edit Location form Modal */}
+                {isLocModalOpen && (
+                  <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4 transition-all animate-fade-in overflow-y-auto">
+                    <div className="w-full max-w-md rounded-3xl bg-[var(--surface)] p-8 shadow-2xl border border-[var(--border-subtle)] transform transition-all scale-100 my-8">
+                      <div>
+                        <h3 className="text-xl font-bold text-text-main">
+                          {editingLocId ? "Редактировать локацию" : "Новый филиал"}
+                        </h3>
+                        <p className="mt-1 text-sm text-text-muted">
+                          {editingLocId ? "Изменение ссылок для выбранной точки" : "Создание новой точки с уникальным слагом"}
+                        </p>
+                      </div>
+
+                      <form onSubmit={handleSaveLocation} className="mt-6 space-y-5">
+                        {locError && (
+                          <div className="rounded-xl bg-red-50 p-4 text-xs text-red-800">{locError}</div>
+                        )}
+
+                        <div className="space-y-1.5">
+                          <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Название филиала *</label>
+                          <input
+                            type="text"
+                            required
+                            value={newLocName}
+                            onChange={(e) => handleLocChange("name", e.target.value)}
+                            onBlur={() => handleLocBlur("name")}
+                            placeholder="Например, Dostyk Ave"
+                            className={`w-full rounded-2xl border bg-surface px-4 py-3 text-sm text-text-main dark:text-slate-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:outline-none transition-colors ${locFieldErrors.name ? 'border-red-500 focus:border-red-500 ring-2 ring-red-500/20' : 'border-border-subtle focus:border-brand focus:ring-2 focus:ring-brand/20'}`}
+                          />
+                          {locFieldErrors.name && <p className="mt-1 text-xs text-error animate-fade-in">{locFieldErrors.name}</p>}
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Слаг для редиректа *</label>
+                          <input
+                            type="text"
+                            required
+                            disabled={editingLocId !== null}
+                            value={newLocSlug}
+                            onChange={(e) => handleLocChange("slug", e.target.value)}
+                            onBlur={() => handleLocBlur("slug")}
+                            placeholder="Например, dostyk"
+                            className={`w-full rounded-2xl border bg-surface px-4 py-3 text-sm text-text-main dark:text-slate-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:outline-none disabled:bg-slate-50 disabled:dark:bg-zinc-900/50 disabled:text-slate-400 disabled:dark:text-zinc-600 transition-colors ${locFieldErrors.slug ? 'border-red-500 focus:border-red-500 ring-2 ring-red-500/20' : 'border-border-subtle focus:border-brand focus:ring-2 focus:ring-brand/20'}`}
+                          />
+                          {locFieldErrors.slug && <p className="mt-1 text-xs text-error animate-fade-in">{locFieldErrors.slug}</p>}
+                          {!editingLocId && !locFieldErrors.slug && (
+                            <p className="text-[11px] text-slate-500 dark:text-slate-400">Ссылка: <b>reviewflow.kz/go/{newLocSlug || "слаг"}</b></p>
+                          )}
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Ссылка 2ГИС (опционально)</label>
+                          <input
+                            type="url"
+                            value={newLocGis}
+                            onChange={(e) => setNewLocGis(e.target.value)}
+                            placeholder="Ссылка на филиал в 2ГИС"
+                            className="w-full rounded-2xl border border-border-subtle bg-surface px-4 py-3 text-sm text-text-main dark:text-slate-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:border-brand focus:outline-none transition-colors"
+                          />
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Ссылка Яндекс.Карты (опционально)</label>
+                          <input
+                            type="url"
+                            value={newLocYandex}
+                            onChange={(e) => setNewLocYandex(e.target.value)}
+                            placeholder="Ссылка на филиал в Яндекс.Картах"
+                            className="w-full rounded-2xl border border-border-subtle bg-surface px-4 py-3 text-sm text-text-main dark:text-slate-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:border-brand focus:outline-none transition-colors"
+                          />
+                        </div>
+
+                        <div className="flex gap-3 pt-4">
+                          <button
+                            type="button"
+                            onClick={handleCancelEditLocation}
+                            className="flex-1 rounded-full bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 dark:hover:bg-zinc-700 py-3.5 text-sm font-semibold text-slate-700 dark:text-slate-300 transition-colors active:scale-95 focus:ring-2 focus:ring-slate-300 dark:focus:ring-zinc-600 focus:outline-none"
+                          >
+                            Отмена
+                          </button>
+                          <button
+                            type="submit"
+                            className="flex-1 rounded-full bg-brand hover:bg-brand-hover py-3.5 text-sm font-semibold text-white transition-colors shadow-md active:scale-95 focus:ring-2 focus:ring-[var(--brand)] focus:outline-none focus:ring-offset-2 dark:focus:ring-offset-zinc-900 disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            {editingLocId ? "Сохранить" : "Создать"}
+                          </button>
+                        </div>
+                      </form>
+                    </div>
                   </div>
-
-                  <form onSubmit={handleSaveLocation} className="mt-6 space-y-4">
-                    {locError && (
-                      <div className="rounded-xl bg-red-50 p-4 text-xs text-red-800">{locError}</div>
-                    )}
-
-                    <div className="space-y-1">
-                      <label className="text-xs font-bold text-text-muted uppercase">Название филиала *</label>
-                      <input
-                        type="text"
-                        required
-                        value={newLocName}
-                        onChange={(e) => handleLocChange("name", e.target.value)}
-                        onBlur={() => handleLocBlur("name")}
-                        placeholder="Например, Dostyk Ave"
-                        className={`w-full rounded-2xl border bg-surface px-4 py-3 text-sm text-text-main dark:text-slate-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:outline-none transition-colors ${locFieldErrors.name ? 'border-red-500 focus:border-red-500 ring-2 ring-red-500/20' : 'border-border-subtle focus:border-brand focus:ring-2 focus:ring-brand/20'}`}
-                      />
-                      {locFieldErrors.name && <p className="mt-1 text-xs text-error animate-fade-in">{locFieldErrors.name}</p>}
-                    </div>
-
-                    <div className="space-y-1">
-                      <label className="text-xs font-bold text-text-muted uppercase">Слаг для редиректа *</label>
-                      <input
-                        type="text"
-                        required
-                        disabled={editingLocId !== null}
-                        value={newLocSlug}
-                        onChange={(e) => handleLocChange("slug", e.target.value)}
-                        onBlur={() => handleLocBlur("slug")}
-                        placeholder="Например, dostyk"
-                        className={`w-full rounded-2xl border bg-surface px-4 py-3 text-sm text-text-main dark:text-slate-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:outline-none disabled:bg-slate-50 disabled:dark:bg-zinc-900/50 disabled:text-text-muted disabled:dark:text-zinc-500 transition-colors ${locFieldErrors.slug ? 'border-red-500 focus:border-red-500 ring-2 ring-red-500/20' : 'border-border-subtle focus:border-brand focus:ring-2 focus:ring-brand/20'}`}
-                      />
-                      {locFieldErrors.slug && <p className="mt-1 text-xs text-error animate-fade-in">{locFieldErrors.slug}</p>}
-                      {!editingLocId && !locFieldErrors.slug && (
-                        <p className="text-[10px] text-text-muted">Будет создана ссылка: <b>{REDIRECT_BASE}/{newLocSlug || "слаг"}</b></p>
-                      )}
-                    </div>
-
-                    <div className="space-y-1">
-                      <label className="text-xs font-bold text-text-muted uppercase">Ссылка 2ГИС (опционально)</label>
-                      <input
-                        type="url"
-                        value={newLocGis}
-                        onChange={(e) => setNewLocGis(e.target.value)}
-                        placeholder="Ссылка на филиал в 2ГИС"
-                        className="w-full rounded-2xl border border-border-subtle bg-surface px-4 py-3 text-sm text-text-main dark:text-slate-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:border-brand focus:outline-none transition-colors"
-                      />
-                    </div>
-
-                    <div className="space-y-1">
-                      <label className="text-xs font-bold text-text-muted uppercase">Ссылка Яндекс.Карты (опционально)</label>
-                      <input
-                        type="url"
-                        value={newLocYandex}
-                        onChange={(e) => setNewLocYandex(e.target.value)}
-                        placeholder="Ссылка на филиал в Яндекс.Картах"
-                        className="w-full rounded-2xl border border-border-subtle bg-surface px-4 py-3 text-sm text-text-main dark:text-slate-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:border-brand focus:outline-none transition-colors"
-                      />
-                    </div>
-
-                    <div className="flex gap-2 pt-2">
-                      <button
-                        type="submit"
-                        className="flex-1 rounded-full bg-brand hover:bg-brand-hover py-3 text-sm font-semibold text-white transition-colors shadow-sm active:scale-95 focus:ring-2 focus:ring-[var(--brand)] focus:outline-none focus:ring-offset-2 dark:focus:ring-offset-zinc-900 disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        {editingLocId ? "Сохранить изменения" : "Создать локацию"}
-                      </button>
-                      {editingLocId && (
-                        <button
-                          type="button"
-                          onClick={handleCancelEditLocation}
-                          className="rounded-full bg-transparent hover:bg-slate-100 dark:hover:bg-zinc-800 border border-border-subtle px-5 py-3 text-sm font-semibold text-slate-600 dark:text-slate-300 transition-colors active:scale-95 focus:ring-2 focus:ring-slate-300 dark:focus:ring-zinc-600 focus:outline-none"
-                        >
-                          Отмена
-                        </button>
-                      )}
-                    </div>
-                  </form>
-                </CardShell>
+                )}
               </div>
             )}
 
