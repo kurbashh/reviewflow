@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { RiMailLine, RiLockPasswordLine, RiUserLine, RiEyeLine, RiEyeOffLine } from "@remixicon/react";
 
 interface LoginPageProps {
@@ -14,6 +14,14 @@ export function LoginPage({ onLogin, onRegister }: LoginPageProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [showSessionExpired, setShowSessionExpired] = useState(false);
+
+  useEffect(() => {
+    if (sessionStorage.getItem("rf_session_expired") === "1") {
+      setShowSessionExpired(true);
+      sessionStorage.removeItem("rf_session_expired");
+    }
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -96,9 +104,16 @@ export function LoginPage({ onLogin, onRegister }: LoginPageProps) {
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-5 p-6">
+            {/* Session expired banner */}
+            {showSessionExpired && (
+              <div className="rounded-xl bg-blue-500/10 border border-blue-500/20 p-3 text-sm text-blue-600 dark:text-blue-400 text-center">
+                Сессия истекла. Пожалуйста, войдите снова.
+              </div>
+            )}
+
             {/* Error message */}
             {error && (
-              <div className="rounded-xl bg-red-500/10 border border-red-500/20 p-3 text-sm text-red-500">
+              <div className="rounded-xl bg-red-500/10 border border-red-500/20 p-3 text-sm text-red-500 text-center">
                 {error}
               </div>
             )}
