@@ -6,7 +6,7 @@ import { OnboardingPage } from "./pages/OnboardingPage";
 import { onSessionExpired } from "./lib/apiClient";
 
 export default function App() {
-  const { user, token, loading, isAuthenticated, login, register, logout, refreshUser } = useAuth();
+  const { user, loading, isAuthenticated, login, register, logout, refreshUser } = useAuth();
 
   const [activeTab, setActiveTab] = useState<string>(() => {
     return localStorage.getItem("rf_active_tab") || "overview";
@@ -37,7 +37,7 @@ export default function App() {
   } else if (!isAuthenticated) {
     content = <LoginPage onLogin={login} onRegister={register} />;
   } else if (!user?.businesses || user.businesses.length === 0) {
-    content = <OnboardingPage token={token || ""} onComplete={refreshUser} />;
+    content = <OnboardingPage onComplete={refreshUser} />;
   } else {
     content = (
       <DashboardPage

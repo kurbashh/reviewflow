@@ -121,7 +121,7 @@ export function DashboardPage({
   // Fetch functions
   const fetchStats = async () => {
     try {
-      const res = await authFetch(`${API_BASE}/${businessId}/stats`);
+      const res = await apiFetch(`${API_BASE}/${businessId}/stats`);
       if (!res.ok) throw new Error("Не удалось загрузить статистику");
       const data = await res.json();
       setStats(data);

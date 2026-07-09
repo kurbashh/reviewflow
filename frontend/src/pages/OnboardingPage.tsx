@@ -5,11 +5,10 @@ import { apiFetch } from "../lib/apiClient";
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "https://167-233-118-175.sslip.io";
 
 interface OnboardingProps {
-  token: string;
   onComplete: () => void;
 }
 
-export function OnboardingPage({ token, onComplete }: OnboardingProps) {
+export function OnboardingPage({ onComplete }: OnboardingProps) {
   const [step, setStep] = useState(1);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
