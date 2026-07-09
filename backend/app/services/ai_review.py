@@ -95,3 +95,60 @@ def generate_review_text(
         raise AiReviewError("OpenAI вернул пустой текст отзыва")
 
     return text
+
+
+MASTER_INSIGHT_PROMPT = """Сделай очень короткий (2-3 предложения), емкий вывод по оценкам мастера.
+Мастер: {master_name}
+Всего оценок: {total_rated}
+Средняя оценка: {avg_rating} (позитивных: {positive_count}, негативных: {negative_count})
+Жалобы клиентов: {complaints}
+Напиши факт-ориентированный текст на русском языке, без воды, markdown и кавычек.
+Например: "У мастера Данияра заметна доля низких оценок — клиенты жалуются на опоздания."
+или "Мастер Света чаще получает высокие оценки, клиенты хвалят за аккуратность и скорость."
+Если жалоб нет, просто укажи, что мастер работает отлично."""
+
+
+def generate_master_insight(
+    *,
+    master_name: str,
+    total_rated: int,
+    avg_rating: float,
+    positive_count: int,
+    negative_count: int,
+    complaint_samples: list[str],
+) -> str:
+    """
+    Возвращает сгенерированный ИИ-инсайт по мастеру.
+    Если оценок < 3, возвращает заглушку без вызова OpenAI.
+    """
+    if total_rated < 3:
+        return "Пока недостаточно оценок для анализа."
+
+    complaints_text = "нет" if not complaint_samples else " | ".join(complaint_samples)
+    
+    prompt = MASTER_INSIGHT_PROMPT.format(
+        master_name=master_name,
+        total_rated=total_rated,
+        avg_rating=avg_rating,
+        positive_count=positive_count,
+        negative_count=negative_count,
+        complaints=complaints_text,
+    )
+
+    try:
+        completion = _get_client().chat.completions.create(
+            model=settings.openai_model,
+            messages=[{"role": "user", "content": prompt}],
+            max_tokens=150,
+            temperature=0.3,  # меньше дефолта: нужна четкая аналитика без выдумок
+        )
+    except (APIError, OpenAIError) as exc:
+        logger.warning("ai_review: OpenAI вернул ошибку при генерации инсайта: %s", exc)
+        return "Не удалось сгенерировать аналитику из-за ошибки сервиса."
+
+    text = (completion.choices[0].message.content or "").strip()
+    if not text:
+        return "Не удалось сгенерировать аналитику (пустой ответ ИИ)."
+
+    return text
+

@@ -46,6 +46,23 @@ interface Stats {
   location_stats: Array<{ name: string; sent: number; rated: number; avg_rating: number }>;
 }
 
+interface MasterSummary {
+  name: string;
+  review_count: number;
+  avg_rating: number;
+  negative_count: number;
+}
+
+interface MasterStats {
+  master_name: string;
+  total_rated: number;
+  avg_rating: number;
+  positive_count: number;
+  negative_count: number;
+  daily: Array<{ date: string; count: number; avg_rating: number }>;
+  insight: string;
+}
+
 interface SettingsData {
   id: string;
   name: string;
@@ -72,6 +89,78 @@ interface BillingData {
   subscription_ends_at: string | null;
   is_manually_paused: boolean;
 }
+
+const renderSvgChart = (
+  data: Array<{ date: string; [key: string]: any }>,
+  line1Key: string,
+  line2Key: string | null = null,
+  line1Color: string = "var(--brand)",
+  line2Color: string = "#3b82f6"
+) => {
+  const maxData = Math.max(...data.map(d => Math.max(Number(d[line1Key]) || 0, line2Key ? (Number(d[line2Key]) || 0) : 0)));
+  const isChartEmpty = maxData === 0;
+
+  if (isChartEmpty) {
+    return (
+      <div className="flex flex-col items-center justify-center h-48 text-center">
+        <div className="rounded-full bg-[var(--surface)] p-4 text-text-muted mb-3">
+          <svg className="w-6 h-6 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
+          </svg>
+        </div>
+        <p className="text-sm font-medium text-text-muted">Нет данных за выбранный период</p>
+      </div>
+    );
+  }
+
+  const width = 600;
+  const height = 200;
+  const padding = 25;
+  const chartWidth = width - padding * 2;
+  const chartHeight = height - padding * 2;
+  const maxVal = Math.max(4, Math.ceil(maxData / 4) * 4);
+
+  const getPoints = (key: string) => data.map((d, i) => {
+    const x = padding + (i * chartWidth) / (data.length - 1);
+    const y = padding + chartHeight - ((Number(d[key]) || 0) * chartHeight) / maxVal;
+    return `${x},${y}`;
+  }).join(" ");
+
+  const points1 = getPoints(line1Key);
+  const points2 = line2Key ? getPoints(line2Key) : null;
+
+  return (
+    <svg className="w-full h-48" viewBox={`0 0 ${width} ${height}`}>
+      {/* Grid Lines */}
+      {[0, 0.25, 0.5, 0.75, 1].map((r, idx) => {
+        const y = padding + chartHeight * r;
+        const val = Math.round(maxVal * (1 - r));
+        return (
+          <g key={idx}>
+            <line x1={padding} y1={y} x2={width - padding} y2={y} stroke="var(--border-subtle)" strokeWidth="1" strokeDasharray="4 4" />
+            <text x={padding - 5} y={y + 4} fill="var(--text-muted)" fontSize="10" textAnchor="end">{val}</text>
+          </g>
+        );
+      })}
+      
+      {/* Lines */}
+      <polyline fill="none" stroke={line1Color} strokeWidth={line2Key ? "2.5" : "3"} strokeDasharray={line2Key ? "5 5" : "none"} strokeLinecap="round" strokeLinejoin="round" points={points1} />
+      {points2 && <polyline fill="none" stroke={line2Color} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" points={points2} />}
+
+      {/* Axis Labels */}
+      {data.map((d, i) => {
+        const x = padding + (i * chartWidth) / (data.length - 1);
+        const dateParts = d.date.split("-");
+        const label = `${dateParts[2]}/${dateParts[1]}`;
+        return (
+          <text key={i} x={x} y={height - 5} fill="var(--text-muted)" fontSize="10" textAnchor="middle">
+            {label}
+          </text>
+        );
+      })}
+    </svg>
+  );
+};
 
 export function DashboardPage({
   activeTab,
@@ -110,6 +199,12 @@ export function DashboardPage({
       localStorage.setItem("rf_theme", "light");
     }
   }, [darkMode]);
+
+  // Master Analytics State
+  const [masters, setMasters] = useState<MasterSummary[]>([]);
+  const [selectedMaster, setSelectedMaster] = useState<string | null>(null);
+  const [masterStats, setMasterStats] = useState<MasterStats | null>(null);
+  const [loadingMasterStats, setLoadingMasterStats] = useState(false);
 
   // Reviews Tab Filters & Pagination
   const [reviewFilter, setReviewFilter] = useState<"all" | "negative">("all");
@@ -195,6 +290,14 @@ export function DashboardPage({
   const [profileMsg, setProfileMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   useEffect(() => {
+    if (businessId) {
+      fetchStats();
+      fetchBilling();
+      fetchMasters();
+    }
+  }, [businessId]);
+
+  useEffect(() => {
     if (user) {
       setProfileForm(prev => ({
         ...prev,
@@ -203,6 +306,12 @@ export function DashboardPage({
       }));
     }
   }, [user]);
+
+  useEffect(() => {
+    if (selectedMaster) {
+      fetchMasterStats(selectedMaster);
+    }
+  }, [selectedMaster]);
 
   const handleProfileChange = (field: keyof typeof profileForm, val: string) => {
     setProfileForm(prev => ({ ...prev, [field]: val }));
@@ -217,6 +326,32 @@ export function DashboardPage({
       setStats(data);
     } catch (err: any) {
       setError(err.message);
+    }
+  };
+
+  const fetchMasters = async () => {
+    try {
+      const res = await apiFetch(`${API_BASE}/${businessId}/masters`);
+      if (!res.ok) return; // Silent fail for masters to not block dashboard
+      const data = await res.json();
+      setMasters(data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const fetchMasterStats = async (masterName: string) => {
+    setLoadingMasterStats(true);
+    setMasterStats(null);
+    try {
+      const res = await apiFetch(`${API_BASE}/${businessId}/masters/stats?master_name=${encodeURIComponent(masterName)}`);
+      if (!res.ok) throw new Error("Ошибка при загрузке статистики мастера");
+      const data = await res.json();
+      setMasterStats(data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoadingMasterStats(false);
     }
   };
 
@@ -578,7 +713,7 @@ export function DashboardPage({
               <div className="space-y-8">
                 
                 {/* Overview & Metrics Layout */}
-                <div className="grid gap-[var(--spacing-fluid-lg)] lg:grid-cols-[1fr_300px]">
+                <div className="grid gap-[var(--spacing-fluid-lg)] lg:grid-cols-2 xl:grid-cols-[1fr_300px_300px]">
                   {/* Left Column: Welcome & Volume */}
                   <div className="space-y-[var(--spacing-fluid-md)]">
                     <section className="rounded-card bg-[var(--surface)] shadow-sm p-6 sm:p-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -645,6 +780,29 @@ export function DashboardPage({
                       </div>
                     </div>
                   </div>
+                  
+                  {/* AI Protection Card (Moved to top) */}
+                  <CardShell className="bg-gradient-to-br from-slate-900 to-slate-950 text-white border-0 shadow-lg relative overflow-hidden flex flex-col justify-between h-full">
+                    <div className="absolute right-0 top-0 translate-x-10 -translate-y-10 w-40 h-40 rounded-full bg-brand/10 blur-xl" />
+                    <div>
+                      <span className="rounded-full bg-brand/20 px-3 py-1 text-xs font-semibold text-brand tracking-wider uppercase">ReviewFlow.kz</span>
+                      <h4 className="mt-4 text-xl font-bold tracking-tight text-white">Рейтинг защищен</h4>
+                      <p className="mt-2 text-xs text-slate-300 leading-relaxed">
+                        Недовольные клиенты перенаправляются на форму обратной связи, предотвращая публикацию негативных отзывов на картах.
+                      </p>
+                    </div>
+
+                    <div className="mt-8 pt-8 border-t border-slate-800/80 grid grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-2xl font-bold text-white font-mono">{stats.reviews_completed}</p>
+                        <p className="text-[10px] text-slate-300">Сгенерировано AI</p>
+                      </div>
+                      <div>
+                        <p className="text-2xl font-bold text-brand font-mono">{stats.negative_captured}</p>
+                        <p className="text-[10px] text-slate-300">Перехвачено жалоб</p>
+                      </div>
+                    </div>
+                  </CardShell>
                 </div>
 
                 {/* Charts & Locations */}
@@ -670,75 +828,7 @@ export function DashboardPage({
                     </div>
 
                     <div className="mt-8 overflow-hidden rounded-2xl bg-[var(--dashboard-bg)] p-6">
-                      {(() => {
-                        const maxData = Math.max(...stats.daily_stats.map(d => Math.max(d.sent, d.rated)));
-                        const isChartEmpty = maxData === 0;
-
-                        if (isChartEmpty) {
-                          return (
-                            <div className="flex flex-col items-center justify-center h-48 text-center">
-                              <div className="rounded-full bg-[var(--surface)] p-4 text-text-muted mb-3">
-                                <svg className="w-6 h-6 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
-                                </svg>
-                              </div>
-                              <p className="text-sm font-medium text-text-muted">Нет данных за выбранный период</p>
-                            </div>
-                          );
-                        }
-
-                        const width = 600;
-                        const height = 200;
-                        const padding = 25;
-                        const chartWidth = width - padding * 2;
-                        const chartHeight = height - padding * 2;
-
-                        const maxVal = Math.max(4, Math.ceil(maxData / 4) * 4);
-
-                        const pointsSent = stats.daily_stats.map((d, i) => {
-                          const x = padding + (i * chartWidth) / (stats.daily_stats.length - 1);
-                          const y = padding + chartHeight - (d.sent * chartHeight) / maxVal;
-                          return `${x},${y}`;
-                        }).join(" ");
-
-                        const pointsRated = stats.daily_stats.map((d, i) => {
-                          const x = padding + (i * chartWidth) / (stats.daily_stats.length - 1);
-                          const y = padding + chartHeight - (d.rated * chartHeight) / maxVal;
-                          return `${x},${y}`;
-                        }).join(" ");
-
-                        return (
-                          <svg className="w-full h-48" viewBox={`0 0 ${width} ${height}`}>
-                            {/* Grid Lines */}
-                            {[0, 0.25, 0.5, 0.75, 1].map((r, idx) => {
-                              const y = padding + chartHeight * r;
-                              const val = Math.round(maxVal * (1 - r));
-                              return (
-                                <g key={idx}>
-                                  <line x1={padding} y1={y} x2={width - padding} y2={y} stroke="var(--border-subtle)" strokeWidth="1" strokeDasharray="4 4" />
-                                  <text x={padding - 5} y={y + 4} fill="var(--text-muted)" fontSize="10" textAnchor="end">{val}</text>
-                                </g>
-                              );
-                            })}
-                            
-                            {/* Lines */}
-                            <polyline fill="none" stroke="var(--brand)" strokeWidth="2.5" strokeDasharray="5 5" points={pointsSent} />
-                            <polyline fill="none" stroke="#3b82f6" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" points={pointsRated} />
-
-                            {/* Axis Labels */}
-                            {stats.daily_stats.map((d, i) => {
-                              const x = padding + (i * chartWidth) / (stats.daily_stats.length - 1);
-                              const dateParts = d.date.split("-");
-                              const label = `${dateParts[2]}/${dateParts[1]}`;
-                              return (
-                                <text key={i} x={x} y={height - 5} fill="var(--text-muted)" fontSize="10" textAnchor="middle">
-                                  {label}
-                                </text>
-                              );
-                            })}
-                          </svg>
-                        );
-                      })()}
+                      {renderSvgChart(stats.daily_stats, "sent", "rated")}
                     </div>
                   </div>
 
@@ -844,29 +934,86 @@ export function DashboardPage({
                     </ul>
                   </CardShell>
 
-                  {/* Summary Overview Card */}
-                  <CardShell className="bg-gradient-to-br from-slate-900 to-slate-950 text-white border-0 shadow-lg relative overflow-hidden flex flex-col justify-between">
-                    <div className="absolute right-0 top-0 translate-x-10 -translate-y-10 w-40 h-40 rounded-full bg-brand/10 blur-xl" />
+
+                </section>
+
+                {/* Master Analytics */}
+                {masters.length > 0 && (
+                  <section className="rounded-card bg-[var(--surface)] shadow-sm p-6 sm:p-8">
                     <div>
-                      <span className="rounded-full bg-brand/20 px-3 py-1 text-xs font-semibold text-brand tracking-wider uppercase">ReviewFlow.kz</span>
-                      <h4 className="mt-4 text-xl font-bold tracking-tight text-white">Рейтинг защищен</h4>
-                      <p className="mt-2 text-xs text-slate-300 leading-relaxed">
-                        Недовольные клиенты перенаправляются на форму обратной связи, предотвращая публикацию негативных отзывов на картах.
-                      </p>
+                      <h3 className="text-lg font-bold text-text-main">Аналитика по мастерам</h3>
+                      <p className="mt-1 text-sm text-text-muted">Персональный рейтинг и AI-анализ работы</p>
                     </div>
 
-                    <div className="mt-8 pt-8 border-t border-slate-800/80 grid grid-cols-2 gap-4">
-                      <div>
-                        <p className="text-2xl font-bold text-white font-mono">{stats.reviews_completed}</p>
-                        <p className="text-[10px] text-slate-300">Сгенерировано AI</p>
-                      </div>
-                      <div>
-                        <p className="text-2xl font-bold text-brand font-mono">{stats.negative_captured}</p>
-                        <p className="text-[10px] text-slate-300">Перехвачено жалоб</p>
-                      </div>
+                    <div className="mt-6 overflow-x-auto pb-2 -mx-2 px-2 hide-scrollbar flex gap-2">
+                      {masters.map(master => (
+                        <button
+                          key={master.name}
+                          onClick={() => setSelectedMaster(master.name)}
+                          className={`flex items-center gap-2 px-4 py-2 rounded-full border whitespace-nowrap transition-all ${selectedMaster === master.name ? 'border-[var(--brand)] bg-[var(--brand)]/10 text-[var(--brand)]' : 'border-[var(--border-subtle)] hover:bg-slate-50 dark:hover:bg-zinc-800/50 text-text-main'}`}
+                        >
+                          <span className="font-semibold">{master.name}</span>
+                          <span className="flex items-center gap-1 text-xs opacity-80">
+                            ★ {master.avg_rating} <span className="opacity-50">({master.review_count})</span>
+                          </span>
+                        </button>
+                      ))}
                     </div>
-                  </CardShell>
-                </section>
+
+                    {selectedMaster && (
+                      <div className="mt-6 pt-6 border-t border-[var(--border-subtle)] grid gap-6 md:grid-cols-2">
+                        {loadingMasterStats ? (
+                          <div className="col-span-full py-12 flex flex-col items-center justify-center space-y-4">
+                            <div className="w-8 h-8 rounded-full border-2 border-[var(--brand)] border-t-transparent animate-spin" />
+                            <p className="text-sm text-text-muted">Анализируем отзывы мастера...</p>
+                          </div>
+                        ) : masterStats ? (
+                          <>
+                            {/* График мастера */}
+                            <div className="overflow-hidden rounded-2xl bg-[var(--dashboard-bg)] p-4 sm:p-6 flex flex-col justify-center">
+                              <h4 className="text-sm font-semibold text-text-main mb-4">Динамика оценок</h4>
+                              {masterStats.daily.length > 0 ? (
+                                renderSvgChart(masterStats.daily, "count", null, "#3b82f6")
+                              ) : (
+                                <p className="text-xs text-text-muted">Нет данных для графика</p>
+                              )}
+                            </div>
+                            
+                            {/* Инсайт мастера */}
+                            <div className="flex flex-col gap-4">
+                              <div className="grid grid-cols-2 gap-4">
+                                <div className="rounded-xl bg-[var(--dashboard-bg)] p-4">
+                                  <p className="text-xs text-text-muted mb-1">Оценок</p>
+                                  <p className="text-2xl font-bold text-text-main">{masterStats.total_rated}</p>
+                                </div>
+                                <div className="rounded-xl bg-[var(--dashboard-bg)] p-4">
+                                  <p className="text-xs text-text-muted mb-1">Средний балл</p>
+                                  <p className="text-2xl font-bold text-text-main flex items-center gap-1">
+                                    <RiStarFill className="w-5 h-5 text-[var(--brand)]" />
+                                    {masterStats.avg_rating}
+                                  </p>
+                                </div>
+                              </div>
+                              
+                              <div className={`mt-2 rounded-xl p-4 sm:p-5 ${masterStats.avg_rating < 4 ? 'bg-orange-50 dark:bg-orange-950/20 border border-orange-200 dark:border-orange-900/30' : 'ai-glow-effect'}`}>
+                                <h4 className={`text-xs font-bold uppercase tracking-wider mb-2 ${masterStats.avg_rating < 4 ? 'text-orange-800 dark:text-orange-300' : 'text-[var(--brand)]'}`}>
+                                  AI Анализ
+                                </h4>
+                                <p className={`text-sm leading-relaxed ${masterStats.avg_rating < 4 ? 'text-orange-900 dark:text-orange-200' : 'text-[var(--brand)] drop-shadow-sm'}`}>
+                                  {masterStats.insight}
+                                </p>
+                              </div>
+                            </div>
+                          </>
+                        ) : (
+                          <div className="col-span-full py-8 text-center text-text-muted">
+                            Не удалось загрузить данные
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </section>
+                )}
               </div>
             )}
 

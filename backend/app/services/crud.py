@@ -19,7 +19,7 @@ from __future__ import annotations
 import uuid
 from datetime import datetime, timezone, timedelta
 
-from sqlalchemy import select, func, cast, Date
+from sqlalchemy import select, func, desc, nulls_last, case, cast, Integer
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Session, selectinload
 
@@ -364,6 +364,138 @@ async def get_business_stats(session: AsyncSession, business_id: uuid.UUID) -> d
         "response_rate": response_rate,
         "daily_stats": daily_stats,
         "location_stats": location_stats
+    }
+
+
+async def get_business_masters(session: AsyncSession, business_id: uuid.UUID) -> list[dict]:
+    """
+    Возвращает список мастеров для бизнеса с агрегированной статистикой.
+    """
+    stmt = (
+        select(
+            ReviewRequest.master_name.label("name"),
+            func.count(ReviewRequest.rating).label("review_count"),
+            func.avg(ReviewRequest.rating).label("avg_rating"),
+            func.sum(
+                cast(ReviewRequest.rating <= 3, Integer)
+            ).label("negative_count")
+        )
+        .where(
+            ReviewRequest.business_id == business_id,
+            ReviewRequest.master_name.is_not(None)
+        )
+        .group_by(ReviewRequest.master_name)
+        .order_by(func.count(ReviewRequest.rating).desc())
+    )
+    res = await session.execute(stmt)
+    rows = res.all()
+    
+    return [
+        {
+            "name": row.name.strip() if row.name else "",
+            "review_count": row.review_count,
+            "avg_rating": round(float(row.avg_rating), 1) if row.avg_rating is not None else 0.0,
+            "negative_count": int(row.negative_count) if row.negative_count is not None else 0
+        }
+        for row in rows if row.name and row.name.strip()
+    ]
+
+
+async def get_master_rating_timeseries(
+    session: AsyncSession, 
+    business_id: uuid.UUID, 
+    master_name: str, 
+    days: int = 30
+) -> dict:
+    """
+    Возвращает статистику по конкретному мастеру: таймлайн за days дней,
+    общие агрегаты и примеры жалоб.
+    """
+    from datetime import date, timedelta
+    
+    threshold = datetime.now(timezone.utc) - timedelta(days=days)
+    
+    # 1. Таймсерия по дням
+    daily_stmt = (
+        select(
+            cast(ReviewRequest.created_at, Date).label("day"),
+            func.count(ReviewRequest.rating).label("count"),
+            func.avg(ReviewRequest.rating).label("avg_rating"),
+        )
+        .where(
+            ReviewRequest.business_id == business_id,
+            func.trim(ReviewRequest.master_name) == master_name,
+            ReviewRequest.created_at >= threshold,
+            ReviewRequest.rating.is_not(None)
+        )
+        .group_by(cast(ReviewRequest.created_at, Date))
+        .order_by(cast(ReviewRequest.created_at, Date).desc())
+    )
+    daily_res = await session.execute(daily_stmt)
+    daily_rows = daily_res.all()
+
+    # Заполняем пропущенные дни нулями, чтобы график не имел разрывов
+    daily_dict = {row.day: row for row in daily_rows}
+    today = date.today()
+    
+    daily_stats = []
+    # Идем от старых дат к новым
+    for i in range(days - 1, -1, -1):
+        d = today - timedelta(days=i)
+        if d in daily_dict:
+            row = daily_dict[d]
+            daily_stats.append({
+                "date": str(d),
+                "count": row.count,
+                "avg_rating": round(float(row.avg_rating), 1) if row.avg_rating is not None else 0.0
+            })
+        else:
+            daily_stats.append({
+                "date": str(d),
+                "count": 0,
+                "avg_rating": 0.0
+            })
+
+    # 2. Общие агрегаты по мастеру
+    agg_stmt = (
+        select(
+            func.count(ReviewRequest.id).label("total_rated"),
+            func.avg(ReviewRequest.rating).label("avg_rating"),
+            func.sum(cast(ReviewRequest.rating >= 4, Integer)).label("positive_count"),
+            func.sum(cast(ReviewRequest.rating <= 3, Integer)).label("negative_count")
+        )
+        .where(
+            ReviewRequest.business_id == business_id,
+            func.trim(ReviewRequest.master_name) == master_name,
+            ReviewRequest.rating.is_not(None)
+        )
+    )
+    agg_res = await session.execute(agg_stmt)
+    agg_row = agg_res.one()
+
+    # 3. Примеры жалоб (rating <= 3 и owner_feedback IS NOT NULL)
+    complaints_stmt = (
+        select(ReviewRequest.owner_feedback)
+        .where(
+            ReviewRequest.business_id == business_id,
+            func.trim(ReviewRequest.master_name) == master_name,
+            ReviewRequest.rating <= 3,
+            ReviewRequest.owner_feedback.is_not(None)
+        )
+        .order_by(ReviewRequest.created_at.desc())
+        .limit(5)
+    )
+    complaints_res = await session.execute(complaints_stmt)
+    complaint_samples = [str(r) for r in complaints_res.scalars().all() if str(r).strip()]
+
+    return {
+        "master_name": master_name,
+        "total_rated": agg_row.total_rated or 0,
+        "avg_rating": round(float(agg_row.avg_rating), 1) if agg_row.avg_rating is not None else 0.0,
+        "positive_count": int(agg_row.positive_count) if agg_row.positive_count is not None else 0,
+        "negative_count": int(agg_row.negative_count) if agg_row.negative_count is not None else 0,
+        "daily": daily_stats,
+        "complaint_samples": complaint_samples
     }
 
 

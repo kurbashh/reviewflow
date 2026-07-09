@@ -13,6 +13,8 @@ from app.db.models import BusinessPlan, BusinessStatus, CrmType, User, Business
 from app.core.jwt import get_current_user
 from app.core.redis import get_redis
 from app.services.green_api import send_whatsapp_message, GreenApiError
+from app.services.ai_review import generate_master_insight
+from fastapi.concurrency import run_in_threadpool
 import random
 
 router = APIRouter()
@@ -184,6 +186,60 @@ async def complete_onboarding(
     await session.commit()
     await session.refresh(business)
     return OnboardingResponse(business_id=business.id, message="Бизнес успешно создан")
+
+
+@router.get("/{business_id}/masters")
+async def get_masters_list(
+    business_id: str,
+    session: AsyncSession = Depends(get_session),
+    current_user: User = Depends(get_current_user)
+):
+    business = await crud.get_owned_business(session, business_id, current_user.id)
+    if not business:
+        raise HTTPException(status_code=404, detail="Business not found")
+        
+    masters = await crud.get_business_masters(session, business.id)
+    return masters
+
+
+@router.get("/{business_id}/masters/stats")
+async def get_master_stats(
+    business_id: str,
+    master_name: str,
+    session: AsyncSession = Depends(get_session),
+    current_user: User = Depends(get_current_user)
+):
+    business = await crud.get_owned_business(session, business_id, current_user.id)
+    if not business:
+        raise HTTPException(status_code=404, detail="Business not found")
+        
+    stats = await crud.get_master_rating_timeseries(session, business.id, master_name)
+    
+    # Кэшируем инсайт
+    redis = get_redis()
+    cache_key = f"master_insight:{business_id}:{master_name}"
+    
+    insight = await redis.get(cache_key)
+    
+    if insight is None:
+        if stats["total_rated"] < 3:
+            insight = "Пока недостаточно оценок для анализа."
+        else:
+            insight = await run_in_threadpool(
+                generate_master_insight,
+                master_name=stats["master_name"],
+                total_rated=stats["total_rated"],
+                avg_rating=stats["avg_rating"],
+                positive_count=stats["positive_count"],
+                negative_count=stats["negative_count"],
+                complaint_samples=stats["complaint_samples"]
+            )
+            # Сохраняем в кэш на 12 часов (43200 секунд)
+            await redis.setex(cache_key, 43200, insight)
+            
+    stats["insight"] = insight
+    return stats
+
 
 @router.get("/{business_id}/stats")
 async def get_dashboard_stats(
