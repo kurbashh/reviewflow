@@ -16,6 +16,49 @@ export function LoginPage({ onLogin, onRegister }: LoginPageProps) {
   const [loading, setLoading] = useState(false);
   const [showSessionExpired, setShowSessionExpired] = useState(false);
 
+  // Inline Validation States
+  const [fieldErrors, setFieldErrors] = useState<{ fullName?: string; email?: string; password?: string }>({});
+  const [touched, setTouched] = useState<{ fullName?: boolean; email?: boolean; password?: boolean }>({});
+
+  const validateEmail = (val: string) => {
+    if (!val) return "Обязательное поле";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) return "Кажется, в email закралась опечатка";
+    return "";
+  };
+
+  const validatePassword = (val: string, isLog: boolean) => {
+    if (!val) return "Обязательное поле";
+    if (!isLog && val.length < 12) return "Пароль должен состоять минимум из 12 символов";
+    return "";
+  };
+
+  const validateFullName = (val: string, isLog: boolean) => {
+    if (!isLog && !val.trim()) return "Представьтесь, пожалуйста";
+    return "";
+  };
+
+  const handleBlur = (field: "email" | "password" | "fullName") => {
+    setTouched((prev) => ({ ...prev, [field]: true }));
+    if (field === "email") setFieldErrors((prev) => ({ ...prev, email: validateEmail(email) }));
+    if (field === "password") setFieldErrors((prev) => ({ ...prev, password: validatePassword(password, isLogin) }));
+    if (field === "fullName") setFieldErrors((prev) => ({ ...prev, fullName: validateFullName(fullName, isLogin) }));
+  };
+
+  const handleChange = (field: "email" | "password" | "fullName", val: string) => {
+    if (field === "email") {
+      setEmail(val);
+      if (touched.email) setFieldErrors((prev) => ({ ...prev, email: validateEmail(val) }));
+    }
+    if (field === "password") {
+      setPassword(val);
+      if (touched.password) setFieldErrors((prev) => ({ ...prev, password: validatePassword(val, isLogin) }));
+    }
+    if (field === "fullName") {
+      setFullName(val);
+      if (touched.fullName) setFieldErrors((prev) => ({ ...prev, fullName: validateFullName(val, isLogin) }));
+    }
+  };
+
   useEffect(() => {
     if (sessionStorage.getItem("rf_session_expired") === "1") {
       setShowSessionExpired(true);
@@ -27,8 +70,15 @@ export function LoginPage({ onLogin, onRegister }: LoginPageProps) {
     e.preventDefault();
     setError(null);
 
-    if (!isLogin && password.length < 12) {
-      setError("Парольная фраза должна содержать не менее 12 символов");
+    // Run all validations on submit
+    const eErr = validateEmail(email);
+    const pErr = validatePassword(password, isLogin);
+    const fErr = validateFullName(fullName, isLogin);
+
+    setTouched({ email: true, password: true, fullName: !isLogin });
+    setFieldErrors({ email: eErr, password: pErr, fullName: fErr });
+
+    if (eErr || pErr || (!isLogin && fErr)) {
       return;
     }
 
@@ -55,6 +105,8 @@ export function LoginPage({ onLogin, onRegister }: LoginPageProps) {
   const switchMode = () => {
     setIsLogin(!isLogin);
     setError(null);
+    setFieldErrors({});
+    setTouched({});
   };
 
   return (
@@ -131,16 +183,24 @@ export function LoginPage({ onLogin, onRegister }: LoginPageProps) {
                   Полное имя
                 </label>
                 <div className="relative">
-                  <RiUserLine className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--text-muted)] transition-colors group-focus-within:text-[var(--brand)]" />
+                  <RiUserLine className={`absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 transition-colors ${fieldErrors.fullName ? 'text-red-400' : 'text-[var(--text-muted)] group-focus-within:text-[var(--brand)]'}`} />
                   <input
                     type="text"
                     value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
+                    onChange={(e) => handleChange("fullName", e.target.value)}
+                    onBlur={() => handleBlur("fullName")}
                     placeholder="Артур Курбанов"
-                    className="w-full rounded-xl border border-[var(--border-subtle)] bg-[var(--dashboard-bg)] py-3 pl-11 pr-4 text-sm text-[var(--text-main)] placeholder-[var(--text-muted)] outline-none transition-all focus:border-[var(--brand)] focus:ring-2 focus:ring-[var(--brand)]/20"
+                    className={`w-full rounded-xl border bg-[var(--dashboard-bg)] py-3 pl-11 pr-4 text-sm text-[var(--text-main)] placeholder-[var(--text-muted)] outline-none transition-all ${
+                      fieldErrors.fullName
+                        ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20'
+                        : 'border-[var(--border-subtle)] focus:border-[var(--brand)] focus:ring-2 focus:ring-[var(--brand)]/20'
+                    }`}
                     autoComplete="name"
                   />
                 </div>
+                {fieldErrors.fullName && (
+                  <p className="mt-1.5 text-xs text-red-500 animate-fade-in">{fieldErrors.fullName}</p>
+                )}
               </div>
             )}
 
@@ -150,17 +210,25 @@ export function LoginPage({ onLogin, onRegister }: LoginPageProps) {
                 Email
               </label>
               <div className="relative">
-                <RiMailLine className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--text-muted)] transition-colors group-focus-within:text-[var(--brand)]" />
+                <RiMailLine className={`absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 transition-colors ${fieldErrors.email ? 'text-red-400' : 'text-[var(--text-muted)] group-focus-within:text-[var(--brand)]'}`} />
                 <input
                   type="email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => handleChange("email", e.target.value)}
+                  onBlur={() => handleBlur("email")}
                   placeholder="you@company.com"
-                  className="w-full rounded-xl border border-[var(--border-subtle)] bg-[var(--dashboard-bg)] py-3 pl-11 pr-4 text-sm text-[var(--text-main)] placeholder-[var(--text-muted)] outline-none transition-all focus:border-[var(--brand)] focus:ring-2 focus:ring-[var(--brand)]/20"
-                  required
+                  className={`w-full rounded-xl border bg-[var(--dashboard-bg)] py-3 pl-11 pr-4 text-sm text-[var(--text-main)] placeholder-[var(--text-muted)] outline-none transition-all ${
+                    fieldErrors.email
+                      ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20'
+                      : 'border-[var(--border-subtle)] focus:border-[var(--brand)] focus:ring-2 focus:ring-[var(--brand)]/20'
+                  }`}
                   autoComplete="email"
+                  required
                 />
               </div>
+              {fieldErrors.email && (
+                <p className="mt-1.5 text-xs text-red-500 animate-fade-in">{fieldErrors.email}</p>
+              )}
             </div>
 
             {/* Password */}
@@ -169,26 +237,35 @@ export function LoginPage({ onLogin, onRegister }: LoginPageProps) {
                 Пароль
               </label>
               <div className="relative">
-                <RiLockPasswordLine className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--text-muted)] transition-colors group-focus-within:text-[var(--brand)]" />
+                <RiLockPasswordLine className={`absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 transition-colors ${fieldErrors.password ? 'text-red-400' : 'text-[var(--text-muted)] group-focus-within:text-[var(--brand)]'}`} />
                 <input
                   type={showPassword ? "text" : "password"}
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => handleChange("password", e.target.value)}
+                  onBlur={() => handleBlur("password")}
                   placeholder={isLogin ? "••••••••" : "Парольная фраза (мин. 12 символов)"}
-                  className="w-full rounded-xl border border-[var(--border-subtle)] bg-[var(--dashboard-bg)] py-3 pl-11 pr-11 text-sm text-[var(--text-main)] placeholder-[var(--text-muted)] outline-none transition-all focus:border-[var(--brand)] focus:ring-2 focus:ring-[var(--brand)]/20"
-                  required
+                  className={`w-full rounded-xl border bg-[var(--dashboard-bg)] py-3 pl-11 pr-11 text-sm text-[var(--text-main)] placeholder-[var(--text-muted)] outline-none transition-all ${
+                    fieldErrors.password
+                      ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20'
+                      : 'border-[var(--border-subtle)] focus:border-[var(--brand)] focus:ring-2 focus:ring-[var(--brand)]/20'
+                  }`}
                   autoComplete={isLogin ? "current-password" : "new-password"}
+                  required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--brand)] rounded-lg p-0.5"
                   tabIndex={-1}
+                  aria-label={showPassword ? "Скрыть пароль" : "Показать пароль"}
                 >
                   {showPassword ? <RiEyeOffLine className="h-5 w-5" /> : <RiEyeLine className="h-5 w-5" />}
                 </button>
               </div>
-              {!isLogin && (
+              {fieldErrors.password && (
+                <p className="mt-1.5 text-xs text-red-500 animate-fade-in">{fieldErrors.password}</p>
+              )}
+              {!isLogin && !fieldErrors.password && (
                 <div className="mt-2 flex items-center gap-2 text-xs">
                   <div className={`flex h-4 w-4 items-center justify-center rounded-full transition-colors ${password.length >= 12 ? 'bg-emerald-500 text-white' : 'bg-slate-200 dark:bg-zinc-700 text-transparent'}`}>
                     <RiCheckLine className="h-3 w-3" />
@@ -204,13 +281,21 @@ export function LoginPage({ onLogin, onRegister }: LoginPageProps) {
             <button
               type="submit"
               disabled={loading}
-              className="w-full rounded-xl bg-gradient-to-r from-[var(--brand)] to-purple-600 py-3.5 text-sm font-semibold text-white shadow-lg shadow-purple-500/25 transition-all hover:shadow-xl hover:shadow-purple-500/30 hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
+              className="w-full rounded-xl bg-gradient-to-r from-[var(--brand)] to-purple-600 py-3.5 text-sm font-semibold text-white shadow-lg shadow-purple-500/25 transition-all hover:shadow-xl hover:shadow-purple-500/30 hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] flex items-center justify-center gap-2"
             >
-              {loading
-                ? "Загрузка..."
-                : isLogin
-                  ? "Войти"
-                  : "Создать аккаунт"}
+              {loading ? (
+                <>
+                  <svg className="h-5 w-5 animate-spin text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  <span>Загрузка...</span>
+                </>
+              ) : isLogin ? (
+                "Войти"
+              ) : (
+                "Создать аккаунт"
+              )}
             </button>
           </form>
         </div>

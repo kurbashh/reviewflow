@@ -5,7 +5,7 @@ import {
   CardShell,
   Avatar,
 } from "../components/ui/icons";
-import { RiStarFill, RiMagicFill, RiChatSmile3Fill, RiFileCopyLine, RiCheckLine } from "@remixicon/react";
+import { RiStarFill, RiMagicFill, RiChatSmile3Fill, RiFileCopyLine, RiCheckLine, RiEditLine, RiDeleteBinLine } from "@remixicon/react";
 
 const API_BASE = `${import.meta.env.VITE_API_BASE_URL || "https://167-233-118-175.sslip.io"}/api/dashboard`;
 const REDIRECT_BASE = `${import.meta.env.VITE_API_BASE_URL || "https://167-233-118-175.sslip.io"}/api/redirect`;
@@ -106,6 +106,34 @@ export function DashboardPage({
   const [locError, setLocError] = useState<string | null>(null);
   const [editingLocId, setEditingLocId] = useState<string | null>(null);
 
+  const [locFieldErrors, setLocFieldErrors] = useState<{ name?: string; slug?: string }>({});
+  const [locTouched, setLocTouched] = useState<{ name?: boolean; slug?: boolean }>({});
+
+  const validateLocName = (val: string) => !val.trim() ? "Обязательное поле" : "";
+  const validateLocSlug = (val: string) => {
+    if (!val.trim()) return "Обязательное поле";
+    if (!/^[a-z0-9-_]+$/.test(val)) return "Только латинские буквы, цифры, дефис и подчеркивание";
+    return "";
+  };
+
+  const handleLocBlur = (field: "name" | "slug") => {
+    setLocTouched(prev => ({ ...prev, [field]: true }));
+    if (field === "name") setLocFieldErrors(prev => ({ ...prev, name: validateLocName(newLocName) }));
+    if (field === "slug") setLocFieldErrors(prev => ({ ...prev, slug: validateLocSlug(newLocSlug) }));
+  };
+
+  const handleLocChange = (field: "name" | "slug", val: string) => {
+    if (field === "name") {
+      setNewLocName(val);
+      if (locTouched.name) setLocFieldErrors(prev => ({ ...prev, name: validateLocName(val) }));
+    }
+    if (field === "slug") {
+      const formatted = val.toLowerCase().replace(/[^a-z0-9-_]/g, "");
+      setNewLocSlug(formatted);
+      if (locTouched.slug) setLocFieldErrors(prev => ({ ...prev, slug: validateLocSlug(formatted) }));
+    }
+  };
+
   // Settings Tab State
   const [settingsForm, setSettingsForm] = useState({
     name: "",
@@ -117,6 +145,23 @@ export function DashboardPage({
     telegram_chat_id: "",
   });
   const [settingsMsg, setSettingsMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
+
+  const [settingsFieldErrors, setSettingsFieldErrors] = useState<{ name?: string; category?: string; phone?: string }>({});
+  const [settingsTouched, setSettingsTouched] = useState<{ name?: boolean; category?: boolean; phone?: boolean }>({});
+
+  const validateSettingsField = (val: string) => !val.trim() ? "Обязательное поле" : "";
+
+  const handleSettingsBlur = (field: "name" | "category" | "phone") => {
+    setSettingsTouched(prev => ({ ...prev, [field]: true }));
+    setSettingsFieldErrors(prev => ({ ...prev, [field]: validateSettingsField(settingsForm[field]) }));
+  };
+
+  const handleSettingsChange = (field: keyof typeof settingsForm, val: string) => {
+    setSettingsForm(prev => ({ ...prev, [field]: val }));
+    if (settingsTouched[field as "name" | "category" | "phone"]) {
+      setSettingsFieldErrors(prev => ({ ...prev, [field as "name" | "category" | "phone"]: validateSettingsField(val) }));
+    }
+  };
 
   // Fetch functions
   const fetchStats = async () => {
@@ -852,16 +897,18 @@ export function DashboardPage({
                             <button
                               type="button"
                               onClick={() => handleStartEditLocation(loc)}
-                              className="rounded-full bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 dark:hover:bg-zinc-700 px-4 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 transition-colors"
+                              title="Редактировать"
+                              className="flex h-8 w-8 items-center justify-center rounded-full text-slate-400 hover:bg-slate-100 hover:text-[var(--brand)] dark:hover:bg-zinc-800 transition-colors active:scale-95 focus:ring-2 focus:ring-[var(--brand)] focus:outline-none"
                             >
-                              Редактировать
+                              <RiEditLine className="h-4 w-4" />
                             </button>
                             <button
                               type="button"
                               onClick={() => handleDeleteLocation(loc.id)}
-                              className="rounded-full bg-red-50 dark:bg-red-950/20 hover:bg-red-100 dark:hover:bg-red-900/60 px-4 py-2 text-xs font-semibold text-red-600 dark:text-red-300 border border-red-100 dark:border-red-900/30 dark:hover:border-red-900/60 transition-all"
+                              title="Удалить"
+                              className="flex h-8 w-8 items-center justify-center rounded-full text-slate-400 hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-950/20 dark:hover:text-red-400 transition-colors active:scale-95 focus:ring-2 focus:ring-red-500 focus:outline-none"
                             >
-                              Удалить
+                              <RiDeleteBinLine className="h-4 w-4" />
                             </button>
                           </div>
                         </div>
@@ -892,10 +939,12 @@ export function DashboardPage({
                         type="text"
                         required
                         value={newLocName}
-                        onChange={(e) => setNewLocName(e.target.value)}
+                        onChange={(e) => handleLocChange("name", e.target.value)}
+                        onBlur={() => handleLocBlur("name")}
                         placeholder="Например, Dostyk Ave"
-                        className="w-full rounded-2xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:border-brand focus:outline-none transition-colors"
+                        className={`w-full rounded-2xl border bg-white dark:bg-zinc-800 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:outline-none transition-colors ${locFieldErrors.name ? 'border-red-500 focus:border-red-500 ring-2 ring-red-500/20' : 'border-slate-200 dark:border-zinc-700 focus:border-brand focus:ring-2 focus:ring-brand/20'}`}
                       />
+                      {locFieldErrors.name && <p className="mt-1 text-xs text-red-500 animate-fade-in">{locFieldErrors.name}</p>}
                     </div>
 
                     <div className="space-y-1">
@@ -905,11 +954,13 @@ export function DashboardPage({
                         required
                         disabled={editingLocId !== null}
                         value={newLocSlug}
-                        onChange={(e) => setNewLocSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-_]/g, ""))}
+                        onChange={(e) => handleLocChange("slug", e.target.value)}
+                        onBlur={() => handleLocBlur("slug")}
                         placeholder="Например, dostyk"
-                        className="w-full rounded-2xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:border-brand focus:outline-none disabled:bg-slate-50 disabled:dark:bg-zinc-900/50 disabled:text-slate-400 disabled:dark:text-zinc-500 transition-colors"
+                        className={`w-full rounded-2xl border bg-white dark:bg-zinc-800 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:outline-none disabled:bg-slate-50 disabled:dark:bg-zinc-900/50 disabled:text-slate-400 disabled:dark:text-zinc-500 transition-colors ${locFieldErrors.slug ? 'border-red-500 focus:border-red-500 ring-2 ring-red-500/20' : 'border-slate-200 dark:border-zinc-700 focus:border-brand focus:ring-2 focus:ring-brand/20'}`}
                       />
-                      {!editingLocId && (
+                      {locFieldErrors.slug && <p className="mt-1 text-xs text-red-500 animate-fade-in">{locFieldErrors.slug}</p>}
+                      {!editingLocId && !locFieldErrors.slug && (
                         <p className="text-[10px] text-slate-400">Будет создана ссылка: <b>{REDIRECT_BASE}/{newLocSlug || "слаг"}</b></p>
                       )}
                     </div>
@@ -939,7 +990,7 @@ export function DashboardPage({
                     <div className="flex gap-2 pt-2">
                       <button
                         type="submit"
-                        className="flex-1 rounded-full bg-brand hover:bg-brand-hover py-3 text-sm font-semibold text-white transition-colors shadow-sm"
+                        className="flex-1 rounded-full bg-brand hover:bg-brand-hover py-3 text-sm font-semibold text-white transition-colors shadow-sm active:scale-95 focus:ring-2 focus:ring-[var(--brand)] focus:outline-none focus:ring-offset-2 dark:focus:ring-offset-zinc-900 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         {editingLocId ? "Сохранить изменения" : "Создать локацию"}
                       </button>
@@ -947,7 +998,7 @@ export function DashboardPage({
                         <button
                           type="button"
                           onClick={handleCancelEditLocation}
-                          className="rounded-full bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 dark:hover:bg-zinc-700 px-5 py-3 text-sm font-semibold text-slate-700 dark:text-slate-200 transition-colors"
+                          className="rounded-full bg-transparent hover:bg-slate-100 dark:hover:bg-zinc-800 border border-slate-200 dark:border-zinc-700 px-5 py-3 text-sm font-semibold text-slate-600 dark:text-slate-300 transition-colors active:scale-95 focus:ring-2 focus:ring-slate-300 dark:focus:ring-zinc-600 focus:outline-none"
                         >
                           Отмена
                         </button>
@@ -986,9 +1037,11 @@ export function DashboardPage({
                           type="text"
                           required
                           value={settingsForm.name}
-                          onChange={(e) => setSettingsForm({ ...settingsForm, name: e.target.value })}
-                          className="w-full rounded-2xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:border-brand focus:outline-none transition-colors"
+                          onChange={(e) => handleSettingsChange("name", e.target.value)}
+                          onBlur={() => handleSettingsBlur("name")}
+                          className={`w-full rounded-2xl border bg-white dark:bg-zinc-800 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:outline-none transition-colors ${settingsFieldErrors.name ? 'border-red-500 focus:border-red-500 ring-2 ring-red-500/20' : 'border-slate-200 dark:border-zinc-700 focus:border-brand focus:ring-2 focus:ring-brand/20'}`}
                         />
+                        {settingsFieldErrors.name && <p className="mt-1 text-xs text-red-500 animate-fade-in">{settingsFieldErrors.name}</p>}
                       </div>
                       <div className="space-y-1">
                         <label className="text-xs font-bold text-slate-500 uppercase">Категория / Сфера *</label>
@@ -996,10 +1049,12 @@ export function DashboardPage({
                           type="text"
                           required
                           value={settingsForm.category}
-                          onChange={(e) => setSettingsForm({ ...settingsForm, category: e.target.value })}
+                          onChange={(e) => handleSettingsChange("category", e.target.value)}
+                          onBlur={() => handleSettingsBlur("category")}
                           placeholder="Например, Салон красоты"
-                          className="w-full rounded-2xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:border-brand focus:outline-none transition-colors"
+                          className={`w-full rounded-2xl border bg-white dark:bg-zinc-800 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:outline-none transition-colors ${settingsFieldErrors.category ? 'border-red-500 focus:border-red-500 ring-2 ring-red-500/20' : 'border-slate-200 dark:border-zinc-700 focus:border-brand focus:ring-2 focus:ring-brand/20'}`}
                         />
+                        {settingsFieldErrors.category && <p className="mt-1 text-xs text-red-500 animate-fade-in">{settingsFieldErrors.category}</p>}
                       </div>
                     </div>
 
@@ -1009,9 +1064,11 @@ export function DashboardPage({
                         type="tel"
                         required
                         value={settingsForm.phone}
-                        onChange={(e) => setSettingsForm({ ...settingsForm, phone: e.target.value })}
-                        className="w-full rounded-2xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:border-brand focus:outline-none transition-colors"
+                        onChange={(e) => handleSettingsChange("phone", e.target.value)}
+                        onBlur={() => handleSettingsBlur("phone")}
+                        className={`w-full rounded-2xl border bg-white dark:bg-zinc-800 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:outline-none transition-colors ${settingsFieldErrors.phone ? 'border-red-500 focus:border-red-500 ring-2 ring-red-500/20' : 'border-slate-200 dark:border-zinc-700 focus:border-brand focus:ring-2 focus:ring-brand/20'}`}
                       />
+                      {settingsFieldErrors.phone && <p className="mt-1 text-xs text-red-500 animate-fade-in">{settingsFieldErrors.phone}</p>}
                     </div>
                   </div>
 
@@ -1089,7 +1146,7 @@ export function DashboardPage({
                   <div className="pt-4">
                     <button
                       type="submit"
-                      className="w-full rounded-full bg-brand hover:bg-brand-hover py-3.5 text-sm font-semibold text-white transition-colors shadow-md hover:shadow-lg"
+                      className="w-full rounded-full bg-brand hover:bg-brand-hover py-3.5 text-sm font-semibold text-white transition-all shadow-md hover:shadow-lg active:scale-[0.98] focus:ring-2 focus:ring-[var(--brand)] focus:outline-none focus:ring-offset-2 dark:focus:ring-offset-zinc-900 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       Сохранить настройки
                     </button>
