@@ -484,69 +484,67 @@ export function DashboardPage({
             {activeTab === "overview" && stats && (
               <div className="space-y-8">
                 
-                {/* Hero / Overview Welcome */}
-                <section className="relative overflow-hidden rounded-card bg-[var(--surface)] border border-[var(--border-subtle)] p-8 shadow-[var(--shadow-card)] lg:p-10 transition-colors duration-200">
-                  <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[var(--success)] to-[var(--brand)]" />
-                  <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
-                    <div className="max-w-xl">
-                      <p className="text-sm font-semibold tracking-wide text-brand uppercase">Добро пожаловать</p>
-                      <h2 className="mt-3 text-3xl font-bold tracking-tight text-text-main sm:text-4xl lg:text-[2.25rem] lg:leading-[1.1]">
-                        Эффективность сбора отзывов
+                {/* Overview & Metrics Layout */}
+                <div className="grid gap-[var(--spacing-fluid-lg)] lg:grid-cols-[1fr_300px]">
+                  {/* Left Column: Welcome & Volume */}
+                  <div className="space-y-[var(--spacing-fluid-md)]">
+                    <section className="rounded-card bg-[var(--surface)] border border-[var(--border-subtle)] p-6 sm:p-8 shadow-sm">
+                      <h2 className="text-2xl sm:text-3xl font-bold text-text-main">
+                        Сбор отзывов активен
                       </h2>
-                      <p className="mt-4 max-w-lg text-sm leading-6 text-text-muted">
-                        Автосбор работает стабильно. AI-модель успешно генерирует тексты отзывов для лояльных клиентов, а негативные оценки перехватываются и пересылаются вам.
+                      <p className="mt-3 max-w-2xl text-sm leading-relaxed text-text-muted">
+                        Мы автоматически запрашиваем отзывы у ваших клиентов после визита. Довольные клиенты перенаправляются на карты, а негатив отправляется вам.
                       </p>
-                      <div className="mt-8 flex flex-wrap items-center gap-3">
+                      <div className="mt-6 flex flex-wrap gap-3">
                         <button
                           onClick={() => setActiveTab("settings")}
-                          className="inline-flex items-center gap-2 rounded-full bg-brand px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-hover shadow-md hover:shadow-lg"
+                          className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full bg-brand px-6 py-2 text-sm font-semibold text-white transition-all hover:bg-brand-hover active:scale-[0.96] focus:outline-none focus:ring-2 focus:ring-[var(--brand)]/30"
                         >
-                          Настройки интеграции
-                          <IconArrowRight className="h-4 w-4" />
+                          Настроить интеграцию
                         </button>
                       </div>
-                    </div>
-                    
-                    <div className="relative mx-auto flex h-48 w-full max-w-sm items-center justify-center rounded-2xl mesh-gradient-flow lg:h-56 shadow-lg">
-                      <div className="absolute inset-6 rounded-xl border border-white/20 bg-white/30 dark:bg-black/30 backdrop-blur-md shadow-sm" />
-                      <div className="relative grid grid-cols-3 gap-6 p-6">
-                        <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-[var(--surface)] text-[#10B981] shadow-sm">
-                          <RiStarFill className="h-7 w-7" />
+                    </section>
+
+                    <div className="grid gap-[var(--spacing-fluid-md)] sm:grid-cols-2">
+                      <div className="rounded-card bg-[var(--surface)] border border-[var(--border-subtle)] p-6 flex flex-col justify-between">
+                        <p className="text-sm font-semibold text-text-muted">Отправлено запросов</p>
+                        <div className="mt-4 flex items-end justify-between">
+                          <p className="text-4xl font-extrabold text-text-main">{stats.sent}</p>
+                          <span className="text-xs font-medium text-success bg-[var(--success)]/10 px-2 py-1 rounded-md">WhatsApp</span>
                         </div>
-                        <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-[var(--brand)] text-white shadow-md">
-                          <RiMagicFill className="h-7 w-7" />
-                        </div>
-                        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--surface)] text-[var(--text-main)] shadow-sm">
-                          <RiChatSmile3Fill className="h-7 w-7" />
+                      </div>
+                      <div className="rounded-card bg-[var(--surface)] border border-[var(--border-subtle)] p-6 flex flex-col justify-between">
+                        <p className="text-sm font-semibold text-text-muted">Ожидают ответа</p>
+                        <div className="mt-4 flex items-end justify-between">
+                          <p className="text-4xl font-extrabold text-text-main">{stats.pending_replies}</p>
+                          <span className="text-xs font-medium text-text-muted bg-dashboard-bg px-2 py-1 rounded-md">В процессе</span>
                         </div>
                       </div>
                     </div>
                   </div>
-                </section>
 
-                {/* Metrics Grid */}
-                <section className="grid gap-[var(--spacing-fluid-md)] grid-cols-[repeat(auto-fit,minmax(240px,1fr))]">
-                  <CardShell>
-                    <p className="text-xs font-semibold uppercase tracking-wider text-text-muted">Всего запросов</p>
-                    <p className="mt-3 text-3xl font-bold font-mono text-text-main">{stats.sent}</p>
-                    <p className="mt-1 text-xs text-text-muted">Отправлено в WhatsApp</p>
-                  </CardShell>
-                  <CardShell>
-                    <p className="text-xs font-semibold uppercase tracking-wider text-text-muted">Средняя оценка</p>
-                    <p className="mt-3 text-3xl font-bold font-mono text-emerald-600 dark:text-emerald-400">★ {stats.avg_rating}</p>
-                    <p className="mt-1 text-xs text-text-muted">Оценка на основе {stats.rated} ответов</p>
-                  </CardShell>
-                  <CardShell>
-                    <p className="text-xs font-semibold uppercase tracking-wider text-text-muted">Конверсия ответов</p>
-                    <p className="mt-3 text-3xl font-bold font-mono text-brand">{stats.response_rate}%</p>
-                    <p className="mt-1 text-xs text-text-muted">Процент ответивших клиентов</p>
-                  </CardShell>
-                  <CardShell>
-                    <p className="text-xs font-semibold uppercase tracking-wider text-text-muted">Ожидают ответа</p>
-                    <p className="mt-3 text-3xl font-bold font-mono text-text-main">{stats.pending_replies}</p>
-                    <p className="mt-1 text-xs text-text-muted">Активные диалоги</p>
-                  </CardShell>
-                </section>
+                  {/* Right Column: Rating Highlight */}
+                  <div className="space-y-[var(--spacing-fluid-md)]">
+                    <div className="rounded-card bg-[var(--surface)] border border-[var(--border-subtle)] p-8 flex flex-col items-center justify-center text-center h-full min-h-[280px] shadow-sm">
+                      <div className="rounded-full bg-brand/10 p-4 mb-4 text-brand">
+                        <RiStarFill className="h-8 w-8" />
+                      </div>
+                      <p className="text-sm font-semibold text-text-muted">Средняя оценка</p>
+                      <p className="mt-2 text-5xl font-black text-text-main">{stats.avg_rating}</p>
+                      <p className="mt-3 text-xs text-text-muted">На основе {stats.rated} ответов</p>
+                      
+                      <div className="mt-6 w-full pt-6 border-t border-[var(--border-subtle)]">
+                        <div className="flex justify-between items-center text-sm">
+                          <span className="text-text-muted">Конверсия</span>
+                          <span className="font-bold text-brand">{stats.response_rate}%</span>
+                        </div>
+                        <div className="mt-2 h-2 w-full bg-[var(--border-subtle)] rounded-full overflow-hidden">
+                          <div className="h-full bg-brand rounded-full transition-all duration-1000" style={{ width: `${stats.response_rate}%` }} />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
                 {/* Charts & Locations */}
                 <section className="grid gap-6 xl:grid-cols-[1.6fr_1fr]">

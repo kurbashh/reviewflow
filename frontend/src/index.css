@@ -64,32 +64,7 @@
   }
 }
 
-/* Mesh gradient animation */
-@keyframes flowGradient {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
 
-.mesh-gradient-flow {
-  background: linear-gradient(-45deg, #059669, #7C3AED, #34D399, #A78BFA);
-  background-size: 400% 400%;
-  animation: flowGradient 15s ease infinite;
-}
-
-/* Glow Effect for AI */
-.ai-glow-effect {
-  box-shadow: 0 0 15px rgba(124, 58, 237, 0.08);
-  border: 1px solid rgba(124, 58, 237, 0.15);
-  background-color: rgba(124, 58, 237, 0.03);
-  transition: all 0.2s ease;
-}
-
-.dark .ai-glow-effect {
-  box-shadow: 0 0 20px rgba(167, 139, 250, 0.15);
-  border: 1px solid rgba(167, 139, 250, 0.25);
-  background-color: rgba(167, 139, 250, 0.05);
-}
 
 /* Custom Scrollbar styling */
 ::-webkit-scrollbar {
