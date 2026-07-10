@@ -775,12 +775,12 @@ export function DashboardPage({
                 </section>
 
                 {/* Metrics Grid */}
-                <div className="grid gap-[var(--spacing-fluid-lg)] lg:grid-cols-3">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
                   
                   {/* Column 1: Risk Zone / Status */}
-                  <div className="space-y-[var(--spacing-fluid-md)] h-full">
+                  <div className="h-full flex flex-col">
                     {masters.filter(m => m.negative_count > 0 || m.avg_rating < 4.0).length > 0 ? (
-                      <div className="rounded-card bg-white dark:bg-zinc-900 shadow-sm p-6 sm:p-8 border-l-4 border-l-red-500 border-y border-r border-[var(--border-subtle)] h-full">
+                      <div className="rounded-card bg-white dark:bg-zinc-900 shadow-sm p-6 sm:p-8 border border-[var(--border-subtle)] h-full flex flex-col">
                         <h3 className="text-sm font-bold text-red-600 dark:text-red-500 uppercase tracking-wider mb-4 flex items-center gap-2">
                           <RiErrorWarningFill className="w-5 h-5" /> Требует внимания
                         </h3>
@@ -803,7 +803,7 @@ export function DashboardPage({
                         </ul>
                       </div>
                     ) : (
-                      <div className="rounded-card bg-white dark:bg-zinc-900 shadow-sm p-6 sm:p-8 border-l-4 border-l-emerald-500 border-y border-r border-[var(--border-subtle)] h-full flex flex-col items-center justify-center text-center">
+                      <div className="rounded-card bg-white dark:bg-zinc-900 shadow-sm p-6 sm:p-8 border border-[var(--border-subtle)] h-full flex flex-col items-center justify-center text-center">
                         <RiCheckLine className="w-10 h-10 text-emerald-500 mb-3" />
                         <h3 className="text-sm font-bold text-emerald-600 dark:text-emerald-500 uppercase tracking-wider mb-1">
                           Все отлично
@@ -816,7 +816,7 @@ export function DashboardPage({
                   </div>
 
                   {/* Right Column: Rating Highlight */}
-                  <div className="space-y-[var(--spacing-fluid-md)]">
+                  <div className="h-full flex flex-col">
                     <div className="rounded-card bg-[var(--surface)] p-6 sm:p-8 shadow-sm h-full flex flex-col justify-center">
                       <p className="text-sm font-semibold text-text-muted mb-6 text-center sm:text-left uppercase tracking-wider">Средняя оценка</p>
                       
@@ -979,7 +979,7 @@ export function DashboardPage({
                       <p className="mt-1 text-sm text-text-muted">Эффективность сотрудников (от худших к лучшим) и AI-разбор</p>
                     </div>
 
-                    <div className="mt-6 overflow-x-auto rounded-xl border border-[var(--border-subtle)]">
+                    <div className="mt-6 overflow-x-auto rounded-xl border border-[var(--border-subtle)] max-w-4xl">
                       <table className="w-full border-collapse text-left text-sm">
                         <thead>
                           <tr className="border-b border-[var(--border-subtle)] bg-slate-50 dark:bg-zinc-800/30 text-xs font-semibold uppercase tracking-wider text-text-muted">
@@ -1174,10 +1174,10 @@ export function DashboardPage({
 
             {/* REVIEWS HISTORY TAB */}
             {activeTab === "reviews" && reviewsData && (
-              <div className="grid grid-cols-1 xl:grid-cols-12 gap-[var(--spacing-fluid-lg)] items-start">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                 
                 {/* Left Column: Reviews List */}
-                <div className="xl:col-span-8 flex flex-col gap-6">
+                <div className="col-span-12 lg:col-span-7 flex flex-col gap-6">
                   <CardShell>
                     <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
                       <div>
@@ -1261,7 +1261,7 @@ export function DashboardPage({
                                 </div>
                               </div>
                             ) : review.generated_review ? (
-                              <div className="mt-5 text-sm text-gray-900 dark:text-gray-100 leading-relaxed not-italic bg-slate-50 dark:bg-zinc-800/40 p-4 rounded-xl border border-[var(--border-subtle)]">
+                              <div className="mt-5 text-sm text-gray-900 dark:text-gray-100 leading-relaxed not-italic">
                                 {review.generated_review}
                               </div>
                             ) : (
@@ -1300,7 +1300,7 @@ export function DashboardPage({
                 </div>
 
                 {/* Right Column: Leaderboard */}
-                <div className="xl:col-span-4">
+                <div className="col-span-12 lg:col-span-5">
                   <CardShell className="sticky top-28 bg-[var(--surface)] shadow-sm border border-[var(--border-subtle)]">
                     <h3 className="text-lg font-bold text-text-main mb-6">Рейтинг мастеров</h3>
                     {masters.length === 0 ? (
