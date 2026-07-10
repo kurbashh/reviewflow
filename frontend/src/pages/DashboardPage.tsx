@@ -759,24 +759,57 @@ export function DashboardPage({
                             : "Сбор отзывов приостановлен"}
                         </h2>
                       </div>
-                      <button
-                        onClick={() => setActiveTab("settings")}
-                        className="inline-flex min-h-[44px] items-center justify-center rounded-full border border-[var(--border-subtle)] bg-[var(--surface)] px-6 py-2 text-sm font-semibold text-text-main transition-all hover:bg-slate-50 dark:hover:bg-zinc-800/50 active:scale-[0.96] focus:outline-none focus:ring-2 focus:ring-[var(--brand)]/30"
-                      >
-                        Настроить интеграцию
-                      </button>
+                      <div className="flex items-center gap-3">
+                        {billing?.is_manually_paused && (
+                          <button
+                            onClick={handleTogglePause}
+                            className="inline-flex min-h-[44px] items-center justify-center rounded-full bg-[var(--brand)] px-6 py-2 text-sm font-semibold text-[var(--surface)] transition-all hover:opacity-90 active:scale-[0.96]"
+                          >
+                            Возобновить сбор
+                          </button>
+                        )}
+                        <button
+                          onClick={() => setActiveTab("settings")}
+                          className="inline-flex min-h-[44px] items-center justify-center rounded-full border border-[var(--border-subtle)] bg-transparent px-6 py-2 text-sm font-semibold text-text-main transition-all hover:bg-slate-50 dark:hover:bg-zinc-800/50"
+                        >
+                          Настроить интеграцию
+                        </button>
+                      </div>
                     </section>
 
-                    <div className="rounded-card bg-[var(--surface)] shadow-sm flex flex-col sm:flex-row overflow-hidden">
-                      <div className="flex-1 p-6 sm:p-8 border-b sm:border-b-0 sm:border-r border-[var(--border-subtle)]">
-                        <p className="text-sm font-semibold text-text-muted">Отправлено запросов • WhatsApp</p>
-                        <p className="mt-4 text-4xl sm:text-5xl font-black text-text-main">{stats.sent}</p>
+                    {masters.filter(m => m.negative_count > 0 || m.avg_rating < 4.0).length > 0 ? (
+                      <div className="rounded-card bg-red-50 dark:bg-red-950/20 shadow-sm p-6 sm:p-8 border border-red-100 dark:border-red-900/30">
+                        <h3 className="text-sm font-bold text-red-800 dark:text-red-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+                          <RiErrorWarningFill className="w-5 h-5" /> Зона риска (Внимание)
+                        </h3>
+                        <ul className="space-y-3">
+                          {masters.filter(m => m.negative_count > 0 || m.avg_rating < 4.0).slice(0, 3).map(m => (
+                            <li key={m.name} className="flex items-center justify-between bg-white dark:bg-zinc-900 rounded-lg p-3 border border-red-100 dark:border-red-900/20 shadow-sm">
+                              <div className="flex items-center gap-3">
+                                <Avatar name={m.name} className="h-8 w-8 text-[10px]" />
+                                <div>
+                                  <p className="text-sm font-bold text-text-main">{m.name}</p>
+                                  <p className="text-xs text-red-600 dark:text-red-400 font-medium">{m.negative_count > 0 ? `${m.negative_count} жалоб(ы)` : 'Низкий рейтинг'}</p>
+                                </div>
+                              </div>
+                              <span className="flex items-center gap-1 text-sm font-bold text-error">
+                                <RiStarFill className="w-4 h-4" /> {m.avg_rating.toFixed(1)}
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
                       </div>
-                      <div className="flex-1 p-6 sm:p-8">
-                        <p className="text-sm font-semibold text-text-muted">Ожидают ответа</p>
-                        <p className="mt-4 text-4xl sm:text-5xl font-black text-text-main">{stats.pending_replies}</p>
+                    ) : (
+                      <div className="rounded-card bg-emerald-50 dark:bg-emerald-950/20 shadow-sm p-6 sm:p-8 border border-emerald-100 dark:border-emerald-900/30 flex flex-col items-center justify-center text-center">
+                        <RiCheckLine className="w-10 h-10 text-emerald-500 mb-3" />
+                        <h3 className="text-sm font-bold text-emerald-800 dark:text-emerald-400 uppercase tracking-wider mb-1">
+                          Все отлично
+                        </h3>
+                        <p className="text-xs text-emerald-600 dark:text-emerald-500/80">
+                          Жалоб нет, мастера работают на 5 звезд!
+                        </p>
                       </div>
-                    </div>
+                    )}
                   </div>
 
                   {/* Right Column: Rating Highlight */}
@@ -807,57 +840,55 @@ export function DashboardPage({
                   </div>
                   
                   {/* AI Protection Card -> Conversion Funnel (P0) */}
-                  <CardShell className="bg-gradient-to-br from-slate-900 to-slate-950 text-white border-0 shadow-lg relative overflow-hidden flex flex-col justify-between h-full">
-                    <div className="absolute right-0 top-0 translate-x-10 -translate-y-10 w-40 h-40 rounded-full bg-brand/20 blur-[50px]" />
-                    <div className="absolute left-0 bottom-0 -translate-x-10 translate-y-10 w-40 h-40 rounded-full bg-blue-500/10 blur-[50px]" />
+                  <CardShell className="bg-[var(--surface)] border border-[var(--border-subtle)] shadow-sm relative overflow-hidden flex flex-col justify-between h-full">
                     
                     <div className="relative z-10">
-                      <span className="rounded-full bg-brand/20 px-3 py-1 text-xs font-semibold text-brand tracking-wider uppercase">Воронка конверсии</span>
-                      <h4 className="mt-4 text-xl font-bold tracking-tight text-white">Автопилот отзывов</h4>
-                      <p className="mt-2 text-xs text-slate-300 leading-relaxed mb-5">
+                      <span className="rounded-full bg-brand/10 px-3 py-1 text-xs font-semibold text-brand tracking-wider uppercase">Воронка конверсии</span>
+                      <h4 className="mt-4 text-xl font-bold tracking-tight text-text-main">Автопилот отзывов</h4>
+                      <p className="mt-2 text-xs text-text-muted leading-relaxed mb-5">
                         Как наш AI превращает ваши контакты в рейтинг на картах и защищает от жалоб.
                       </p>
                       
                       <div className="flex flex-col gap-2.5">
                         {/* Step 1 */}
-                        <div className="flex items-center justify-between bg-slate-800/50 rounded-xl p-3 border border-slate-700/50 relative">
+                        <div className="flex items-center justify-between bg-slate-50 dark:bg-zinc-800/50 rounded-xl p-3 border border-[var(--border-subtle)] relative">
                           <div className="flex items-center gap-3">
-                            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-700 text-[10px] font-bold text-slate-300">1</div>
-                            <span className="text-sm font-medium text-slate-200">Отправлено запросов</span>
+                            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-200 dark:bg-zinc-700 text-[10px] font-bold text-slate-600 dark:text-slate-300">1</div>
+                            <span className="text-sm font-medium text-text-main">Отправлено запросов</span>
                           </div>
-                          <span className="text-lg font-bold font-mono text-white">{stats.sent}</span>
-                          <div className="absolute -bottom-2.5 left-6 h-2.5 w-px bg-slate-700"></div>
+                          <span className="text-lg font-bold font-mono text-text-main">{stats.sent}</span>
+                          <div className="absolute -bottom-2.5 left-6 h-2.5 w-px bg-[var(--border-subtle)]"></div>
                         </div>
                         
                         {/* Step 2 */}
-                        <div className="flex items-center justify-between bg-slate-800/50 rounded-xl p-3 border border-slate-700/50 relative">
+                        <div className="flex items-center justify-between bg-slate-50 dark:bg-zinc-800/50 rounded-xl p-3 border border-[var(--border-subtle)] relative">
                           <div className="flex items-center gap-3">
-                            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-700 text-[10px] font-bold text-slate-300">2</div>
-                            <span className="text-sm font-medium text-slate-200">Перешли по ссылке</span>
+                            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-200 dark:bg-zinc-700 text-[10px] font-bold text-slate-600 dark:text-slate-300">2</div>
+                            <span className="text-sm font-medium text-text-main">Перешли по ссылке</span>
                           </div>
-                          <span className="text-lg font-bold font-mono text-white">{stats.rated}</span>
-                          <div className="absolute -bottom-2.5 left-6 h-2.5 w-px bg-slate-700"></div>
+                          <span className="text-lg font-bold font-mono text-text-main">{stats.rated}</span>
+                          <div className="absolute -bottom-2.5 left-6 h-2.5 w-px bg-[var(--border-subtle)]"></div>
                         </div>
                         
                         {/* Step 3 */}
-                        <div className="flex items-center justify-between bg-[var(--brand)]/20 rounded-xl p-3 border border-[var(--brand)]/30 relative">
+                        <div className="flex items-center justify-between bg-[var(--brand)]/10 rounded-xl p-3 border border-[var(--brand)]/20 relative">
                           <div className="flex items-center gap-3">
-                            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--brand)]/30 text-[10px] font-bold text-brand">3</div>
+                            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--brand)]/20 text-[10px] font-bold text-brand">3</div>
                             <span className="text-sm font-medium text-brand">Сгенерировано AI</span>
                           </div>
-                          <span className="text-lg font-bold font-mono text-white">{stats.reviews_completed}</span>
-                          <div className="absolute -bottom-2.5 left-6 h-2.5 w-px bg-[var(--brand)]/40"></div>
+                          <span className="text-lg font-bold font-mono text-text-main">{stats.reviews_completed}</span>
+                          <div className="absolute -bottom-2.5 left-6 h-2.5 w-px bg-[var(--brand)]/20"></div>
                         </div>
                         
                         {/* Step 4 (Branching) */}
                         <div className="grid grid-cols-2 gap-3 mt-1">
-                          <div className="flex flex-col items-center justify-center bg-emerald-500/10 rounded-xl p-3 border border-emerald-500/20 text-center">
-                            <span className="text-2xl font-bold font-mono text-emerald-400">{Math.max(0, stats.reviews_completed - stats.negative_captured)}</span>
-                            <span className="text-[10px] text-emerald-200/80 mt-1 uppercase tracking-wider font-semibold">Ушли на карты</span>
+                          <div className="flex flex-col items-center justify-center bg-emerald-50 dark:bg-emerald-500/10 rounded-xl p-3 border border-emerald-500/20 text-center">
+                            <span className="text-2xl font-bold font-mono text-emerald-600 dark:text-emerald-400">{Math.max(0, stats.reviews_completed - stats.negative_captured)}</span>
+                            <span className="text-[10px] text-emerald-600/80 dark:text-emerald-200/80 mt-1 uppercase tracking-wider font-semibold">Ушли на карты</span>
                           </div>
-                          <div className="flex flex-col items-center justify-center bg-orange-500/10 rounded-xl p-3 border border-orange-500/20 text-center">
-                            <span className="text-2xl font-bold font-mono text-orange-400">{stats.negative_captured}</span>
-                            <span className="text-[10px] text-orange-200/80 mt-1 uppercase tracking-wider font-semibold">Перехвачено</span>
+                          <div className="flex flex-col items-center justify-center bg-orange-50 dark:bg-orange-500/10 rounded-xl p-3 border border-orange-500/20 text-center">
+                            <span className="text-2xl font-bold font-mono text-orange-600 dark:text-orange-400">{stats.negative_captured}</span>
+                            <span className="text-[10px] text-orange-600/80 dark:text-orange-200/80 mt-1 uppercase tracking-wider font-semibold">Перехвачено</span>
                           </div>
                         </div>
                         
@@ -1128,134 +1159,168 @@ export function DashboardPage({
 
             {/* REVIEWS HISTORY TAB */}
             {activeTab === "reviews" && reviewsData && (
-              <CardShell>
-                <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-                  <div>
-                    <h3 className="text-lg font-semibold text-text-main">История сбора отзывов</h3>
-                    <p className="mt-1 text-sm text-text-muted">Все диалоги и оценки по вашему бизнесу</p>
-                  </div>
+              <div className="grid grid-cols-1 xl:grid-cols-12 gap-[var(--spacing-fluid-lg)] items-start">
+                
+                {/* Left Column: Reviews List */}
+                <div className="xl:col-span-8 flex flex-col gap-6">
+                  <CardShell>
+                    <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+                      <div>
+                        <h3 className="text-lg font-bold text-text-main">История сбора отзывов</h3>
+                        <p className="mt-1 text-sm text-text-muted">Все диалоги и оценки по вашему бизнесу</p>
+                      </div>
 
-                  {/* Filter tabs */}
-                  <div className="flex items-center gap-1 rounded-full bg-slate-100 dark:bg-zinc-800 p-1">
-                    <button
-                      onClick={() => handleReviewFilterChange("all")}
-                      className={`rounded-full px-4 py-1.5 text-xs font-semibold transition-colors ${
-                        reviewFilter === "all" ? "bg-surface text-text-main dark:text-slate-100 shadow-sm" : "text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
-                      }`}
-                    >
-                      Все отзывы
-                    </button>
-                    <button
-                      onClick={() => handleReviewFilterChange("negative")}
-                      className={`rounded-full px-4 py-1.5 text-xs font-semibold transition-colors ${
-                        reviewFilter === "negative" ? "bg-surface text-text-main dark:text-slate-100 shadow-sm" : "text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
-                      }`}
-                    >
-                      Негативные (1-3★)
-                    </button>
-                  </div>
-                </div>
+                      <div className="flex items-center gap-1 rounded-full bg-slate-100 dark:bg-zinc-800 p-1">
+                        <button
+                          onClick={() => handleReviewFilterChange("all")}
+                          className={`rounded-full px-4 py-1.5 text-xs font-semibold transition-colors ${
+                            reviewFilter === "all" ? "bg-surface text-text-main dark:text-slate-100 shadow-sm bg-white" : "text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
+                          }`}
+                        >
+                          Все отзывы
+                        </button>
+                        <button
+                          onClick={() => handleReviewFilterChange("negative")}
+                          className={`rounded-full px-4 py-1.5 text-xs font-semibold transition-colors ${
+                            reviewFilter === "negative" ? "bg-surface text-text-main dark:text-slate-100 shadow-sm bg-white" : "text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
+                          }`}
+                        >
+                          Негативные (1-3★)
+                        </button>
+                      </div>
+                    </div>
 
-                <div className="mt-6 overflow-x-auto">
-                  <table className="w-full border-collapse text-left text-sm text-text-muted">
-                    <thead>
-                      <tr className="border-b border-slate-100 text-xs font-semibold uppercase tracking-wider text-text-muted">
-                        <th className="py-4 pl-4 w-1/4">Клиент</th>
-                        <th className="py-4 w-1/4">Детали услуги</th>
-                        <th className="py-4 w-1/6">Оценка</th>
-                        <th className="py-4 w-1/6">Статус</th>
-                        <th className="py-4 pr-4 w-auto">Результат</th>
-                      </tr>
-                    </thead>
-                    <tbody>
+                    <div className="mt-6 space-y-4">
                       {reviewsData.reviews.length === 0 ? (
-                        <tr>
-                          <td colSpan={5} className="py-12 text-center text-xs text-text-muted">
-                            Подходящие отзывы не найдены.
-                          </td>
-                        </tr>
+                        <div className="py-12 text-center text-sm text-text-muted bg-slate-50 dark:bg-zinc-800/20 rounded-2xl border border-dashed border-slate-200 dark:border-zinc-700">
+                          Подходящие отзывы не найдены.
+                        </div>
                       ) : (
                         reviewsData.reviews.map((review) => (
-                          <tr key={review.id} className="border-b border-[var(--border-subtle)] hover:bg-slate-50 dark:hover:bg-zinc-800/40 transition-colors cursor-pointer">
-                            <td className="py-4 pl-4 font-semibold text-text-main">
-                              <div>{review.client_name || "Без имени"}</div>
-                              <div className="text-xs text-text-muted font-mono mt-0.5">{review.client_phone}</div>
-                            </td>
-                            <td className="py-4">
-                              <div className="text-slate-700 dark:text-slate-200 font-medium">{review.service_name || "Не указана"}</div>
-                              <div className="text-xs text-text-muted">Мастер: {review.master_name || "Не указан"}</div>
-                            </td>
-                            <td className="py-4 font-medium">{renderStars(review.rating)}</td>
-                            <td className="py-4">
-                              <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                                (review.rating !== null || review.status === "completed") ? "bg-[var(--success)]/10 text-[var(--success)]" : "bg-slate-100 text-slate-600 dark:bg-zinc-800 dark:text-slate-400"
+                          <div key={review.id} className="relative bg-white dark:bg-zinc-900 rounded-2xl border border-[var(--border-subtle)] p-5 shadow-sm transition-shadow hover:shadow-md">
+                            
+                            {/* Master Badge in Top Right */}
+                            {review.master_name && (
+                              <div className="absolute top-5 right-5 inline-flex items-center rounded-md bg-slate-100 dark:bg-zinc-800 px-2 py-1 text-xs font-bold text-slate-700 dark:text-slate-300">
+                                [М] {review.master_name}
+                              </div>
+                            )}
+
+                            {/* Header: Client Name, Date, Service */}
+                            <div className="mb-4 pr-24">
+                              <h4 className="font-bold text-gray-900 dark:text-gray-100 text-lg leading-tight">{review.client_name || "Без имени"}</h4>
+                              <p className="text-xs text-gray-500 dark:text-zinc-400 mt-1.5 font-medium">
+                                {new Date(review.created_at).toLocaleDateString("ru-RU", { day: 'numeric', month: 'long', year: 'numeric' })} • {review.service_name || "Услуга не указана"}
+                              </p>
+                            </div>
+
+                            {/* Rating */}
+                            <div className="mb-4 flex items-center gap-3">
+                              {renderStars(review.rating)}
+                              <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
+                                (review.rating !== null || review.status === "completed") ? "bg-[var(--success)]/10 text-[var(--success)]" : "bg-slate-100 text-slate-500 dark:bg-zinc-800 dark:text-slate-400"
                               }`}>
                                 {(review.rating !== null || review.status === "completed") ? "Получен" : "Ожидает"}
                               </span>
-                              <div className="text-[10px] text-text-muted mt-1 font-medium">
-                                {new Date(review.created_at).toLocaleDateString("ru-RU")}
+                            </div>
+
+                            {/* Content */}
+                            {review.rating !== null && review.rating <= 3 && review.owner_feedback ? (
+                              <div className="mt-5 border-l-4 border-red-500 bg-red-50 dark:bg-red-950/20 p-4 rounded-r-xl">
+                                <div className="flex items-start gap-3">
+                                  <RiErrorWarningFill className="h-5 w-5 text-red-500 shrink-0 mt-0.5" />
+                                  <div className="w-full">
+                                    <p className="text-sm text-gray-900 dark:text-gray-100 leading-relaxed font-medium">{review.owner_feedback}</p>
+                                    <div className="mt-4 flex items-center justify-between border-t border-red-200/50 dark:border-red-900/30 pt-3">
+                                      <span className={`text-[11px] font-bold uppercase tracking-wider ${review.is_resolved ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
+                                        {review.is_resolved ? '✓ Улажено' : '⚠ В работе'}
+                                      </span>
+                                      <button
+                                        onClick={(e) => { e.preventDefault(); handleToggleResolve(review.id, review.is_resolved); }}
+                                        className="px-4 py-2 rounded-lg text-xs font-bold bg-white dark:bg-zinc-900 border border-gray-300 dark:border-zinc-700 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-900/30 hover:text-green-700 dark:hover:text-green-400 transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500/30"
+                                      >
+                                        {review.is_resolved ? 'Отменить статус' : 'Отметить как улаженное'}
+                                      </button>
+                                    </div>
+                                  </div>
+                                </div>
                               </div>
-                            </td>
-                            <td className="py-4 pr-4">
-                              {review.rating !== null && review.rating <= 3 && review.owner_feedback ? (
-                                <div className="flex flex-col gap-2">
-                                  <div className="flex items-start gap-1.5">
-                                    <RiErrorWarningFill className="h-4 w-4 text-error shrink-0 mt-0.5" />
-                                    <span className="text-xs text-text-main line-clamp-2" title={review.owner_feedback}>
-                                      {review.owner_feedback}
-                                    </span>
-                                  </div>
-                                  <div className="flex items-center justify-between mt-1">
-                                    <span className={`text-[10px] font-bold uppercase tracking-wider ${review.is_resolved ? 'text-emerald-500' : 'text-error'}`}>
-                                      {review.is_resolved ? '✓ Улажено' : '⚠ В работе'}
-                                    </span>
-                                    <button
-                                      onClick={(e) => { e.stopPropagation(); handleToggleResolve(review.id, review.is_resolved); }}
-                                      className={`px-2 py-1 rounded text-[10px] font-semibold transition-colors ${review.is_resolved ? 'bg-slate-100 text-slate-500 hover:bg-slate-200 dark:bg-zinc-800 dark:hover:bg-zinc-700' : 'bg-error/10 text-error hover:bg-error/20'}`}
-                                    >
-                                      Изменить
-                                    </button>
-                                  </div>
-                                </div>
-                              ) : review.generated_review ? (
-                                <div className="text-xs text-text-main line-clamp-2" title={review.generated_review}>
-                                  {review.generated_review}
-                                </div>
-                              ) : (
-                                <span className="text-slate-300">-</span>
-                              )}
-                            </td>
-                          </tr>
+                            ) : review.generated_review ? (
+                              <div className="mt-5 text-sm text-gray-900 dark:text-gray-100 leading-relaxed not-italic bg-slate-50 dark:bg-zinc-800/40 p-4 rounded-xl border border-[var(--border-subtle)]">
+                                {review.generated_review}
+                              </div>
+                            ) : (
+                              <div className="mt-5 text-sm text-slate-400 italic">
+                                {review.rating !== null ? "Клиент не оставил текстовый комментарий." : "Клиент еще не оценил визит."}
+                              </div>
+                            )}
+                          </div>
                         ))
                       )}
-                    </tbody>
-                  </table>
+                    </div>
+
+                    <div className="mt-8 flex items-center justify-between border-t border-[var(--border-subtle)] pt-6 text-sm">
+                      <span className="text-text-muted font-medium">
+                        Показано <b className="text-text-main">{reviewsOffset + 1}-{Math.min(reviewsOffset + REVIEWS_LIMIT, reviewsData.total_count)}</b> из <b className="text-text-main">{reviewsData.total_count}</b>
+                      </span>
+                      
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleReviewsPageChange("prev")}
+                          disabled={reviewsOffset === 0}
+                          className="rounded-full border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-5 py-2 font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-zinc-800 disabled:opacity-50 disabled:pointer-events-none transition-colors shadow-sm"
+                        >
+                          Назад
+                        </button>
+                        <button
+                          onClick={() => handleReviewsPageChange("next")}
+                          disabled={reviewsOffset + REVIEWS_LIMIT >= reviewsData.total_count}
+                          className="rounded-full border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-5 py-2 font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-zinc-800 disabled:opacity-50 disabled:pointer-events-none transition-colors shadow-sm"
+                        >
+                          Вперед
+                        </button>
+                      </div>
+                    </div>
+                  </CardShell>
                 </div>
 
-                {/* Pagination */}
-                <div className="mt-6 flex items-center justify-between border-t border-slate-100 pt-4 text-xs">
-                  <span className="text-text-muted font-medium">
-                    Показано <b>{reviewsOffset + 1}-{Math.min(reviewsOffset + REVIEWS_LIMIT, reviewsData.total_count)}</b> из <b>{reviewsData.total_count}</b>
-                  </span>
-                  
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => handleReviewsPageChange("prev")}
-                      disabled={reviewsOffset === 0}
-                      className="rounded-full border border-slate-200 bg-white px-4 py-2 font-semibold text-slate-600 hover:border-slate-300 disabled:opacity-50 disabled:pointer-events-none transition-colors"
-                    >
-                      Назад
-                    </button>
-                    <button
-                      onClick={() => handleReviewsPageChange("next")}
-                      disabled={reviewsOffset + REVIEWS_LIMIT >= reviewsData.total_count}
-                      className="rounded-full border border-slate-200 bg-white px-4 py-2 font-semibold text-slate-600 hover:border-slate-300 disabled:opacity-50 disabled:pointer-events-none transition-colors"
-                    >
-                      Вперед
-                    </button>
-                  </div>
+                {/* Right Column: Leaderboard */}
+                <div className="xl:col-span-4">
+                  <CardShell className="sticky top-28 bg-[var(--surface)] shadow-sm border border-[var(--border-subtle)]">
+                    <h3 className="text-lg font-bold text-text-main mb-6">Рейтинг мастеров</h3>
+                    {masters.length === 0 ? (
+                      <div className="text-sm text-text-muted text-center py-6">Нет данных о мастерах</div>
+                    ) : (
+                      <div className="space-y-4">
+                        {[...masters].sort((a, b) => b.avg_rating - a.avg_rating).map((m, idx) => (
+                          <div key={m.name} className="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-zinc-800/40 transition-colors border border-transparent hover:border-[var(--border-subtle)]">
+                            <div className="flex items-center gap-3">
+                              <span className="text-xs font-bold text-slate-400 dark:text-zinc-500 w-5 text-center">{idx + 1}</span>
+                              <Avatar name={m.name} className="h-10 w-10 shrink-0" />
+                              <div>
+                                <p className="text-sm font-bold text-gray-900 dark:text-slate-100">{m.name}</p>
+                                <p className="text-xs text-gray-500 dark:text-zinc-400 font-medium mt-0.5">{m.review_count} отзывов</p>
+                              </div>
+                            </div>
+                            <div className="flex flex-col items-end gap-1">
+                              <span className="flex items-center gap-1 font-bold text-sm text-gray-900 dark:text-white">
+                                <RiStarFill className="w-4 h-4 text-brand" />
+                                {m.avg_rating.toFixed(1)}
+                              </span>
+                              {m.negative_count > 0 && (
+                                <span className="text-[10px] font-bold text-red-500 bg-red-50 dark:bg-red-950/30 px-1.5 py-0.5 rounded">
+                                  {m.negative_count} жалоб
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </CardShell>
                 </div>
-              </CardShell>
+                
+              </div>
             )}
 
             {/* LOCATIONS TAB */}
