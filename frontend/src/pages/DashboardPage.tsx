@@ -5,7 +5,7 @@ import {
   CardShell,
   Avatar,
 } from "../components/ui/icons";
-import { RiStarFill, RiFileCopyLine, RiCheckLine, RiEditLine, RiDeleteBinLine, RiErrorWarningFill, RiEyeLine, RiEyeOffLine } from "@remixicon/react";
+import { RiStarFill, RiFileCopyLine, RiCheckLine, RiEditLine, RiDeleteBinLine, RiErrorWarningFill, RiEyeLine, RiEyeOffLine, RiSparklingFill } from "@remixicon/react";
 
 const API_BASE = `${import.meta.env.VITE_API_BASE_URL || "https://167-233-118-175.sslip.io"}/api/dashboard`;
 const REDIRECT_BASE = `${import.meta.env.VITE_API_BASE_URL || "https://167-233-118-175.sslip.io"}/api/redirect`;
@@ -1015,7 +1015,7 @@ export function DashboardPage({
                                   className={`group inline-flex items-center justify-center p-2 rounded-lg transition-colors ${selectedMaster === master.name ? 'bg-slate-200 dark:bg-zinc-700 text-text-main' : 'text-slate-400 hover:bg-slate-100 hover:text-brand dark:hover:bg-zinc-800'}`}
                                   title="Запросить анализ"
                                 >
-                                  <span className="text-sm">✨</span>
+                                  <RiSparklingFill className="w-5 h-5" />
                                   <span className="sr-only">AI анализ</span>
                                 </button>
                               </td>
