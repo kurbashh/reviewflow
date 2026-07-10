@@ -271,6 +271,9 @@ class ReviewRequest(Base):
     # хранится здесь же для истории/дашборда (Этап 5).
     owner_feedback: Mapped[str | None] = mapped_column(Text, nullable=True)
 
+    # Флаг для дашборда: улажена ли жалоба (для Action-элементов)
+    is_resolved: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false", nullable=False)
+
     # DateTime(timezone=True) обязателен: весь код проекта (crud.py, тасках)
     # пишет сюда timezone-aware datetime.now(timezone.utc). Без timezone=True
     # колонка становится TIMESTAMP WITHOUT TIME ZONE, и asyncpg роняет запрос

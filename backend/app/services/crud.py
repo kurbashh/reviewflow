@@ -378,7 +378,10 @@ async def get_business_masters(session: AsyncSession, business_id: uuid.UUID) ->
             func.avg(ReviewRequest.rating).label("avg_rating"),
             func.sum(
                 cast(ReviewRequest.rating <= 3, Integer)
-            ).label("negative_count")
+            ).label("negative_count"),
+            func.sum(
+                cast(ReviewRequest.rating >= 4, Integer)
+            ).label("positive_count")
         )
         .where(
             ReviewRequest.business_id == business_id,
@@ -395,7 +398,8 @@ async def get_business_masters(session: AsyncSession, business_id: uuid.UUID) ->
             "name": row.name.strip() if row.name else "",
             "review_count": row.review_count,
             "avg_rating": round(float(row.avg_rating), 1) if row.avg_rating is not None else 0.0,
-            "negative_count": int(row.negative_count) if row.negative_count is not None else 0
+            "negative_count": int(row.negative_count) if row.negative_count is not None else 0,
+            "positive_count": int(row.positive_count) if row.positive_count is not None else 0
         }
         for row in rows if row.name and row.name.strip()
     ]

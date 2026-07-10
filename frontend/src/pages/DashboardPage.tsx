@@ -32,6 +32,7 @@ interface Review {
   owner_feedback: string | null;
   created_at: string;
   completed_at: string | null;
+  is_resolved?: boolean;
 }
 
 interface Stats {
@@ -51,6 +52,7 @@ interface MasterSummary {
   review_count: number;
   avg_rating: number;
   negative_count: number;
+  positive_count: number;
 }
 
 interface MasterStats {
@@ -439,6 +441,29 @@ export function DashboardPage({
     fetchReviews(newOffset, reviewFilter === "negative");
   };
 
+  // Handle Review Resolution Toggle
+  const handleToggleResolve = async (reviewId: string, currentStatus: boolean = false) => {
+    if (!businessId) return;
+    try {
+      const res = await apiFetch(`${API_BASE}/${businessId}/reviews/${reviewId}/resolve`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ is_resolved: !currentStatus }),
+      });
+      if (!res.ok) throw new Error("Не удалось обновить статус");
+      
+      setReviewsData(prev => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          reviews: prev.reviews.map(r => r.id === reviewId ? { ...r, is_resolved: !currentStatus } : r)
+        };
+      });
+    } catch (err: any) {
+      console.error(err.message);
+    }
+  };
+
   // Create or Update Location
   const handleSaveLocation = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -781,25 +806,61 @@ export function DashboardPage({
                     </div>
                   </div>
                   
-                  {/* AI Protection Card (Moved to top) */}
+                  {/* AI Protection Card -> Conversion Funnel (P0) */}
                   <CardShell className="bg-gradient-to-br from-slate-900 to-slate-950 text-white border-0 shadow-lg relative overflow-hidden flex flex-col justify-between h-full">
-                    <div className="absolute right-0 top-0 translate-x-10 -translate-y-10 w-40 h-40 rounded-full bg-brand/10 blur-xl" />
-                    <div>
-                      <span className="rounded-full bg-brand/20 px-3 py-1 text-xs font-semibold text-brand tracking-wider uppercase">ReviewFlow.kz</span>
-                      <h4 className="mt-4 text-xl font-bold tracking-tight text-white">Рейтинг защищен</h4>
-                      <p className="mt-2 text-xs text-slate-300 leading-relaxed">
-                        Недовольные клиенты перенаправляются на форму обратной связи, предотвращая публикацию негативных отзывов на картах.
+                    <div className="absolute right-0 top-0 translate-x-10 -translate-y-10 w-40 h-40 rounded-full bg-brand/20 blur-[50px]" />
+                    <div className="absolute left-0 bottom-0 -translate-x-10 translate-y-10 w-40 h-40 rounded-full bg-blue-500/10 blur-[50px]" />
+                    
+                    <div className="relative z-10">
+                      <span className="rounded-full bg-brand/20 px-3 py-1 text-xs font-semibold text-brand tracking-wider uppercase">Воронка конверсии</span>
+                      <h4 className="mt-4 text-xl font-bold tracking-tight text-white">Автопилот отзывов</h4>
+                      <p className="mt-2 text-xs text-slate-300 leading-relaxed mb-5">
+                        Как наш AI превращает ваши контакты в рейтинг на картах и защищает от жалоб.
                       </p>
-                    </div>
-
-                    <div className="mt-8 pt-8 border-t border-slate-800/80 grid grid-cols-2 gap-4">
-                      <div>
-                        <p className="text-2xl font-bold text-white font-mono">{stats.reviews_completed}</p>
-                        <p className="text-[10px] text-slate-300">Сгенерировано AI</p>
-                      </div>
-                      <div>
-                        <p className="text-2xl font-bold text-brand font-mono">{stats.negative_captured}</p>
-                        <p className="text-[10px] text-slate-300">Перехвачено жалоб</p>
+                      
+                      <div className="flex flex-col gap-2.5">
+                        {/* Step 1 */}
+                        <div className="flex items-center justify-between bg-slate-800/50 rounded-xl p-3 border border-slate-700/50 relative">
+                          <div className="flex items-center gap-3">
+                            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-700 text-[10px] font-bold text-slate-300">1</div>
+                            <span className="text-sm font-medium text-slate-200">Отправлено запросов</span>
+                          </div>
+                          <span className="text-lg font-bold font-mono text-white">{stats.sent}</span>
+                          <div className="absolute -bottom-2.5 left-6 h-2.5 w-px bg-slate-700"></div>
+                        </div>
+                        
+                        {/* Step 2 */}
+                        <div className="flex items-center justify-between bg-slate-800/50 rounded-xl p-3 border border-slate-700/50 relative">
+                          <div className="flex items-center gap-3">
+                            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-700 text-[10px] font-bold text-slate-300">2</div>
+                            <span className="text-sm font-medium text-slate-200">Перешли по ссылке</span>
+                          </div>
+                          <span className="text-lg font-bold font-mono text-white">{stats.rated}</span>
+                          <div className="absolute -bottom-2.5 left-6 h-2.5 w-px bg-slate-700"></div>
+                        </div>
+                        
+                        {/* Step 3 */}
+                        <div className="flex items-center justify-between bg-[var(--brand)]/20 rounded-xl p-3 border border-[var(--brand)]/30 relative">
+                          <div className="flex items-center gap-3">
+                            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--brand)]/30 text-[10px] font-bold text-brand">3</div>
+                            <span className="text-sm font-medium text-brand">Сгенерировано AI</span>
+                          </div>
+                          <span className="text-lg font-bold font-mono text-white">{stats.reviews_completed}</span>
+                          <div className="absolute -bottom-2.5 left-6 h-2.5 w-px bg-[var(--brand)]/40"></div>
+                        </div>
+                        
+                        {/* Step 4 (Branching) */}
+                        <div className="grid grid-cols-2 gap-3 mt-1">
+                          <div className="flex flex-col items-center justify-center bg-emerald-500/10 rounded-xl p-3 border border-emerald-500/20 text-center">
+                            <span className="text-2xl font-bold font-mono text-emerald-400">{Math.max(0, stats.reviews_completed - stats.negative_captured)}</span>
+                            <span className="text-[10px] text-emerald-200/80 mt-1 uppercase tracking-wider font-semibold">Ушли на карты</span>
+                          </div>
+                          <div className="flex flex-col items-center justify-center bg-orange-500/10 rounded-xl p-3 border border-orange-500/20 text-center">
+                            <span className="text-2xl font-bold font-mono text-orange-400">{stats.negative_captured}</span>
+                            <span className="text-[10px] text-orange-200/80 mt-1 uppercase tracking-wider font-semibold">Перехвачено</span>
+                          </div>
+                        </div>
+                        
                       </div>
                     </div>
                   </CardShell>
@@ -876,31 +937,57 @@ export function DashboardPage({
                   </div>
                 </section>
 
-                {/* Master Analytics */}
+                {/* Master Analytics Leaderboard */}
                 {masters.length > 0 && (
                   <section className="rounded-card bg-[var(--surface)] shadow-sm p-6 sm:p-8">
                     <div>
                       <h3 className="text-lg font-bold text-text-main">Аналитика по мастерам</h3>
-                      <p className="mt-1 text-sm text-text-muted">Персональный рейтинг и AI-анализ работы</p>
+                      <p className="mt-1 text-sm text-text-muted">Эффективность сотрудников (от худших к лучшим) и AI-разбор</p>
                     </div>
 
-                    <div className="mt-6 overflow-x-auto pb-2 -mx-2 px-2 hide-scrollbar flex gap-2">
-                      {masters.map(master => (
-                        <button
-                          key={master.name}
-                          onClick={() => setSelectedMaster(master.name)}
-                          className={`flex items-center gap-2 px-4 py-2 rounded-full border whitespace-nowrap transition-all ${selectedMaster === master.name ? 'border-[var(--brand)] bg-[var(--brand)]/10 text-[var(--brand)]' : 'border-[var(--border-subtle)] hover:bg-slate-50 dark:hover:bg-zinc-800/50 text-text-main'}`}
-                        >
-                          <span className="font-semibold">{master.name}</span>
-                          <span className="flex items-center gap-1 text-xs opacity-80">
-                            ★ {master.avg_rating} <span className="opacity-50">({master.review_count})</span>
-                          </span>
-                        </button>
-                      ))}
+                    <div className="mt-6 overflow-x-auto rounded-xl border border-[var(--border-subtle)]">
+                      <table className="w-full border-collapse text-left text-sm">
+                        <thead>
+                          <tr className="border-b border-[var(--border-subtle)] bg-slate-50 dark:bg-zinc-800/30 text-xs font-semibold uppercase tracking-wider text-text-muted">
+                            <th className="py-3 pl-4 w-1/3">Мастер</th>
+                            <th className="py-3">Балл</th>
+                            <th className="py-3 text-center">Сгенерировано</th>
+                            <th className="py-3 text-center">Перехвачено</th>
+                            <th className="py-3 pr-4 text-right">AI-Вердикт</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {[...masters].sort((a, b) => a.avg_rating - b.avg_rating).map(master => (
+                            <tr key={master.name} className={`border-b last:border-0 border-[var(--border-subtle)] hover:bg-slate-50 dark:hover:bg-zinc-800/40 transition-colors ${selectedMaster === master.name ? 'bg-slate-50 dark:bg-zinc-800/60' : ''}`}>
+                              <td className="py-3 pl-4">
+                                <div className="flex items-center gap-3">
+                                  <Avatar name={master.name} className="h-8 w-8 shrink-0" />
+                                  <span className="font-bold text-text-main">{master.name}</span>
+                                </div>
+                              </td>
+                              <td className="py-3">
+                                <span className={`inline-flex items-center gap-1 font-bold ${master.avg_rating < 4 ? 'text-error' : 'text-emerald-500'}`}>
+                                  <RiStarFill className="w-4 h-4" /> {master.avg_rating.toFixed(1)}
+                                </span>
+                              </td>
+                              <td className="py-3 text-center font-mono text-emerald-600 dark:text-emerald-400 font-semibold">{master.positive_count || 0}</td>
+                              <td className="py-3 text-center font-mono text-error font-semibold">{master.negative_count || 0}</td>
+                              <td className="py-3 pr-4 text-right">
+                                <button
+                                  onClick={() => setSelectedMaster(selectedMaster === master.name ? null : master.name)}
+                                  className={`text-xs font-bold transition-colors px-3 py-1.5 rounded-full ${selectedMaster === master.name ? 'bg-slate-200 dark:bg-zinc-700 text-text-main' : 'bg-brand/10 text-brand hover:bg-brand/20'}`}
+                                >
+                                  {selectedMaster === master.name ? 'Скрыть' : 'Запросить анализ'}
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
                     </div>
 
                     {selectedMaster && (
-                      <div className="mt-6 pt-6 border-t border-[var(--border-subtle)] grid gap-6 md:grid-cols-2">
+                      <div className="mt-6 pt-6 border-t border-[var(--border-subtle)] grid gap-6 md:grid-cols-2 animate-fade-in">
                         {loadingMasterStats ? (
                           <div className="col-span-full py-12 flex flex-col items-center justify-center space-y-4">
                             <div className="w-8 h-8 rounded-full border-2 border-[var(--brand)] border-t-transparent animate-spin" />
@@ -976,34 +1063,56 @@ export function DashboardPage({
                       {!reviewsData || reviewsData.reviews.length === 0 ? (
                         <p className="text-center text-xs text-text-muted py-8">Отзывов пока нет.</p>
                       ) : (
-                        reviewsData.reviews.slice(0, 4).map((review) => (
+                        reviewsData.reviews.slice(0, 4).map((r) => (
                           <li
-                            key={review.id}
+                            key={r.id}
                             className="flex flex-col gap-3 rounded-2xl border border-[var(--border-subtle)] p-4 hover:bg-slate-50 dark:hover:bg-zinc-800/50 transition-all cursor-pointer"
                           >
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-3">
-                                <Avatar name={review.client_name || "К"} className="h-9 w-9 shrink-0" />
-                                <div>
-                                  <p className="text-sm font-bold text-slate-800 dark:text-slate-200">{review.client_name || "Клиент"}</p>
-                                  <p className="text-xs text-text-muted">{review.service_name || "Услуга не указана"}</p>
-                                </div>
+                            <div className="flex justify-between items-start mb-2">
+                              <div>
+                                <p className="font-bold text-text-main flex items-center gap-2">
+                                  {r.client_name || "Клиент"}
+                                  <span className="text-xs font-normal text-text-muted">{r.client_phone}</span>
+                                </p>
+                                <p className="text-xs text-text-muted mt-1 flex items-center gap-3">
+                                  <span>{new Date(r.created_at).toLocaleDateString()}</span>
+                                  {r.master_name && (
+                                    <span className="flex items-center gap-1.5 bg-slate-200/50 dark:bg-zinc-800/50 px-2 py-0.5 rounded-full text-text-main font-medium">
+                                      <Avatar name={r.master_name} className="h-4 w-4 text-[8px]" />
+                                      {r.master_name}
+                                    </span>
+                                  )}
+                                </p>
                               </div>
-                              <div className="text-right">
-                                {renderStars(review.rating)}
-                                <p className="text-[10px] text-text-muted mt-0.5">{review.client_phone}</p>
-                              </div>
+                              <span className={`inline-flex items-center gap-1 text-sm font-bold ${r.rating !== null && r.rating <= 3 ? 'text-error' : 'text-amber-500'}`}>
+                                <RiStarFill className="w-4 h-4" /> {r.rating}
+                              </span>
                             </div>
 
-                            {review.rating !== null && review.rating <= 3 && review.owner_feedback && (
-                              <div className="rounded-xl bg-orange-50 dark:bg-orange-950/20 border border-orange-200 dark:border-orange-900/30 p-3 text-xs text-orange-800 dark:text-orange-300">
-                                <b>Жалоба клиента:</b> "{review.owner_feedback}"
+                            {r.rating !== null && r.rating <= 3 && r.owner_feedback && (
+                              <div className="mt-3 p-3 rounded-lg bg-[var(--surface)] border border-[var(--border-subtle)] text-sm shadow-sm relative">
+                                <span className="absolute -top-2 left-3 bg-[var(--surface)] px-1 text-[10px] font-bold text-error uppercase tracking-wider">Причина недовольства</span>
+                                <p className="text-text-main italic">"{r.owner_feedback}"</p>
                               </div>
                             )}
 
-                            {review.rating !== null && review.rating >= 4 && review.generated_review && (
-                              <div className="ai-glow-effect rounded-xl p-3 text-xs italic text-[var(--brand)]">
-                                "{review.generated_review}"
+                            {r.rating !== null && r.rating >= 4 && r.generated_review && (
+                              <div className="mt-3 ai-glow-effect rounded-xl p-3 text-xs italic text-[var(--brand)]">
+                                "{r.generated_review}"
+                              </div>
+                            )}
+
+                            {r.rating !== null && r.rating <= 3 && (
+                              <div className="mt-4 pt-4 border-t border-[var(--border-subtle)] flex items-center justify-between">
+                                <span className={`text-xs font-bold uppercase tracking-wider ${r.is_resolved ? 'text-emerald-500' : 'text-error'}`}>
+                                  {r.is_resolved ? '✓ Улажено' : '⚠ Требует внимания'}
+                                </span>
+                                <button
+                                  onClick={() => handleToggleResolve(r.id, r.is_resolved)}
+                                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${r.is_resolved ? 'bg-[var(--surface)] text-text-muted border border-[var(--border-subtle)] hover:bg-slate-100 dark:hover:bg-zinc-800' : 'bg-error text-white hover:bg-error-hover shadow-sm'}`}
+                                >
+                                  {r.is_resolved ? 'Вернуть в работу' : 'Отметить как улаженное'}
+                                </button>
                               </div>
                             )}
                           </li>
@@ -1089,11 +1198,24 @@ export function DashboardPage({
                             </td>
                             <td className="py-4 pr-4">
                               {review.rating !== null && review.rating <= 3 && review.owner_feedback ? (
-                                <div className="flex items-start gap-1.5">
-                                  <RiErrorWarningFill className="h-4 w-4 text-error shrink-0 mt-0.5" />
-                                  <span className="text-xs text-text-main line-clamp-2" title={review.owner_feedback}>
-                                    {review.owner_feedback}
-                                  </span>
+                                <div className="flex flex-col gap-2">
+                                  <div className="flex items-start gap-1.5">
+                                    <RiErrorWarningFill className="h-4 w-4 text-error shrink-0 mt-0.5" />
+                                    <span className="text-xs text-text-main line-clamp-2" title={review.owner_feedback}>
+                                      {review.owner_feedback}
+                                    </span>
+                                  </div>
+                                  <div className="flex items-center justify-between mt-1">
+                                    <span className={`text-[10px] font-bold uppercase tracking-wider ${review.is_resolved ? 'text-emerald-500' : 'text-error'}`}>
+                                      {review.is_resolved ? '✓ Улажено' : '⚠ В работе'}
+                                    </span>
+                                    <button
+                                      onClick={(e) => { e.stopPropagation(); handleToggleResolve(review.id, review.is_resolved); }}
+                                      className={`px-2 py-1 rounded text-[10px] font-semibold transition-colors ${review.is_resolved ? 'bg-slate-100 text-slate-500 hover:bg-slate-200 dark:bg-zinc-800 dark:hover:bg-zinc-700' : 'bg-error/10 text-error hover:bg-error/20'}`}
+                                    >
+                                      Изменить
+                                    </button>
+                                  </div>
                                 </div>
                               ) : review.generated_review ? (
                                 <div className="text-xs text-text-main line-clamp-2" title={review.generated_review}>

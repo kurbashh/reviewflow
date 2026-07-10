@@ -93,6 +93,7 @@ class ReviewResponse(BaseModel):
     rating: int | None = None
     generated_review: str | None = None
     owner_feedback: str | None = None
+    is_resolved: bool = False
     created_at: str
     completed_at: str | None = None
 
@@ -119,6 +120,9 @@ class BillingPauseRequest(BaseModel):
 
 class BillingLifetimeRequest(BaseModel):
     is_lifetime: bool
+
+class ResolveReviewRequest(BaseModel):
+    is_resolved: bool
 
 import logging
 
@@ -294,6 +298,7 @@ async def get_dashboard_reviews(
                 rating=r.rating,
                 generated_review=r.generated_review,
                 owner_feedback=r.owner_feedback,
+                is_resolved=r.is_resolved,
                 created_at=r.created_at.isoformat(),
                 completed_at=r.completed_at.isoformat() if r.completed_at else None,
             )
@@ -572,4 +577,32 @@ async def lifetime_billing(
         business.status = BusinessStatus.ACTIVE
     session.add(business)
     await session.commit()
+    return {"status": "success"}
+
+@router.patch("/{business_id}/reviews/{review_id}/resolve", response_model=dict[str, str])
+async def resolve_review(
+    business_id: str,
+    review_id: str,
+    payload: ResolveReviewRequest,
+    session: AsyncSession = Depends(get_session),
+    current_user: User = Depends(get_current_user),
+):
+    try:
+        business_uuid = uuid.UUID(business_id)
+        review_uuid = uuid.UUID(review_id)
+    except ValueError:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Неверный формат UUID")
+
+    business = await crud.get_owned_business(session, business_id, current_user.id)
+    if not business:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Бизнес не найден")
+
+    from app.db.models import ReviewRequest
+    review = await session.get(ReviewRequest, review_uuid)
+    if not review or review.business_id != business_uuid:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Отзыв не найден")
+
+    review.is_resolved = payload.is_resolved
+    await session.commit()
+
     return {"status": "success"}
