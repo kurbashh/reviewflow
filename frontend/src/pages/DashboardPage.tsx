@@ -1073,7 +1073,7 @@ export function DashboardPage({
                 )}
                 
                 {/* Recent Reviews Summary */}
-                <section className="grid gap-6 lg:grid-cols-[1.6fr_1fr]">
+                <section className="mt-8">
                   
                   {/* Reviews List */}
                   <CardShell>
@@ -1097,53 +1097,60 @@ export function DashboardPage({
                         reviewsData.reviews.slice(0, 4).map((r) => (
                           <li
                             key={r.id}
-                            className="flex flex-col gap-3 rounded-2xl border border-[var(--border-subtle)] p-4 hover:bg-slate-50 dark:hover:bg-zinc-800/50 transition-all cursor-pointer"
+                            className="relative bg-[var(--surface)] rounded-2xl border border-[var(--border-subtle)] p-5 shadow-sm transition-shadow hover:shadow-md"
                           >
-                            <div className="flex justify-between items-start mb-2">
-                              <div>
-                                <p className="font-bold text-text-main flex items-center gap-2">
-                                  {r.client_name || "Клиент"}
-                                  <span className="text-xs font-normal text-text-muted">{r.client_phone}</span>
-                                </p>
-                                <p className="text-xs text-text-muted mt-1 flex items-center gap-3">
-                                  <span>{new Date(r.created_at).toLocaleDateString()}</span>
-                                  {r.master_name && (
-                                    <span className="flex items-center gap-1.5 bg-slate-200/50 dark:bg-zinc-800/50 px-2 py-0.5 rounded-full text-text-main font-medium">
-                                      <Avatar name={r.master_name} className="h-4 w-4 text-[8px]" />
-                                      {r.master_name}
-                                    </span>
-                                  )}
-                                </p>
+                            {/* Master Badge in Top Right */}
+                            {r.master_name && (
+                              <div className="absolute top-5 right-5 inline-flex items-center rounded-md bg-slate-100 dark:bg-zinc-800 px-2 py-1 text-xs font-bold text-slate-700 dark:text-slate-300">
+                                [М] {r.master_name}
                               </div>
-                              <span className={`inline-flex items-center gap-1 text-sm font-bold ${r.rating !== null && r.rating <= 3 ? 'text-error' : 'text-amber-500'}`}>
-                                <RiStarFill className="w-4 h-4" /> {r.rating}
-                              </span>
+                            )}
+
+                            {/* Header: Client Name, Date, Service */}
+                            <div className="mb-4 pr-24">
+                              <h4 className="font-bold text-gray-900 dark:text-gray-100 text-lg leading-tight">{r.client_name || "Без имени"}</h4>
+                              <p className="text-xs text-gray-500 dark:text-zinc-400 mt-1.5 font-medium">
+                                {new Date(r.created_at).toLocaleDateString("ru-RU", { day: 'numeric', month: 'long', year: 'numeric' })} • {r.service_name || "Услуга не указана"}
+                              </p>
                             </div>
 
+                            {/* Rating */}
+                            <div className="mb-4 flex items-center gap-3">
+                              {renderStars(r.rating)}
+                            </div>
+
+                            {/* Content */}
                             {r.rating !== null && r.rating <= 3 && r.owner_feedback && (
-                              <div className="mt-3 p-3 rounded-lg bg-[var(--surface)] border border-[var(--border-subtle)] text-sm shadow-sm relative">
-                                <span className="absolute -top-2 left-3 bg-[var(--surface)] px-1 text-[10px] font-bold text-error uppercase tracking-wider">Причина недовольства</span>
-                                <p className="text-text-main italic">"{r.owner_feedback}"</p>
+                              <div className="mt-5 border-l-4 border-red-500 bg-red-50 dark:bg-red-950/20 p-4 rounded-r-xl">
+                                <div className="flex items-start gap-3">
+                                  <RiErrorWarningFill className="h-5 w-5 text-red-500 shrink-0 mt-0.5" />
+                                  <div className="w-full">
+                                    <p className="text-sm text-gray-900 dark:text-gray-100 leading-relaxed font-medium">{r.owner_feedback}</p>
+                                    <div className="mt-4 flex items-center justify-between border-t border-red-200/50 dark:border-red-900/30 pt-3">
+                                      <span className={`text-[11px] font-bold uppercase tracking-wider ${r.is_resolved ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
+                                        {r.is_resolved ? '✓ Улажено' : '⚠ В работе'}
+                                      </span>
+                                      <button
+                                        onClick={(e) => { e.preventDefault(); handleToggleResolve(r.id, r.is_resolved); }}
+                                        className="px-4 py-2 rounded-lg text-xs font-bold bg-white dark:bg-zinc-900 border border-gray-300 dark:border-zinc-700 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-900/30 hover:text-green-700 dark:hover:text-green-400 transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500/30"
+                                      >
+                                        {r.is_resolved ? 'Отменить статус' : 'Отметить как улаженное'}
+                                      </button>
+                                    </div>
+                                  </div>
+                                </div>
                               </div>
                             )}
 
                             {r.rating !== null && r.rating >= 4 && r.generated_review && (
-                              <div className="mt-3 ai-glow-effect rounded-xl p-3 text-xs italic text-[var(--brand)]">
-                                "{r.generated_review}"
+                              <div className="mt-5 text-sm text-gray-900 dark:text-gray-100 leading-relaxed not-italic bg-slate-50 dark:bg-zinc-800/40 p-4 rounded-xl border border-[var(--border-subtle)]">
+                                {r.generated_review}
                               </div>
                             )}
 
-                            {r.rating !== null && r.rating <= 3 && (
-                              <div className="mt-4 pt-4 border-t border-[var(--border-subtle)] flex items-center justify-between">
-                                <span className={`text-xs font-bold uppercase tracking-wider ${r.is_resolved ? 'text-emerald-500' : 'text-error'}`}>
-                                  {r.is_resolved ? '✓ Улажено' : '⚠ Требует внимания'}
-                                </span>
-                                <button
-                                  onClick={() => handleToggleResolve(r.id, r.is_resolved)}
-                                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${r.is_resolved ? 'bg-[var(--surface)] text-text-muted border border-[var(--border-subtle)] hover:bg-slate-100 dark:hover:bg-zinc-800' : 'bg-error text-white hover:bg-error-hover shadow-sm'}`}
-                                >
-                                  {r.is_resolved ? 'Вернуть в работу' : 'Отметить как улаженное'}
-                                </button>
+                            {r.rating !== null && r.rating <= 3 && !r.owner_feedback && (
+                              <div className="mt-5 text-sm text-slate-400 italic">
+                                Клиент не оставил текстовый комментарий.
                               </div>
                             )}
                           </li>
