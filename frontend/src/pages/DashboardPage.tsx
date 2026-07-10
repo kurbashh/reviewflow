@@ -971,9 +971,99 @@ export function DashboardPage({
                   </div>
                 </section>
 
-                {/* Master Analytics Leaderboard */}
-                {masters.length > 0 && (
-                  <section className="rounded-card bg-[var(--surface)] shadow-sm p-6 sm:p-8">
+                {/* Master Analytics Leaderboard & Recent Reviews */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start mt-8">
+                  {/* Left Column: Recent Reviews List */}
+                  <div className="lg:col-span-7 flex flex-col gap-6">
+                    {/* Reviews List */}
+                  <CardShell>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="text-lg font-semibold text-text-main">Последние отзывы</h3>
+                        <p className="mt-1 text-sm text-text-muted">Недавние ответы и оценки клиентов</p>
+                      </div>
+                      <button
+                        onClick={() => setActiveTab("reviews")}
+                        className="text-xs font-bold text-brand hover:text-brand-hover transition-colors"
+                      >
+                        Смотреть все
+                      </button>
+                    </div>
+
+                    <ul className="mt-6 space-y-4">
+                      {!reviewsData || reviewsData.reviews.length === 0 ? (
+                        <p className="text-center text-xs text-text-muted py-8">Отзывов пока нет.</p>
+                      ) : (
+                        reviewsData.reviews.slice(0, 4).map((r) => (
+                          <li
+                            key={r.id}
+                            className="relative bg-[var(--surface)] rounded-2xl border border-[var(--border-subtle)] p-5 shadow-sm transition-shadow hover:shadow-md"
+                          >
+                            {/* Master Badge in Top Right */}
+                            {r.master_name && (
+                              <div className="absolute top-5 right-5 inline-flex items-center rounded-md bg-slate-100 dark:bg-zinc-800 px-2 py-1 text-xs font-bold text-slate-700 dark:text-slate-300">
+                                [М] {r.master_name}
+                              </div>
+                            )}
+
+                            {/* Header: Client Name, Date, Service */}
+                            <div className="mb-4 pr-24">
+                              <h4 className="font-bold text-gray-900 dark:text-gray-100 text-lg leading-tight">{r.client_name || "Без имени"}</h4>
+                              <p className="text-xs text-gray-500 dark:text-zinc-400 mt-1.5 font-medium">
+                                {new Date(r.created_at).toLocaleDateString("ru-RU", { day: 'numeric', month: 'long', year: 'numeric' })} • {r.service_name || "Услуга не указана"}
+                              </p>
+                            </div>
+
+                            {/* Rating */}
+                            <div className="mb-4 flex items-center gap-3">
+                              {renderStars(r.rating)}
+                            </div>
+
+                            {/* Content */}
+                            {r.rating !== null && r.rating <= 3 && r.owner_feedback && (
+                              <div className="mt-5 border-l-4 border-red-500 bg-red-50 dark:bg-red-950/20 p-4 rounded-r-xl">
+                                <div className="flex items-start gap-3">
+                                  <RiErrorWarningFill className="h-5 w-5 text-red-500 shrink-0 mt-0.5" />
+                                  <div className="w-full">
+                                    <p className="text-sm text-gray-900 dark:text-gray-100 leading-relaxed font-medium">{r.owner_feedback}</p>
+                                    <div className="mt-4 flex items-center justify-between border-t border-red-200/50 dark:border-red-900/30 pt-3">
+                                      <span className={`text-[11px] font-bold uppercase tracking-wider ${r.is_resolved ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
+                                        {r.is_resolved ? '✓ Улажено' : '⚠ В работе'}
+                                      </span>
+                                      <button
+                                        onClick={(e) => { e.preventDefault(); handleToggleResolve(r.id, r.is_resolved); }}
+                                        className="px-4 py-2 rounded-lg text-xs font-bold bg-white dark:bg-zinc-900 border border-gray-300 dark:border-zinc-700 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-900/30 hover:text-green-700 dark:hover:text-green-400 transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500/30"
+                                      >
+                                        {r.is_resolved ? 'Отменить статус' : 'Отметить как улаженное'}
+                                      </button>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+
+                            {r.rating !== null && r.rating >= 4 && r.generated_review && (
+                              <div className="mt-5 text-sm text-gray-900 dark:text-gray-100 leading-relaxed not-italic ">
+                                {r.generated_review}
+                              </div>
+                            )}
+
+                            {r.rating !== null && r.rating <= 3 && !r.owner_feedback && (
+                              <div className="mt-5 text-sm text-slate-400 italic">
+                                Клиент не оставил текстовый комментарий.
+                              </div>
+                            )}
+                          </li>
+                        ))
+                      )}
+                    </ul>
+                  </CardShell>
+                  </div>
+
+                  {/* Right Column: Master Analytics Leaderboard */}
+                  <div className="lg:col-span-5">
+                    {masters.length > 0 && (
+                      <section className="rounded-card bg-[var(--surface)] shadow-sm p-6 sm:p-8">
                     <div>
                       <h3 className="text-lg font-bold text-text-main">Аналитика по мастерам</h3>
                       <p className="mt-1 text-sm text-text-muted">Эффективность сотрудников (от худших к лучшим) и AI-разбор</p>
@@ -1079,96 +1169,8 @@ export function DashboardPage({
                     )}
                   </section>
                 )}
-                
-                {/* Recent Reviews Summary */}
-                <section className="mt-8">
-                  
-                  {/* Reviews List */}
-                  <CardShell>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="text-lg font-semibold text-text-main">Последние отзывы</h3>
-                        <p className="mt-1 text-sm text-text-muted">Недавние ответы и оценки клиентов</p>
-                      </div>
-                      <button
-                        onClick={() => setActiveTab("reviews")}
-                        className="text-xs font-bold text-brand hover:text-brand-hover transition-colors"
-                      >
-                        Смотреть все
-                      </button>
-                    </div>
-
-                    <ul className="mt-6 space-y-4">
-                      {!reviewsData || reviewsData.reviews.length === 0 ? (
-                        <p className="text-center text-xs text-text-muted py-8">Отзывов пока нет.</p>
-                      ) : (
-                        reviewsData.reviews.slice(0, 4).map((r) => (
-                          <li
-                            key={r.id}
-                            className="relative bg-[var(--surface)] rounded-2xl border border-[var(--border-subtle)] p-5 shadow-sm transition-shadow hover:shadow-md"
-                          >
-                            {/* Master Badge in Top Right */}
-                            {r.master_name && (
-                              <div className="absolute top-5 right-5 inline-flex items-center rounded-md bg-slate-100 dark:bg-zinc-800 px-2 py-1 text-xs font-bold text-slate-700 dark:text-slate-300">
-                                [М] {r.master_name}
-                              </div>
-                            )}
-
-                            {/* Header: Client Name, Date, Service */}
-                            <div className="mb-4 pr-24">
-                              <h4 className="font-bold text-gray-900 dark:text-gray-100 text-lg leading-tight">{r.client_name || "Без имени"}</h4>
-                              <p className="text-xs text-gray-500 dark:text-zinc-400 mt-1.5 font-medium">
-                                {new Date(r.created_at).toLocaleDateString("ru-RU", { day: 'numeric', month: 'long', year: 'numeric' })} • {r.service_name || "Услуга не указана"}
-                              </p>
-                            </div>
-
-                            {/* Rating */}
-                            <div className="mb-4 flex items-center gap-3">
-                              {renderStars(r.rating)}
-                            </div>
-
-                            {/* Content */}
-                            {r.rating !== null && r.rating <= 3 && r.owner_feedback && (
-                              <div className="mt-5 border-l-4 border-red-500 bg-red-50 dark:bg-red-950/20 p-4 rounded-r-xl">
-                                <div className="flex items-start gap-3">
-                                  <RiErrorWarningFill className="h-5 w-5 text-red-500 shrink-0 mt-0.5" />
-                                  <div className="w-full">
-                                    <p className="text-sm text-gray-900 dark:text-gray-100 leading-relaxed font-medium">{r.owner_feedback}</p>
-                                    <div className="mt-4 flex items-center justify-between border-t border-red-200/50 dark:border-red-900/30 pt-3">
-                                      <span className={`text-[11px] font-bold uppercase tracking-wider ${r.is_resolved ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
-                                        {r.is_resolved ? '✓ Улажено' : '⚠ В работе'}
-                                      </span>
-                                      <button
-                                        onClick={(e) => { e.preventDefault(); handleToggleResolve(r.id, r.is_resolved); }}
-                                        className="px-4 py-2 rounded-lg text-xs font-bold bg-white dark:bg-zinc-900 border border-gray-300 dark:border-zinc-700 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-900/30 hover:text-green-700 dark:hover:text-green-400 transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500/30"
-                                      >
-                                        {r.is_resolved ? 'Отменить статус' : 'Отметить как улаженное'}
-                                      </button>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            )}
-
-                            {r.rating !== null && r.rating >= 4 && r.generated_review && (
-                              <div className="mt-5 text-sm text-gray-900 dark:text-gray-100 leading-relaxed not-italic bg-slate-50 dark:bg-zinc-800/40 p-4 rounded-xl border border-[var(--border-subtle)]">
-                                {r.generated_review}
-                              </div>
-                            )}
-
-                            {r.rating !== null && r.rating <= 3 && !r.owner_feedback && (
-                              <div className="mt-5 text-sm text-slate-400 italic">
-                                Клиент не оставил текстовый комментарий.
-                              </div>
-                            )}
-                          </li>
-                        ))
-                      )}
-                    </ul>
-                  </CardShell>
-
-
-                </section>
+                  </div>
+                </div>
               </div>
             )}
 
