@@ -23,8 +23,7 @@ export function Sidebar({
   setActiveTab: (tab: string) => void;
 }) {
   return (
-
-    <aside className="flex shrink-0 items-center justify-between md:justify-start bg-[var(--surface)] transition-colors border-t md:border-t-0 md:border-r border-[var(--border-subtle)] w-full h-[64px] md:h-full flex-row px-2 sm:px-4 md:w-[88px] md:flex-col md:px-0 md:py-8 lg:w-[104px] z-40">
+    <aside className="flex shrink-0 items-center justify-between md:justify-start bg-[var(--surface)] transition-colors border-t md:border-t-0 md:border-r border-[var(--border-subtle)] w-full h-[64px] md:h-auto flex-row px-2 sm:px-4 md:w-[88px] md:flex-col md:px-0 md:py-8 lg:w-[104px] z-40">
       
       {/* Desktop Logo */}
       <div className="hidden md:flex flex-col items-center">
