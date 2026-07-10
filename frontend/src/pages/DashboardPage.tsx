@@ -737,54 +737,56 @@ export function DashboardPage({
             {activeTab === "overview" && stats && (
               <div className="space-y-8">
                 
-                {/* Overview & Metrics Layout */}
-                <div className="grid gap-[var(--spacing-fluid-lg)] lg:grid-cols-2 xl:grid-cols-[1fr_300px_300px]">
-                  {/* Left Column: Welcome & Volume */}
-                  <div className="space-y-[var(--spacing-fluid-md)]">
-                    <section className="rounded-card bg-[var(--surface)] shadow-sm p-6 sm:p-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                      <div className="flex items-center gap-4">
-                        <div className="relative flex h-3 w-3 shrink-0">
-                          {(!billing?.is_manually_paused && (billing?.status !== "churned" || billing?.is_lifetime_access)) ? (
-                            <>
-                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--success)] opacity-75"></span>
-                              <span className="relative inline-flex rounded-full h-3 w-3 bg-[var(--success)]"></span>
-                            </>
-                          ) : (
-                            <span className="relative inline-flex rounded-full h-3 w-3 bg-orange-500"></span>
-                          )}
-                        </div>
-                        <h2 className="text-2xl font-bold text-text-main leading-tight">
-                          {(!billing?.is_manually_paused && (billing?.status !== "churned" || billing?.is_lifetime_access)) 
-                            ? "Сбор отзывов активен" 
-                            : "Сбор отзывов приостановлен"}
-                        </h2>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        {billing?.is_manually_paused && (
-                          <button
-                            onClick={handleTogglePause}
-                            className="inline-flex min-h-[44px] items-center justify-center rounded-full bg-[var(--brand)] px-6 py-2 text-sm font-semibold text-[var(--surface)] transition-all hover:opacity-90 active:scale-[0.96]"
-                          >
-                            Возобновить сбор
-                          </button>
-                        )}
-                        <button
-                          onClick={() => setActiveTab("settings")}
-                          className="inline-flex min-h-[44px] items-center justify-center rounded-full border border-[var(--border-subtle)] bg-transparent px-6 py-2 text-sm font-semibold text-text-main transition-all hover:bg-slate-50 dark:hover:bg-zinc-800/50"
-                        >
-                          Настроить интеграцию
-                        </button>
-                      </div>
-                    </section>
+                {/* Welcome Header */}
+                <section className="rounded-card bg-[var(--surface)] shadow-sm p-6 sm:p-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                  <div className="flex items-center gap-4">
+                    <div className="relative flex h-3 w-3 shrink-0">
+                      {(!billing?.is_manually_paused && (billing?.status !== "churned" || billing?.is_lifetime_access)) ? (
+                        <>
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--success)] opacity-75"></span>
+                          <span className="relative inline-flex rounded-full h-3 w-3 bg-[var(--success)]"></span>
+                        </>
+                      ) : (
+                        <span className="relative inline-flex rounded-full h-3 w-3 bg-orange-500"></span>
+                      )}
+                    </div>
+                    <h2 className="text-2xl font-bold text-text-main leading-tight">
+                      {(!billing?.is_manually_paused && (billing?.status !== "churned" || billing?.is_lifetime_access)) 
+                        ? "Сбор отзывов активен" 
+                        : "Сбор отзывов приостановлен"}
+                    </h2>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    {billing?.is_manually_paused && (
+                      <button
+                        onClick={handleTogglePause}
+                        className="inline-flex min-h-[44px] items-center justify-center rounded-full bg-[var(--brand)] px-6 py-2 text-sm font-semibold text-[var(--surface)] transition-all hover:opacity-90 active:scale-[0.96]"
+                      >
+                        Возобновить сбор
+                      </button>
+                    )}
+                    <button
+                      onClick={() => setActiveTab("settings")}
+                      className="inline-flex min-h-[44px] items-center justify-center rounded-full border border-[var(--border-subtle)] bg-transparent px-6 py-2 text-sm font-semibold text-text-main transition-all hover:bg-slate-50 dark:hover:bg-zinc-800/50"
+                    >
+                      Настроить интеграцию
+                    </button>
+                  </div>
+                </section>
 
+                {/* Metrics Grid */}
+                <div className="grid gap-[var(--spacing-fluid-lg)] lg:grid-cols-3">
+                  
+                  {/* Column 1: Risk Zone / Status */}
+                  <div className="space-y-[var(--spacing-fluid-md)] h-full">
                     {masters.filter(m => m.negative_count > 0 || m.avg_rating < 4.0).length > 0 ? (
-                      <div className="rounded-card bg-red-50 dark:bg-red-950/20 shadow-sm p-6 sm:p-8 border border-red-100 dark:border-red-900/30">
-                        <h3 className="text-sm font-bold text-red-800 dark:text-red-400 uppercase tracking-wider mb-4 flex items-center gap-2">
-                          <RiErrorWarningFill className="w-5 h-5" /> Зона риска (Внимание)
+                      <div className="rounded-card bg-white dark:bg-zinc-900 shadow-sm p-6 sm:p-8 border-l-4 border-l-red-500 border-y border-r border-[var(--border-subtle)] h-full">
+                        <h3 className="text-sm font-bold text-red-600 dark:text-red-500 uppercase tracking-wider mb-4 flex items-center gap-2">
+                          <RiErrorWarningFill className="w-5 h-5" /> Требует внимания
                         </h3>
                         <ul className="space-y-3">
                           {masters.filter(m => m.negative_count > 0 || m.avg_rating < 4.0).slice(0, 3).map(m => (
-                            <li key={m.name} className="flex items-center justify-between bg-white dark:bg-zinc-900 rounded-lg p-3 border border-red-100 dark:border-red-900/20 shadow-sm">
+                            <li key={m.name} className="flex items-center justify-between bg-slate-50 dark:bg-zinc-800/50 rounded-lg p-3 border border-[var(--border-subtle)] shadow-sm">
                               <div className="flex items-center gap-3">
                                 <Avatar name={m.name} className="h-8 w-8 text-[10px]" />
                                 <div>
@@ -792,20 +794,21 @@ export function DashboardPage({
                                   <p className="text-xs text-red-600 dark:text-red-400 font-medium">{m.negative_count > 0 ? `${m.negative_count} жалоб(ы)` : 'Низкий рейтинг'}</p>
                                 </div>
                               </div>
-                              <span className="flex items-center gap-1 text-sm font-bold text-error">
-                                <RiStarFill className="w-4 h-4" /> {m.avg_rating.toFixed(1)}
+                              <span className="flex items-center gap-1 text-sm font-bold text-text-main">
+                                <RiStarFill className="w-4 h-4 text-slate-300 dark:text-zinc-600" /> 
+                                <span className="text-red-600 dark:text-red-500">{m.avg_rating.toFixed(1)}</span>
                               </span>
                             </li>
                           ))}
                         </ul>
                       </div>
                     ) : (
-                      <div className="rounded-card bg-emerald-50 dark:bg-emerald-950/20 shadow-sm p-6 sm:p-8 border border-emerald-100 dark:border-emerald-900/30 flex flex-col items-center justify-center text-center">
+                      <div className="rounded-card bg-white dark:bg-zinc-900 shadow-sm p-6 sm:p-8 border-l-4 border-l-emerald-500 border-y border-r border-[var(--border-subtle)] h-full flex flex-col items-center justify-center text-center">
                         <RiCheckLine className="w-10 h-10 text-emerald-500 mb-3" />
-                        <h3 className="text-sm font-bold text-emerald-800 dark:text-emerald-400 uppercase tracking-wider mb-1">
+                        <h3 className="text-sm font-bold text-emerald-600 dark:text-emerald-500 uppercase tracking-wider mb-1">
                           Все отлично
                         </h3>
-                        <p className="text-xs text-emerald-600 dark:text-emerald-500/80">
+                        <p className="text-xs text-text-muted">
                           Жалоб нет, мастера работают на 5 звезд!
                         </p>
                       </div>
@@ -980,7 +983,7 @@ export function DashboardPage({
                       <table className="w-full border-collapse text-left text-sm">
                         <thead>
                           <tr className="border-b border-[var(--border-subtle)] bg-slate-50 dark:bg-zinc-800/30 text-xs font-semibold uppercase tracking-wider text-text-muted">
-                            <th className="py-3 pl-4 w-1/3">Мастер</th>
+                            <th className="py-3 pl-4 w-auto">Мастер</th>
                             <th className="py-3">Балл</th>
                             <th className="py-3 text-center">Сгенерировано</th>
                             <th className="py-3 text-center">Перехвачено</th>
@@ -988,8 +991,8 @@ export function DashboardPage({
                           </tr>
                         </thead>
                         <tbody>
-                          {[...masters].sort((a, b) => a.avg_rating - b.avg_rating).map(master => (
-                            <tr key={master.name} className={`border-b last:border-0 border-[var(--border-subtle)] hover:bg-slate-50 dark:hover:bg-zinc-800/40 transition-colors ${selectedMaster === master.name ? 'bg-slate-50 dark:bg-zinc-800/60' : ''}`}>
+                          {[...masters].sort((a, b) => a.avg_rating - b.avg_rating).map((master, idx) => (
+                            <tr key={master.name} className={`border-b last:border-0 border-[var(--border-subtle)] hover:bg-slate-50 dark:hover:bg-zinc-800/40 transition-colors ${idx % 2 === 0 ? 'bg-white dark:bg-zinc-900' : 'bg-slate-50/50 dark:bg-zinc-800/20'} ${selectedMaster === master.name ? 'bg-slate-100 dark:bg-zinc-800/80' : ''}`}>
                               <td className="py-3 pl-4">
                                 <div className="flex items-center gap-3">
                                   <Avatar name={master.name} className="h-8 w-8 shrink-0" />
@@ -997,18 +1000,23 @@ export function DashboardPage({
                                 </div>
                               </td>
                               <td className="py-3">
-                                <span className={`inline-flex items-center gap-1 font-bold ${master.avg_rating < 4 ? 'text-error' : 'text-emerald-500'}`}>
-                                  <RiStarFill className="w-4 h-4" /> {master.avg_rating.toFixed(1)}
+                                <span className="inline-flex items-center gap-1 font-bold text-text-main">
+                                  <RiStarFill className="w-4 h-4 text-slate-300 dark:text-zinc-600" />
+                                  <span className={master.avg_rating < 4 ? 'text-red-600 dark:text-red-500' : 'text-emerald-600 dark:text-emerald-500'}>
+                                    {master.avg_rating.toFixed(1)}
+                                  </span>
                                 </span>
                               </td>
                               <td className="py-3 text-center font-mono text-emerald-600 dark:text-emerald-400 font-semibold">{master.positive_count || 0}</td>
-                              <td className="py-3 text-center font-mono text-error font-semibold">{master.negative_count || 0}</td>
+                              <td className="py-3 text-center font-mono text-red-600 dark:text-red-500 font-semibold">{master.negative_count || 0}</td>
                               <td className="py-3 pr-4 text-right">
                                 <button
                                   onClick={() => setSelectedMaster(selectedMaster === master.name ? null : master.name)}
-                                  className={`text-xs font-bold transition-colors px-3 py-1.5 rounded-full ${selectedMaster === master.name ? 'bg-slate-200 dark:bg-zinc-700 text-text-main' : 'bg-brand/10 text-brand hover:bg-brand/20'}`}
+                                  className={`group inline-flex items-center justify-center p-2 rounded-lg transition-colors ${selectedMaster === master.name ? 'bg-slate-200 dark:bg-zinc-700 text-text-main' : 'text-slate-400 hover:bg-slate-100 hover:text-brand dark:hover:bg-zinc-800'}`}
+                                  title="Запросить анализ"
                                 >
-                                  {selectedMaster === master.name ? 'Скрыть' : 'Запросить анализ'}
+                                  <span className="text-sm">✨</span>
+                                  <span className="sr-only">AI анализ</span>
                                 </button>
                               </td>
                             </tr>

@@ -200,7 +200,7 @@ export function Avatar({ name, className }: { name: string; className?: string }
 
   return (
     <div
-      className={`flex items-center justify-center rounded-full bg-gradient-to-br from-orange-400 to-orange-600 text-xs font-semibold text-white ${className ?? ""}`}
+      className={`flex items-center justify-center rounded-full bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-zinc-700 text-xs font-semibold ${className ?? ""}`}
       aria-hidden="true"
     >
       {initials}
