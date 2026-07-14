@@ -15,8 +15,6 @@ export function LoginPage({ onLogin, onRegister }: LoginPageProps) {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [showSessionExpired, setShowSessionExpired] = useState(false);
-
-  // Inline Validation States
   const [fieldErrors, setFieldErrors] = useState<{ fullName?: string; email?: string; password?: string }>({});
   const [touched, setTouched] = useState<{ fullName?: boolean; email?: boolean; password?: boolean }>({});
 
@@ -69,8 +67,6 @@ export function LoginPage({ onLogin, onRegister }: LoginPageProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-
-    // Run all validations on submit
     const eErr = validateEmail(email);
     const pErr = validatePassword(password, isLogin);
     const fErr = validateFullName(fullName, isLogin);
@@ -111,17 +107,11 @@ export function LoginPage({ onLogin, onRegister }: LoginPageProps) {
 
   return (
     <div className="relative flex min-h-[100dvh] items-center justify-center overflow-hidden bg-[var(--dashboard-bg)] p-[var(--spacing-fluid-md)] transition-colors duration-200">
-      {/* Animated mesh background */}
       <div className="absolute inset-0 mesh-gradient-flow opacity-20" />
-
-      {/* Floating orbs */}
       <div className="absolute left-[10%] top-[20%] h-72 w-72 rounded-full bg-purple-500/10 blur-3xl animate-pulse" />
       <div className="absolute bottom-[10%] right-[15%] h-96 w-96 rounded-full bg-emerald-500/10 blur-3xl animate-pulse" style={{ animationDelay: "1s" }} />
       <div className="absolute left-[50%] top-[60%] h-64 w-64 rounded-full bg-blue-500/10 blur-3xl animate-pulse" style={{ animationDelay: "2s" }} />
-
-      {/* Main card */}
       <div className="relative z-10 w-full max-w-md">
-        {/* Logo */}
         <div className="mb-8 text-center">
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-500 to-emerald-500 text-xl font-bold text-white shadow-lg">
             RF
@@ -131,10 +121,7 @@ export function LoginPage({ onLogin, onRegister }: LoginPageProps) {
             ИИ-платформа автосбора отзывов
           </p>
         </div>
-
-        {/* Glass card */}
         <div className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface)]/80 backdrop-blur-xl shadow-2xl transition-colors duration-200">
-          {/* Tabs */}
           <div className="flex border-b border-[var(--border-subtle)]">
             <button
               type="button"
@@ -159,24 +146,17 @@ export function LoginPage({ onLogin, onRegister }: LoginPageProps) {
               Регистрация
             </button>
           </div>
-
-          {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-5 p-6">
-            {/* Session expired banner */}
             {showSessionExpired && (
               <div className="rounded-xl bg-blue-500/10 border border-blue-500/20 p-3 text-sm text-blue-600 dark:text-blue-400 text-center">
                 Сессия истекла. Пожалуйста, войдите снова.
               </div>
             )}
-
-            {/* Error message */}
             {error && (
               <div className="rounded-xl bg-red-500/10 border border-red-500/20 p-3 text-sm text-error text-center">
                 {error}
               </div>
             )}
-
-            {/* Full name (register only) */}
             {!isLogin && (
               <div className="group">
                 <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)]">
@@ -203,8 +183,6 @@ export function LoginPage({ onLogin, onRegister }: LoginPageProps) {
                 )}
               </div>
             )}
-
-            {/* Email */}
             <div className="group">
               <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)]">
                 Email
@@ -230,8 +208,6 @@ export function LoginPage({ onLogin, onRegister }: LoginPageProps) {
                 <p className="mt-1.5 text-xs text-error animate-fade-in">{fieldErrors.email}</p>
               )}
             </div>
-
-            {/* Password */}
             <div className="group">
               <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)]">
                 Пароль
@@ -276,8 +252,6 @@ export function LoginPage({ onLogin, onRegister }: LoginPageProps) {
                 </div>
               )}
             </div>
-
-            {/* Submit button */}
             <button
               type="submit"
               disabled={loading}

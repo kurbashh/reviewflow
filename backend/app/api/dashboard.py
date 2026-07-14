@@ -20,7 +20,6 @@ import random
 router = APIRouter()
 
 # --------------------------------------------------------------------------
-# Pydantic Schemas
 # --------------------------------------------------------------------------
 
 class LocationResponse(BaseModel):
@@ -488,8 +487,6 @@ async def get_dashboard_billing(
 
     from datetime import timedelta
     trial_ends = business.created_at + timedelta(days=14)
-
-    # Mock payment amount and link
     amount_due = 15000  # 15,000 KZT
     payment_link = f"https://pay.kaspi.kz/pay/reviewflow?merchant_id=rf_{business.id}&amount={amount_due}"
 

@@ -102,8 +102,6 @@ def seed_db():
             ]
 
             now = datetime.now(timezone.utc)
-            
-            # Generate requests spread over the last 10 days
             for i in range(40):
                 days_ago = random.randint(0, 8)
                 created_time = now - timedelta(days=days_ago, hours=random.randint(0, 23), minutes=random.randint(0, 59))
@@ -112,11 +110,8 @@ def seed_db():
                 client_name = random.choice(names)
                 service = random.choice(services)
                 master = random.choice(masters)
-                
-                # Determine status and rating
                 rand_val = random.random()
                 if rand_val < 0.15:
-                    # PENDING
                     status = ReviewRequestStatus.PENDING
                     rating = None
                     generated_review = None
@@ -125,7 +120,6 @@ def seed_db():
                     responded_at = None
                     completed_at = None
                 elif rand_val < 0.30:
-                    # SENT
                     status = ReviewRequestStatus.SENT
                     rating = None
                     generated_review = None

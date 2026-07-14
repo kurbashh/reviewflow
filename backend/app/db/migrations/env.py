@@ -25,10 +25,6 @@ config = context.config
 # alembic.ini — единая точка правды для секретов, как и во всём проекте.
 # Экранируем '%' в '%%' для предотвращения ошибок интерполяции configparser (при url-encoded паролях).
 config.set_main_option("sqlalchemy.url", settings.async_database_url.replace("%", "%%"))
-
-# Interpret the config file for Python logging.
-# This line sets up loggers basically.
-if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
 # Metadata всех моделей — используется командой `alembic revision --autogenerate`

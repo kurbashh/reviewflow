@@ -40,7 +40,6 @@ class Settings(BaseSettings):
     )
 
     # ------------------------------------------------------------------
-    # Billing
     # ------------------------------------------------------------------
     kaspi_pay_secret: str = Field(
         default="mock_kaspi_secret_for_tests",
@@ -78,7 +77,6 @@ class Settings(BaseSettings):
         return str(self.database_url).replace("postgresql://", "postgresql+psycopg://", 1)
 
     # ------------------------------------------------------------------
-    # Redis / Celery
     # ------------------------------------------------------------------
     redis_url: RedisDsn = Field(default="redis://redis:6379/0")
 
@@ -139,7 +137,6 @@ class Settings(BaseSettings):
         ..., description="Общий секрет для HMAC-подписи входящих вебхуков"
     )
     # ------------------------------------------------------------------
-    # JWT Auth
     # ------------------------------------------------------------------
     jwt_secret_key: str = Field(
         default="change-me-in-production",

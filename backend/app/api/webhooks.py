@@ -50,7 +50,6 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 # --------------------------------------------------------------------------
-# Pydantic Schemas
 # --------------------------------------------------------------------------
 
 class WebhookIntakePayload(BaseModel):

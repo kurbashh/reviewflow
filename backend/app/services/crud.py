@@ -304,8 +304,6 @@ async def get_business_stats(session: AsyncSession, business_id: uuid.UUID) -> d
     )
     daily_res = await session.execute(daily_stmt)
     daily_rows = daily_res.all()
-
-    # Format daily stats in chronological order
     daily_stats = []
     for row in reversed(daily_rows):
         daily_stats.append({
@@ -314,9 +312,6 @@ async def get_business_stats(session: AsyncSession, business_id: uuid.UUID) -> d
             "rated": row.rated,
             "avg_rating": round(float(row.avg_rating), 1) if row.avg_rating is not None else 0.0
         })
-
-    # Fallback default values if no activity is recorded
-    if not daily_stats:
         from datetime import date, timedelta
         today = date.today()
         for i in range(6, -1, -1):
@@ -517,13 +512,9 @@ async def get_business_reviews(
     )
     if rating_lte is not None:
         stmt = stmt.where(ReviewRequest.rating <= rating_lte)
-
-    # Count query
     count_stmt = select(func.count()).select_from(stmt.subquery())
     count_res = await session.execute(count_stmt)
     total_count = count_res.scalar_one() or 0
-
-    # Limit and Offset query
     stmt = stmt.limit(limit).offset(offset)
     res = await session.execute(stmt)
     reviews = res.scalars().all()

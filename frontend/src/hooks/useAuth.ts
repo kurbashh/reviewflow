@@ -39,8 +39,6 @@ export function useAuth() {
     }
     setState((prev) => ({ ...prev, token }));
   }, []);
-
-  // Fetch current user on mount or token change
   useEffect(() => {
     if (!state.token) {
       setState({ user: null, token: null, loading: false });

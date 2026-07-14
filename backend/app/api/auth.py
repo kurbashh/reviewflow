@@ -29,7 +29,6 @@ router = APIRouter(prefix="/api/auth", tags=["auth"])
 
 
 # --------------------------------------------------------------------------
-# Pydantic Schemas
 # --------------------------------------------------------------------------
 
 class RegisterRequest(BaseModel):
@@ -77,7 +76,6 @@ class UserResponse(BaseModel):
 
 
 # --------------------------------------------------------------------------
-# Helpers
 # --------------------------------------------------------------------------
 
 def _hash_password(password: str) -> str:
@@ -111,7 +109,6 @@ async def check_pwned_password(password: str) -> bool:
 
 
 # --------------------------------------------------------------------------
-# Endpoints
 # --------------------------------------------------------------------------
 
 @router.post("/register", response_model=TokenResponse, status_code=status.HTTP_201_CREATED)

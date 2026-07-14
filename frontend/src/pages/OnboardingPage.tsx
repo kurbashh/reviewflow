@@ -16,16 +16,12 @@ export function OnboardingPage({ onComplete }: OnboardingProps) {
   const [countdown, setCountdown] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  // Auto-advance from welcome step after 2.5 seconds
   useEffect(() => {
     if (step === 1) {
       const timer = setTimeout(() => setStep(2), 2500);
       return () => clearTimeout(timer);
     }
   }, [step]);
-
-  // Countdown timer
   useEffect(() => {
     let timer: number;
     if (countdown > 0) {
@@ -83,8 +79,6 @@ export function OnboardingPage({ onComplete }: OnboardingProps) {
         const err = await res.json();
         throw new Error(err.detail || "Неверный код");
       }
-
-      // Simulate a small delay for the Windows-like setup effect
       setTimeout(() => {
         onComplete();
       }, 2000);
@@ -98,16 +92,11 @@ export function OnboardingPage({ onComplete }: OnboardingProps) {
 
   return (
     <div className="relative flex min-h-[100dvh] flex-col items-center justify-center overflow-hidden bg-[var(--dashboard-bg)] p-[var(--spacing-fluid-md)] transition-colors duration-500">
-      {/* Background Mesh */}
       <div className="absolute inset-0 mesh-gradient-flow opacity-30" />
-      
-      {/* Floating orbs for Windows 11 style aesthetic */}
       <div className="absolute top-1/4 left-1/4 h-96 w-96 rounded-full bg-blue-500/20 blur-[100px] animate-pulse" style={{ animationDuration: '8s' }} />
       <div className="absolute bottom-1/4 right-1/4 h-96 w-96 rounded-full bg-purple-500/20 blur-[100px] animate-pulse" style={{ animationDuration: '12s' }} />
 
       <div className="relative z-10 w-full max-w-lg transition-all duration-700">
-        
-        {/* Step 1: Welcome */}
         <div className={`transition-all duration-1000 absolute top-1/2 left-1/2 w-full -translate-x-1/2 -translate-y-1/2 text-center ${step === 1 ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}`}>
           <h1 className="text-5xl font-light tracking-tight text-[var(--text-main)] mb-6">Привет</h1>
           <p className="text-xl text-[var(--text-muted)] animate-pulse">Подготавливаем всё для вас...</p>
@@ -130,7 +119,6 @@ export function OnboardingPage({ onComplete }: OnboardingProps) {
             )}
 
             <div className="relative overflow-hidden px-1 pb-1">
-              {/* Step 2 Input */}
               <div className={`transition-transform duration-500 ${step === 2 ? 'translate-x-0' : '-translate-x-[150%] absolute w-full top-0'}`}>
                 <div className="group relative">
                   <RiStore2Line className="absolute left-5 top-1/2 h-6 w-6 -translate-y-1/2 text-[var(--text-muted)] transition-colors group-focus-within:text-[var(--brand)]" />
@@ -152,8 +140,6 @@ export function OnboardingPage({ onComplete }: OnboardingProps) {
                   Далее <RiArrowRightLine className="h-5 w-5" />
                 </button>
               </div>
-
-              {/* Step 3 Input */}
               <div className={`transition-transform duration-500 ${step === 3 ? 'translate-x-0' : 'translate-x-[150%] absolute w-full top-0'}`}>
                 <div className="group relative">
                   <RiPhoneLine className="absolute left-5 top-1/2 h-6 w-6 -translate-y-1/2 text-[var(--text-muted)] transition-colors group-focus-within:text-[var(--brand)]" />
@@ -183,8 +169,6 @@ export function OnboardingPage({ onComplete }: OnboardingProps) {
                   </button>
                 </div>
               </div>
-
-              {/* Step 4 Input */}
               <div className={`transition-transform duration-500 ${step === 4 ? 'translate-x-0' : 'translate-x-[150%] absolute w-full top-0'}`}>
                 <div className="group relative">
                   <input
@@ -232,8 +216,6 @@ export function OnboardingPage({ onComplete }: OnboardingProps) {
             </div>
           </div>
         </div>
-
-        {/* Step 5: Loading / Setup effect */}
         <div className={`transition-all duration-1000 absolute top-1/2 left-1/2 w-full -translate-x-1/2 -translate-y-1/2 text-center ${step === 5 ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}`}>
           <div className="mx-auto mb-8 h-14 w-14 animate-spin rounded-full border-4 border-[var(--border-subtle)] border-t-[var(--brand)]" />
           <h1 className="text-3xl font-light tracking-tight text-[var(--text-main)] mb-3">Это займёт всего пару секунд</h1>

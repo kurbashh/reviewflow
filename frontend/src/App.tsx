@@ -22,11 +22,7 @@ export default function App() {
       setShowExpiredModal(true);
     });
   }, []);
-
-  // Determine businessId from user's businesses (first one)
   const businessId = user?.businesses?.[0]?.id || "";
-
-  // Determine content based on state
   let content = null;
   if (loading) {
     content = (

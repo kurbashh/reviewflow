@@ -133,7 +133,6 @@ const renderSvgChart = (
 
   return (
     <svg className="w-full h-48" viewBox={`0 0 ${width} ${height}`}>
-      {/* Grid Lines */}
       {[0, 0.25, 0.5, 0.75, 1].map((r, idx) => {
         const y = padding + chartHeight * r;
         const val = Math.round(maxVal * (1 - r));
@@ -144,12 +143,8 @@ const renderSvgChart = (
           </g>
         );
       })}
-      
-      {/* Lines */}
       <polyline fill="none" stroke={line1Color} strokeWidth={line2Key ? "2.5" : "3"} strokeDasharray={line2Key ? "5 5" : "none"} strokeLinecap="round" strokeLinejoin="round" points={points1} />
       {points2 && <polyline fill="none" stroke={line2Color} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" points={points2} />}
-
-      {/* Axis Labels */}
       {data.map((d, i) => {
         const x = padding + (i * chartWidth) / (data.length - 1);
         const dateParts = d.date.split("-");
@@ -179,7 +174,6 @@ export function DashboardPage({
   refreshUser: () => void;
   onLogout?: () => void;
 }) {
-  // Loading & State
   const [stats, setStats] = useState<Stats | null>(null);
   const [reviewsData, setReviewsData] = useState<{ reviews: Review[]; total_count: number } | null>(null);
   const [settings, setSettings] = useState<SettingsData | null>(null);
@@ -201,19 +195,13 @@ export function DashboardPage({
       localStorage.setItem("rf_theme", "light");
     }
   }, [darkMode]);
-
-  // Master Analytics State
   const [masters, setMasters] = useState<MasterSummary[]>([]);
   const [selectedMaster, setSelectedMaster] = useState<string | null>(null);
   const [masterStats, setMasterStats] = useState<MasterStats | null>(null);
   const [loadingMasterStats, setLoadingMasterStats] = useState(false);
-
-  // Reviews Tab Filters & Pagination
   const [reviewFilter, setReviewFilter] = useState<"all" | "negative">("all");
   const [reviewsOffset, setReviewsOffset] = useState(0);
   const REVIEWS_LIMIT = 10;
-
-  // Locations Tab State
   const [newLocName, setNewLocName] = useState("");
   const [newLocSlug, setNewLocSlug] = useState("");
   const [newLocGis, setNewLocGis] = useState("");
@@ -250,8 +238,6 @@ export function DashboardPage({
       if (locTouched.slug) setLocFieldErrors(prev => ({ ...prev, slug: validateLocSlug(formatted) }));
     }
   };
-
-  // Settings Tab State
   const [settingsForm, setSettingsForm] = useState({
     name: "",
     category: "",
@@ -281,8 +267,6 @@ export function DashboardPage({
       setSettingsFieldErrors(prev => ({ ...prev, [field as "name" | "category" | "phone"]: validateSettingsField(val) }));
     }
   };
-
-  // Profile Form State
   const [profileForm, setProfileForm] = useState({
     full_name: user?.full_name || "",
     email: user?.email || "",
@@ -318,8 +302,6 @@ export function DashboardPage({
   const handleProfileChange = (field: keyof typeof profileForm, val: string) => {
     setProfileForm(prev => ({ ...prev, [field]: val }));
   };
-
-  // Fetch functions
   const fetchStats = async () => {
     try {
       const res = await apiFetch(`${API_BASE}/${businessId}/stats`);
@@ -402,8 +384,6 @@ export function DashboardPage({
       setError(err.message);
     }
   };
-
-  // Re-fetch data on activeTab or businessId change
   useEffect(() => {
     setLoading(true);
     setError(null);
@@ -424,15 +404,11 @@ export function DashboardPage({
     };
     loadData();
   }, [activeTab, businessId]);
-
-  // Handle Review Filter switch
   const handleReviewFilterChange = (filter: "all" | "negative") => {
     setReviewFilter(filter);
     setReviewsOffset(0);
     fetchReviews(0, filter === "negative");
   };
-
-  // Handle Review Pagination
   const handleReviewsPageChange = (direction: "prev" | "next") => {
     const newOffset = direction === "prev"
       ? Math.max(0, reviewsOffset - REVIEWS_LIMIT)
@@ -440,8 +416,6 @@ export function DashboardPage({
     setReviewsOffset(newOffset);
     fetchReviews(newOffset, reviewFilter === "negative");
   };
-
-  // Handle Review Resolution Toggle
   const handleToggleResolve = async (reviewId: string, currentStatus: boolean = false) => {
     if (!businessId) return;
     try {
@@ -463,14 +437,11 @@ export function DashboardPage({
       console.error(err.message);
     }
   };
-
-  // Create or Update Location
   const handleSaveLocation = async (e: React.FormEvent) => {
     e.preventDefault();
     setLocError(null);
     try {
       if (editingLocId) {
-        // Update
         const res = await apiFetch(`${API_BASE}/${businessId}/locations/${editingLocId}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -482,7 +453,6 @@ export function DashboardPage({
         });
         if (!res.ok) throw new Error("Не удалось обновить локацию");
       } else {
-        // Create
         const res = await apiFetch(`${API_BASE}/${businessId}/locations`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -498,7 +468,6 @@ export function DashboardPage({
           throw new Error(errData.detail || "Не удалось создать локацию");
         }
       }
-      // Reset & refresh
       setNewLocGis("");
       setNewLocYandex("");
       setEditingLocId(null);
@@ -508,8 +477,6 @@ export function DashboardPage({
       setLocError(err.message);
     }
   };
-
-  // Delete Location
   const handleDeleteLocation = (locId: string) => {
     setLocToDelete(locId);
   };
@@ -528,8 +495,6 @@ export function DashboardPage({
       setLocToDelete(null);
     }
   };
-
-  // Start Editing Location
   const handleStartEditLocation = (loc: Location) => {
     setEditingLocId(loc.id);
     setNewLocName(loc.name);
@@ -538,8 +503,6 @@ export function DashboardPage({
     setNewLocYandex(loc.yandex_maps_url || "");
     setIsLocModalOpen(true);
   };
-
-  // Cancel Editing Location
   const handleCancelEditLocation = () => {
     setEditingLocId(null);
     setNewLocName("");
@@ -548,8 +511,6 @@ export function DashboardPage({
     setNewLocYandex("");
     setIsLocModalOpen(false);
   };
-
-  // Save Settings Form
   const handleSaveSettings = async (e: React.FormEvent) => {
     e.preventDefault();
     setSettingsMsg(null);
@@ -573,8 +534,6 @@ export function DashboardPage({
       setSettingsMsg({ type: "error", text: err.message });
     }
   };
-
-  // Render Star Utility
   const renderStars = (rating: number | null) => {
     if (rating === null) return <span className="text-slate-300">-</span>;
     const starColor = rating <= 3 ? "text-error" : "text-amber-500";
@@ -670,8 +629,6 @@ export function DashboardPage({
   return (
     <DashboardLayout activeTab={activeTab} setActiveTab={setActiveTab}>
       <div className="space-y-8">
-        
-        {/* Header */}
         <header className="sticky top-0 z-30 -mx-[var(--spacing-fluid-md)] px-[var(--spacing-fluid-md)] lg:-mx-[var(--spacing-fluid-lg)] lg:px-[var(--spacing-fluid-lg)] pt-[var(--spacing-fluid-md)] lg:pt-[var(--spacing-fluid-lg)] pb-4 bg-[var(--dashboard-bg)] flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between border-b border-[var(--border-subtle)] mb-8">
           <div>
             <p className="text-sm font-semibold tracking-wide text-brand uppercase"> ReviewFlow.kz</p>
@@ -706,8 +663,6 @@ export function DashboardPage({
             </button>
           </div>
         </header>
-
-        {/* Global Loading / Error */}
         {loading && (
           <div className="flex h-64 items-center justify-center rounded-3xl bg-[var(--surface)] border border-[var(--border-subtle)] shadow-soft transition-colors duration-200">
             <div className="text-center">
@@ -729,15 +684,10 @@ export function DashboardPage({
             </button>
           </div>
         )}
-
-        {/* TABS CONTENT */}
         {!loading && !error && (
           <>
-            {/* OVERVIEW TAB */}
             {activeTab === "overview" && stats && (
               <div className="space-y-8">
-                
-                {/* Welcome Header */}
                 <section className="rounded-card bg-[var(--surface)] shadow-sm p-6 sm:p-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                   <div className="flex items-center gap-4">
                     <div className="relative flex h-3 w-3 shrink-0">
@@ -773,11 +723,7 @@ export function DashboardPage({
                     </button>
                   </div>
                 </section>
-
-                {/* Metrics Grid */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
-                  
-                  {/* Column 1: Risk Zone / Status */}
                   <div className="h-full flex flex-col">
                     {masters.filter(m => m.negative_count > 0 || m.avg_rating < 4.0).length > 0 ? (
                       <div className="rounded-card bg-white dark:bg-zinc-900 shadow-sm p-6 sm:p-8 border border-[var(--border-subtle)] h-full flex flex-col">
@@ -814,8 +760,6 @@ export function DashboardPage({
                       </div>
                     )}
                   </div>
-
-                  {/* Right Column: Rating Highlight */}
                   <div className="h-full flex flex-col">
                     <div className="rounded-card bg-[var(--surface)] p-6 sm:p-8 shadow-sm h-full flex flex-col justify-center">
                       <p className="text-sm font-semibold text-text-muted mb-6 text-center sm:text-left uppercase tracking-wider">Средняя оценка</p>
@@ -841,8 +785,6 @@ export function DashboardPage({
                       </div>
                     </div>
                   </div>
-                  
-                  {/* AI Protection Card -> Conversion Funnel (P0) */}
                   <CardShell className="bg-[var(--surface)] border border-[var(--border-subtle)] shadow-sm relative overflow-hidden flex flex-col justify-between h-full">
                     
                     <div className="relative z-10">
@@ -853,7 +795,6 @@ export function DashboardPage({
                       </p>
                       
                       <div className="flex flex-col gap-2.5">
-                        {/* Step 1 */}
                         <div className="flex items-center justify-between bg-slate-50 dark:bg-zinc-800/50 rounded-xl p-3 border border-[var(--border-subtle)] relative">
                           <div className="flex items-center gap-3">
                             <div className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-200 dark:bg-zinc-700 text-[10px] font-bold text-slate-600 dark:text-slate-300">1</div>
@@ -862,8 +803,6 @@ export function DashboardPage({
                           <span className="text-lg font-bold font-mono text-text-main">{stats.sent}</span>
                           <div className="absolute -bottom-2.5 left-6 h-2.5 w-px bg-[var(--border-subtle)]"></div>
                         </div>
-                        
-                        {/* Step 2 */}
                         <div className="flex items-center justify-between bg-slate-50 dark:bg-zinc-800/50 rounded-xl p-3 border border-[var(--border-subtle)] relative">
                           <div className="flex items-center gap-3">
                             <div className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-200 dark:bg-zinc-700 text-[10px] font-bold text-slate-600 dark:text-slate-300">2</div>
@@ -872,8 +811,6 @@ export function DashboardPage({
                           <span className="text-lg font-bold font-mono text-text-main">{stats.rated}</span>
                           <div className="absolute -bottom-2.5 left-6 h-2.5 w-px bg-[var(--border-subtle)]"></div>
                         </div>
-                        
-                        {/* Step 3 */}
                         <div className="flex items-center justify-between bg-[var(--brand)]/10 rounded-xl p-3 border border-[var(--brand)]/20 relative">
                           <div className="flex items-center gap-3">
                             <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--brand)]/20 text-[10px] font-bold text-brand">3</div>
@@ -882,8 +819,6 @@ export function DashboardPage({
                           <span className="text-lg font-bold font-mono text-text-main">{stats.reviews_completed}</span>
                           <div className="absolute -bottom-2.5 left-6 h-2.5 w-px bg-[var(--brand)]/20"></div>
                         </div>
-                        
-                        {/* Step 4 (Branching) */}
                         <div className="grid grid-cols-2 gap-3 mt-1">
                           <div className="flex flex-col items-center justify-center bg-emerald-50 dark:bg-emerald-500/10 rounded-xl p-3 border border-emerald-500/20 text-center">
                             <span className="text-2xl font-bold font-mono text-emerald-600 dark:text-emerald-400">{Math.max(0, stats.reviews_completed - stats.negative_captured)}</span>
@@ -899,11 +834,7 @@ export function DashboardPage({
                     </div>
                   </CardShell>
                 </div>
-
-                {/* Charts & Locations */}
                 <section className="grid gap-[var(--spacing-fluid-md)] xl:grid-cols-[1.6fr_1fr]">
-                  
-                  {/* Dynamic Line Chart */}
                   <div className="rounded-card bg-[var(--surface)] shadow-sm p-6 sm:p-8">
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                       <div>
@@ -926,8 +857,6 @@ export function DashboardPage({
                       {renderSvgChart(stats.daily_stats, "sent", "rated")}
                     </div>
                   </div>
-
-                  {/* Location Stats */}
                   <div className="rounded-card bg-[var(--surface)] shadow-sm p-6 sm:p-8">
                     <div>
                       <h3 className="text-lg font-bold text-text-main">Показатели по точкам</h3>
@@ -970,12 +899,8 @@ export function DashboardPage({
                     </div>
                   </div>
                 </section>
-
-                {/* Master Analytics Leaderboard & Recent Reviews */}
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start mt-8">
-                  {/* Left Column: Recent Reviews List */}
                   <div className="lg:col-span-7 flex flex-col gap-6">
-                    {/* Reviews List */}
                   <CardShell>
                     <div className="flex items-center justify-between">
                       <div>
@@ -999,7 +924,6 @@ export function DashboardPage({
                             key={r.id}
                             className="relative bg-[var(--surface)] rounded-2xl border border-[var(--border-subtle)] p-5 shadow-sm transition-shadow hover:shadow-md"
                           >
-                            {/* Master Badge in Top Right */}
                             {r.master_name && (
                               <div className="absolute top-5 right-5 inline-flex items-center rounded-md bg-slate-100 dark:bg-zinc-800 px-2 py-1 text-xs font-bold text-slate-700 dark:text-slate-300">
                                 [М] {r.master_name}
@@ -1013,13 +937,9 @@ export function DashboardPage({
                                 {new Date(r.created_at).toLocaleDateString("ru-RU", { day: 'numeric', month: 'long', year: 'numeric' })} • {r.service_name || "Услуга не указана"}
                               </p>
                             </div>
-
-                            {/* Rating */}
                             <div className="mb-4 flex items-center gap-3">
                               {renderStars(r.rating)}
                             </div>
-
-                            {/* Content */}
                             {r.rating !== null && r.rating <= 3 && r.owner_feedback && (
                               <div className="mt-5 border-l-4 border-red-500 bg-red-50 dark:bg-red-950/20 p-4 rounded-r-xl">
                                 <div className="flex items-start gap-3">
@@ -1059,8 +979,6 @@ export function DashboardPage({
                     </ul>
                   </CardShell>
                   </div>
-
-                  {/* Right Column: Master Analytics Leaderboard */}
                   <div className="lg:col-span-5">
                     {masters.length > 0 && (
                       <section className="rounded-card bg-[var(--surface)] shadow-sm p-6 sm:p-8">
@@ -1173,12 +1091,8 @@ export function DashboardPage({
                 </div>
               </div>
             )}
-
-            {/* REVIEWS HISTORY TAB */}
             {activeTab === "reviews" && reviewsData && (
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                
-                {/* Left Column: Reviews List */}
                 <div className="col-span-12 lg:col-span-7 flex flex-col gap-6">
                   <CardShell>
                     <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
@@ -1215,8 +1129,6 @@ export function DashboardPage({
                       ) : (
                         reviewsData.reviews.map((review) => (
                           <div key={review.id} className="relative bg-white dark:bg-zinc-900 rounded-2xl border border-[var(--border-subtle)] p-5 shadow-sm transition-shadow hover:shadow-md">
-                            
-                            {/* Master Badge in Top Right */}
                             {review.master_name && (
                               <div className="absolute top-5 right-5 inline-flex items-center rounded-md bg-slate-100 dark:bg-zinc-800 px-2 py-1 text-xs font-bold text-slate-700 dark:text-slate-300">
                                 [М] {review.master_name}
@@ -1230,8 +1142,6 @@ export function DashboardPage({
                                 {new Date(review.created_at).toLocaleDateString("ru-RU", { day: 'numeric', month: 'long', year: 'numeric' })} • {review.service_name || "Услуга не указана"}
                               </p>
                             </div>
-
-                            {/* Rating */}
                             <div className="mb-4 flex items-center gap-3">
                               {renderStars(review.rating)}
                               <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
@@ -1240,8 +1150,6 @@ export function DashboardPage({
                                 {(review.rating !== null || review.status === "completed") ? "Получен" : "Ожидает"}
                               </span>
                             </div>
-
-                            {/* Content */}
                             {review.rating !== null && review.rating <= 3 && review.owner_feedback ? (
                               <div className="mt-5 border-l-4 border-red-500 bg-red-50 dark:bg-red-950/20 p-4 rounded-r-xl">
                                 <div className="flex items-start gap-3">
@@ -1300,8 +1208,6 @@ export function DashboardPage({
                     </div>
                   </CardShell>
                 </div>
-
-                {/* Right Column: Leaderboard */}
                 <div className="col-span-12 lg:col-span-5">
                   <CardShell className="sticky top-28 bg-[var(--surface)] shadow-sm border border-[var(--border-subtle)]">
                     <h3 className="text-lg font-bold text-text-main mb-6">Рейтинг мастеров</h3>
@@ -1339,11 +1245,8 @@ export function DashboardPage({
                 
               </div>
             )}
-
-            {/* LOCATIONS TAB */}
             {activeTab === "locations" && settings && (
               <div className="space-y-6">
-                {/* Locations list */}
                 <CardShell>
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
@@ -1414,8 +1317,6 @@ export function DashboardPage({
                     )}
                   </div>
                 </CardShell>
-
-                {/* Add/Edit Location form Modal */}
                 {isLocModalOpen && (
                   <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4 transition-all animate-fade-in overflow-y-auto">
                     <div className="w-full max-w-md rounded-3xl bg-[var(--surface)] p-8 shadow-2xl border border-[var(--border-subtle)] transform transition-all scale-100 my-8">
@@ -1508,8 +1409,6 @@ export function DashboardPage({
                 )}
               </div>
             )}
-
-            {/* SETTINGS (ONBOARDING) TAB */}
             {activeTab === "settings" && settings && (
               <CardShell className="max-w-3xl mx-auto">
                 <div>
@@ -1525,8 +1424,6 @@ export function DashboardPage({
                       {settingsMsg.text}
                     </div>
                   )}
-
-                  {/* Section 1: Business Profile */}
                   <div className="space-y-4">
                     <h4 className="text-lg font-semibold text-slate-900 dark:text-white">Профиль бизнеса</h4>
                     
@@ -1571,8 +1468,6 @@ export function DashboardPage({
                       {settingsFieldErrors.phone && <p className="mt-1 text-xs text-error animate-fade-in">{settingsFieldErrors.phone}</p>}
                     </div>
                   </div>
-
-                  {/* Section 2: CRM & Webhooks */}
                   <div className="space-y-4 pt-6 border-t border-slate-100 dark:border-zinc-800">
                     <h4 className="text-lg font-semibold text-slate-900 dark:text-white">Интеграция CRM</h4>
                     
@@ -1627,8 +1522,6 @@ export function DashboardPage({
                       </div>
                     </div>
                   </div>
-
-                  {/* Section 3: Default Map URLs & Alerts */}
                   <div className="space-y-4 pt-6 border-t border-slate-100 dark:border-zinc-800">
                     <h4 className="text-lg font-semibold text-slate-900 dark:text-white">Глобальные ссылки и оповещения</h4>
                     
@@ -1678,12 +1571,8 @@ export function DashboardPage({
                 </form>
               </CardShell>
             )}
-
-            {/* BILLING TAB */}
             {activeTab === "billing" && billing && (
               <div className="max-w-4xl mx-auto space-y-6">
-                
-                {/* Subscription Details Header */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                   <div>
                     <h3 className="text-xl font-bold text-text-main">Управление подпиской</h3>
@@ -1701,7 +1590,6 @@ export function DashboardPage({
                 </div>
 
                 <div className="grid gap-[var(--spacing-fluid-md)] grid-cols-[repeat(auto-fit,minmax(280px,1fr))]">
-                  {/* START Plan */}
                   <div className={`relative rounded-3xl p-6 border border-border-subtle bg-surface transition-all`}>
                     {billing.plan === "light" && <div className="absolute top-0 right-0 rounded-bl-xl rounded-tr-3xl bg-slate-100 dark:bg-zinc-800 px-3 py-1 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Текущий</div>}
                     <div className="min-h-[130px]">
@@ -1718,8 +1606,6 @@ export function DashboardPage({
                       {billing.plan === "light" ? "Активен" : "Выбрать Start"}
                     </button>
                   </div>
-
-                  {/* PRO Plan */}
                   <div className={`relative rounded-3xl p-6 border-2 border-brand bg-brand/5 shadow-lg transform scale-105 z-10 transition-all`}>
                     {billing.plan === "standard" ? (
                       <div className="absolute top-0 right-0 rounded-bl-xl rounded-tr-3xl bg-brand px-3 py-1 text-[10px] font-bold text-white uppercase tracking-wider shadow-sm">Текущий (Популярный)</div>
@@ -1740,8 +1626,6 @@ export function DashboardPage({
                       {billing.plan === "standard" ? "Активен" : "Выбрать Pro"}
                     </button>
                   </div>
-
-                  {/* ENTERPRISE Plan */}
                   <div className={`relative rounded-3xl p-6 border border-border-subtle bg-surface transition-all`}>
                     {billing.plan === "network" && <div className="absolute top-0 right-0 rounded-bl-xl rounded-tr-3xl bg-slate-100 dark:bg-zinc-800 px-3 py-1 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Текущий</div>}
                     <div className="min-h-[130px]">
@@ -1793,8 +1677,6 @@ export function DashboardPage({
 
               </div>
             )}
-
-            {/* PROFILE TAB */}
             {activeTab === "profile" && (
               <div className="max-w-3xl space-y-6">
                 <CardShell>
@@ -1914,8 +1796,6 @@ export function DashboardPage({
           </>
         )}
       </div>
-
-      {/* Delete Location Modal */}
       {locToDelete && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4 transition-all animate-fade-in">
           <div className="w-full max-w-sm rounded-3xl bg-[var(--surface)] p-8 shadow-2xl border border-[var(--border-subtle)] text-center transform transition-all scale-100">
